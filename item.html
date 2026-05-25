@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DoaFácil – Item</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green-deep:  #2D5A27;
+      --green-mid:   #4A7C3F;
+      --green-light: #7BAD6E;
+      --green-pale:  #C8E0C0;
+      --green-bg:    #EDF5EA;
+      --cream:       #F5F0E8;
+      --cream-dark:  #EDE5D5;
+      --text-dark:   #1C2B1A;
+      --text-muted:  #6B7E67;
+      --white:       #FFFFFF;
+      --radius-lg:   18px;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-dark); }
+
+    /* NAV */
+    .top-nav { background: var(--white); border-bottom: 1px solid var(--cream-dark); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-icon { width: 36px; height: 36px; background: var(--green-deep); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .brand-name { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; color: var(--green-deep); }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-link-btn { padding: 7px 16px; border: none; background: transparent; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 500; color: var(--text-muted); cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: background .15s, color .15s; }
+    .nav-link-btn:hover { background: var(--green-bg); color: var(--green-deep); }
+
+    /* BREADCRUMB */
+    .breadcrumb-bar { max-width: 1100px; margin: 0 auto; padding: 20px 24px 0; display: flex; align-items: center; gap: 8px; font-size: .84rem; color: var(--text-muted); }
+    .breadcrumb-bar a { color: var(--green-mid); text-decoration: none; }
+    .breadcrumb-bar a:hover { text-decoration: underline; }
+    .breadcrumb-bar i { font-size: .7rem; }
+
+    /* MAIN */
+    .page-container { max-width: 1100px; margin: 0 auto; padding: 20px 24px 48px; }
+
+    .item-layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; }
+
+    /* LEFT: images + details */
+    .item-gallery {
+      background: var(--cream-dark);
+      border-radius: 24px;
+      height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8rem;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .img-nav {
+      position: absolute;
+      bottom: 18px;
+      display: flex; gap: 8px;
+    }
+    .img-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.5);
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .img-dot.active { background: var(--white); width: 24px; border-radius: 4px; }
+
+    .detail-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(45,90,39,.07);
+    }
+    .detail-card h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Specs grid */
+    .specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .spec-item { background: var(--cream); border-radius: 12px; padding: 12px 16px; }
+    .spec-item .s-label { font-size: .74rem; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: var(--text-muted); margin-bottom: 3px; }
+    .spec-item .s-value { font-size: .92rem; font-weight: 500; }
+
+    /* RIGHT: action panel */
+    .action-panel { position: sticky; top: 80px; }
+
+    .action-card {
+      background: var(--white);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 8px 40px rgba(45,90,39,.1);
+      margin-bottom: 16px;
+    }
+
+    .item-title-main {
+      font-family: 'Fraunces', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .item-category-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--green-bg);
+      color: var(--green-deep);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: .78rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .condition-bar {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 16px;
+    }
+    .cond-pip {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .cond-text { font-size: .85rem; font-weight: 500; }
+
+    .location-block {
+      background: var(--cream);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .location-block .loc-icon { font-size: 1.4rem; }
+    .location-block .loc-name { font-weight: 600; font-size: .9rem; }
+    .location-block .loc-sub { font-size: .78rem; color: var(--text-muted); }
+
+    /* Status badge */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: .8rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .status-available { background: #D4EDD0; color: #2D5A27; }
+
+    .btn-reserve {
+      width: 100%;
+      padding: 16px;
+      background: var(--green-deep);
+      color: var(--white);
+      border: none;
+      border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 12px;
+    }
+    .btn-reserve:hover { background: var(--green-mid); }
+    .btn-reserve:active { transform: scale(.98); }
+
+    .btn-whatsapp {
+      width: 100%;
+      padding: 14px;
+      background: #25D366;
+      color: var(--white);
+      border: none;
+      border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .2s;
+      margin-bottom: 12px;
+    }
+    .btn-whatsapp:hover { background: #1ea854; }
+
+    .btn-outline {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all .18s;
+    }
+    .btn-outline:hover { border-color: var(--green-light); color: var(--green-mid); }
+
+    /* Donor mini card */
+    .donor-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 4px 20px rgba(45,90,39,.07);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .donor-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--green-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .donor-info .d-name { font-weight: 700; font-size: .95rem; margin-bottom: 3px; }
+    .donor-info .d-sub { font-size: .78rem; color: var(--text-muted); }
+    .donor-recurrent {
+      display: flex; align-items: center; gap: 4px;
+      font-size: .74rem; font-weight: 600; color: var(--green-deep);
+      background: var(--green-bg);
+      border-radius: 10px;
+      padding: 2px 8px;
+      margin-top: 5px;
+      width: fit-content;
+    }
+
+    /* Related items */
+    .related-scroll {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: thin;
+    }
+    .related-card {
+      flex-shrink: 0;
+      width: 160px;
+      background: var(--white);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 2px 12px rgba(45,90,39,.07);
+      transition: transform .2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .related-card:hover { transform: translateY(-3px); }
+    .rel-img { height: 80px; background: var(--cream-dark); display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+    .rel-body { padding: 10px 12px; }
+    .rel-title { font-size: .82rem; font-weight: 600; }
+    .rel-location { font-size: .72rem; color: var(--text-muted); }
+
+    /* Reserve modal */
+    .modal-content { border-radius: 20px; border: none; }
+    .modal-header { border-bottom: 1px solid var(--cream-dark); padding: 20px 24px; }
+    .modal-body { padding: 24px; }
+    .modal-footer { border-top: 1px solid var(--cream-dark); padding: 16px 24px; }
+
+    @media (max-width: 900px) {
+      .item-layout { grid-template-columns: 1fr; }
+      .action-panel { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAV -->
+  <nav class="top-nav">
+    <a class="brand" href="01-login.html">
+      <div class="brand-icon">🌿</div>
+      <span class="brand-name">DoaFácil</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link-btn" href="02-feed.html"><i class="bi bi-grid"></i> Feed</a>
+      <a class="nav-link-btn" href="03-perfil.html"><i class="bi bi-person"></i> Perfil</a>
+    </div>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar">
+    <a href="02-feed.html">Feed</a>
+    <i class="bi bi-chevron-right"></i>
+    <a href="#">Móveis</a>
+    <i class="bi bi-chevron-right"></i>
+    <span style="color:var(--text-dark)">Sofá de 3 lugares</span>
+  </div>
+
+  <div class="page-container">
+    <div class="item-layout">
+
+      <!-- LEFT COLUMN -->
+      <div>
+        <!-- Gallery -->
+        <div class="item-gallery" id="gallery-main">
+          <span id="gallery-emoji">🛋️</span>
+          <div class="img-nav">
+            <div class="img-dot active" onclick="switchImg(this, '🛋️')"></div>
+            <div class="img-dot" onclick="switchImg(this, '🔍')"></div>
+            <div class="img-dot" onclick="switchImg(this, '📐')"></div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="detail-card">
+          <h3><i class="bi bi-card-text" style="color:var(--green-mid)"></i> Descrição</h3>
+          <p style="color:var(--text-muted);line-height:1.75;font-size:.92rem;">
+            Sofá de 3 lugares em tecido cinza, estrutura de madeira maciça com pés em metal. Apresenta leve desgaste nos braços pelo uso diário, mas a estrutura e o assento estão em ótimas condições.
+          </p>
+          <p style="color:var(--text-muted);line-height:1.75;font-size:.92rem;margin-top:10px;">
+            Perfeito para quem precisa de um sofá funcional para sala ou escritório. Disponível para retirada a combinar. Levo até o térreo do prédio.
+          </p>
+        </div>
+
+        <!-- Specs -->
+        <div class="detail-card">
+          <h3><i class="bi bi-list-check" style="color:var(--green-mid)"></i> Especificações</h3>
+          <div class="specs-grid">
+            <div class="spec-item">
+              <div class="s-label">Categoria</div>
+              <div class="s-value">🪑 Móveis</div>
+            </div>
+            <div class="spec-item">
+              <div class="s-label">Estado</div>
+              <div class="s-value">Bom estado</div>
+            </div>
+            <div class="spec-item">
+              <div class="s-label">Dimensões</div>
+              <div class="s-value">220 × 85 × 90 cm</div>
+            </div>
+            <div class="spec-item">
+              <div class="s-label">Material</div>
+              <div class="s-value">Tecido / Madeira</div>
+            </div>
+            <div class="spec-item">
+              <div class="s-label">Cor</div>
+              <div class="s-value">Cinza claro</div>
+            </div>
+            <div class="spec-item">
+              <div class="s-label">Retirada</div>
+              <div class="s-value">A combinar</div>
+            </div>
+            <div class="spec-item">
+              <div class="s-label">Publicado em</div>
+              <div class="s-value">19 mai. 2026</div>
+            </div>
+            <div class="spec-item">
+              <div class="s-label">Visualizações</div>
+              <div class="s-value">48 visitas</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map placeholder -->
+        <div class="detail-card">
+          <h3><i class="bi bi-map" style="color:var(--green-mid)"></i> Localização aproximada</h3>
+          <div style="background:var(--cream-dark);border-radius:14px;height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-muted);">
+            <i class="bi bi-geo-alt" style="font-size:2.5rem;color:var(--green-light)"></i>
+            <div style="font-weight:600;font-size:.95rem;">Copacabana, Rio de Janeiro – RJ</div>
+            <div style="font-size:.8rem;">Endereço exato informado após reserva</div>
+          </div>
+        </div>
+
+        <!-- Related -->
+        <div class="detail-card">
+          <h3><i class="bi bi-grid" style="color:var(--green-mid)"></i> Itens relacionados</h3>
+          <div class="related-scroll">
+            <a class="related-card" href="#">
+              <div class="rel-img">🪑</div>
+              <div class="rel-body"><div class="rel-title">Mesa escritório</div><div class="rel-location">Centro, RJ</div></div>
+            </a>
+            <a class="related-card" href="#">
+              <div class="rel-img">🛏️</div>
+              <div class="rel-body"><div class="rel-title">Cama solteiro</div><div class="rel-location">Bonsucesso</div></div>
+            </a>
+            <a class="related-card" href="#">
+              <div class="rel-img">🪟</div>
+              <div class="rel-body"><div class="rel-title">Guarda-roupa</div><div class="rel-location">Botafogo</div></div>
+            </a>
+            <a class="related-card" href="#">
+              <div class="rel-img">🪴</div>
+              <div class="rel-body"><div class="rel-title">Prateleiras</div><div class="rel-location">Tijuca</div></div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Action Panel -->
+      <div class="action-panel">
+
+        <!-- Main action card -->
+        <div class="action-card">
+          <div class="item-category-badge">🪑 Móveis</div>
+          <h1 class="item-title-main">Sofá de 3 lugares</h1>
+
+          <div class="condition-bar">
+            <div class="cond-pip" style="background:#4A7C3F"></div>
+            <span class="cond-text" style="color:var(--green-mid);">Bom estado</span>
+          </div>
+
+          <span class="status-pill status-available"><i class="bi bi-check-circle-fill"></i> Disponível</span>
+
+          <div class="location-block">
+            <div class="loc-icon">📍</div>
+            <div>
+              <div class="loc-name">Copacabana</div>
+              <div class="loc-sub">Rio de Janeiro – RJ · aprox. 2.3 km</div>
+            </div>
+          </div>
+
+          <button class="btn-reserve" data-bs-toggle="modal" data-bs-target="#reserveModal">
+            <i class="bi bi-bookmark-check"></i> Reservar este item
+          </button>
+
+          <button class="btn-whatsapp" onclick="alert('Abrindo WhatsApp...')">
+            <i class="bi bi-whatsapp"></i> Contato via WhatsApp
+          </button>
+
+          <button class="btn-outline" onclick="alert('Item adicionado à lista de desejos!')">
+            <i class="bi bi-heart"></i> Salvar na lista de desejos
+          </button>
+        </div>
+
+        <!-- Donor card -->
+        <div class="donor-card">
+          <div class="donor-avatar">👩‍💼</div>
+          <div class="donor-info">
+            <div class="d-name">Maria Clara Souza</div>
+            <div class="d-sub">23 doações realizadas</div>
+            <div class="donor-recurrent">⭐ Doadora Recorrente</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RESERVE MODAL -->
+  <div class="modal fade" id="reserveModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-family:'Fraunces',serif;">Reservar item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div style="display:flex;align-items:center;gap:14px;background:var(--cream);border-radius:14px;padding:14px;margin-bottom:20px;">
+            <span style="font-size:2.5rem">🛋️</span>
+            <div>
+              <div style="font-weight:700">Sofá de 3 lugares</div>
+              <div style="font-size:.82rem;color:var(--text-muted)">Copacabana, RJ · Bom estado</div>
+            </div>
+          </div>
+          <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:16px;">
+            Ao reservar, você sinaliza ao doador que deseja o item. A retirada deve ser combinada diretamente pelo WhatsApp.
+          </p>
+          <div style="margin-bottom:14px;">
+            <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:6px;">Mensagem ao doador (opcional)</label>
+            <textarea class="form-control" rows="3" style="border-radius:12px;border:1.5px solid var(--cream-dark);font-family:'DM Sans',sans-serif;" placeholder="Ex: Posso buscar no sábado pela manhã..."></textarea>
+          </div>
+          <div style="background:var(--green-bg);border-radius:12px;padding:12px 16px;font-size:.83rem;color:var(--green-deep);">
+            <i class="bi bi-info-circle"></i> A reserva expira em 48h se não houver confirmação.
+          </div>
+        </div>
+        <div class="modal-footer" style="gap:10px;">
+          <button type="button" class="btn-outline" style="width:auto;padding:10px 20px;" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn-reserve" style="width:auto;padding:10px 24px;" onclick="confirmReserve()">Confirmar reserva</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const emojis = ['🛋️', '🔍', '📐'];
+
+    function switchImg(dot, emoji) {
+      document.querySelectorAll('.img-dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+      document.getElementById('gallery-emoji').textContent = emoji;
+    }
+
+    function confirmReserve() {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
+      modal.hide();
+      setTimeout(() => {
+        // Update UI
+        document.querySelector('.status-pill').className = 'status-pill';
+        document.querySelector('.status-pill').style.background = '#FFF3CD';
+        document.querySelector('.status-pill').style.color = '#856404';
+        document.querySelector('.status-pill').innerHTML = '<i class="bi bi-hourglass-split"></i> Reservado';
+        alert('✅ Item reservado com sucesso!\nEntre em contato via WhatsApp para combinar a retirada.');
+      }, 300);
+    }
+  </script>
+</body>
+</html>

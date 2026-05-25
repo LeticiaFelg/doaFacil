@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DoaFácil – Feed</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green-deep:  #2D5A27;
+      --green-mid:   #4A7C3F;
+      --green-light: #7BAD6E;
+      --green-pale:  #C8E0C0;
+      --green-bg:    #EDF5EA;
+      --cream:       #F5F0E8;
+      --cream-dark:  #EDE5D5;
+      --text-dark:   #1C2B1A;
+      --text-muted:  #6B7E67;
+      --white:       #FFFFFF;
+      --radius-lg:   18px;
+      --shadow-card: 0 4px 20px rgba(45,90,39,.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ───────────────────────────────────── */
+    .top-nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--cream-dark);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: var(--green-deep);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .brand-name {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--green-deep);
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-link-btn {
+      padding: 7px 16px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      transition: background .15s, color .15s;
+    }
+    .nav-link-btn:hover, .nav-link-btn.active {
+      background: var(--green-bg);
+      color: var(--green-deep);
+    }
+    .nav-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--green-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border: 2px solid var(--green-light);
+    }
+    .impact-toggle-btn {
+      background: var(--green-deep);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: background .2s;
+    }
+    .impact-toggle-btn:hover { background: var(--green-mid); }
+
+    /* ── LAYOUT ───────────────────────────────────── */
+    .main-layout {
+      display: flex;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      gap: 28px;
+    }
+
+    /* ── SIDEBAR ──────────────────────────────────── */
+    .sidebar {
+      width: 280px;
+      flex-shrink: 0;
+    }
+
+    /* Impact Panel */
+    .impact-panel {
+      background: var(--green-deep);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 20px;
+      color: var(--white);
+    }
+    .impact-panel h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .impact-stat {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .impact-stat:last-child { border-bottom: none; }
+    .impact-icon {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,.12);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .impact-info .num {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .impact-info .lbl {
+      font-size: .75rem;
+      color: rgba(255,255,255,.6);
+      letter-spacing: .3px;
+    }
+
+    /* Filters card */
+    .filter-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+    }
+    .filter-card h4 {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 14px;
+    }
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 20px;
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin: 0 4px 8px 0;
+      transition: all .18s;
+      background: transparent;
+    }
+    .filter-chip:hover { border-color: var(--green-light); color: var(--green-mid); }
+    .filter-chip.active {
+      background: var(--green-bg);
+      border-color: var(--green-mid);
+      color: var(--green-deep);
+    }
+
+    /* ── MAIN CONTENT ─────────────────────────────── */
+    .feed-area { flex: 1; min-width: 0; }
+
+    .feed-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .feed-header h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: var(--white);
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 12px;
+      padding: 8px 16px;
+      gap: 10px;
+      width: 280px;
+    }
+    .search-bar input {
+      border: none; outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      color: var(--text-dark);
+      background: transparent;
+      flex: 1;
+    }
+    .search-bar i { color: var(--text-muted); }
+
+    .sort-select {
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 10px;
+      padding: 7px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      color: var(--text-dark);
+      background: var(--white);
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Feed grid */
+    .feed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    /* Item Card */
+    .item-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+    .item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px rgba(45,90,39,.14);
+    }
+    .item-img {
+      height: 160px;
+      background: var(--cream-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .badge-cond {
+      position: absolute;
+      top: 10px; right: 10px;
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 20px;
+    }
+    .badge-otimo  { background: #D4EDD0; color: #2D5A27; }
+    .badge-bom    { background: #FFF3CD; color: #856404; }
+    .badge-usado  { background: #FDE2D4; color: #843c00; }
+
+    .item-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; }
+    .item-category {
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--green-mid);
+      margin-bottom: 5px;
+    }
+    .item-title {
+      font-weight: 600;
+      font-size: .97rem;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .item-desc {
+      font-size: .82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      flex: 1;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .item-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .item-location {
+      font-size: .78rem;
+      color: var(--text-muted);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .reserve-btn {
+      background: var(--green-deep);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 6px 13px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .18s;
+    }
+    .reserve-btn:hover { background: var(--green-mid); }
+
+    /* Donor badge */
+    .donor-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(45,90,39,.08);
+      border-radius: 20px;
+      padding: 3px 8px;
+      font-size: .72rem;
+      color: var(--green-deep);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    /* ── OFFCANVAS IMPACT (mobile) ─────────────────── */
+    .offcanvas-header { border-bottom: 1px solid var(--cream-dark); }
+    .offcanvas { background: var(--white); }
+
+    /* ── RESPONSIVE ───────────────────────────────── */
+    @media (max-width: 992px) {
+      .sidebar { display: none; }
+      .impact-toggle-btn { display: flex; }
+    }
+    @media (min-width: 993px) {
+      .impact-toggle-btn-mobile { display: none !important; }
+    }
+    @media (max-width: 576px) {
+      .main-layout { padding: 16px; }
+      .top-nav { padding: 0 16px; }
+      .feed-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAV -->
+  <nav class="top-nav">
+    <a class="brand" href="01-login.html">
+      <div class="brand-icon">🌿</div>
+      <span class="brand-name">DoaFácil</span>
+    </a>
+
+    <div class="nav-links">
+      <a class="nav-link-btn active" href="02-feed.html"><i class="bi bi-grid"></i> Feed</a>
+      <a class="nav-link-btn" href="03-perfil.html"><i class="bi bi-person"></i> Perfil</a>
+      <a class="nav-link-btn" href="05-historico.html"><i class="bi bi-clock-history"></i> Histórico</a>
+      <!-- Mobile impact toggle -->
+      <button class="impact-toggle-btn impact-toggle-btn-mobile" data-bs-toggle="offcanvas" data-bs-target="#impactOffcanvas">
+        <i class="bi bi-graph-up"></i> Impacto
+      </button>
+      <a href="03-perfil.html" style="text-decoration:none">
+        <div class="nav-avatar">👤</div>
+      </a>
+    </div>
+  </nav>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- Impact Panel -->
+      <div class="impact-panel">
+        <h3><i class="bi bi-bar-chart-fill"></i> Impacto Social</h3>
+
+        <div class="impact-stat">
+          <div class="impact-icon">📦</div>
+          <div class="impact-info">
+            <div class="num" id="stat-itens">4.231</div>
+            <div class="lbl">Itens redistribuídos</div>
+          </div>
+        </div>
+
+        <div class="impact-stat">
+          <div class="impact-icon">👨‍👩‍👧</div>
+          <div class="impact-info">
+            <div class="num" id="stat-familias">1.847</div>
+            <div class="lbl">Famílias beneficiadas</div>
+          </div>
+        </div>
+
+        <div class="impact-stat">
+          <div class="impact-icon">🤝</div>
+          <div class="impact-info">
+            <div class="num" id="stat-doadores">892</div>
+            <div class="lbl">Doadores ativos</div>
+          </div>
+        </div>
+
+        <div class="impact-stat">
+          <div class="impact-icon">🏛️</div>
+          <div class="impact-info">
+            <div class="num" id="stat-inst">67</div>
+            <div class="lbl">Instituições parceiras</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-card">
+        <h4>Categorias</h4>
+        <div>
+          <button class="filter-chip active" onclick="filterCategory(this, 'all')">🔍 Todos</button>
+          <button class="filter-chip" onclick="filterCategory(this, 'moveis')">🪑 Móveis</button>
+          <button class="filter-chip" onclick="filterCategory(this, 'eletro')">🔌 Eletro</button>
+          <button class="filter-chip" onclick="filterCategory(this, 'roupas')">👗 Roupas</button>
+          <button class="filter-chip" onclick="filterCategory(this, 'calcados')">👟 Calçados</button>
+          <button class="filter-chip" onclick="filterCategory(this, 'utensilios')">🍽️ Utensílios</button>
+          <button class="filter-chip" onclick="filterCategory(this, 'escolar')">📚 Escolar</button>
+          <button class="filter-chip" onclick="filterCategory(this, 'brinquedos')">🧸 Brinquedos</button>
+          <button class="filter-chip" onclick="filterCategory(this, 'outros')">📦 Outros</button>
+        </div>
+
+        <h4 style="margin-top:16px;">Disponibilidade</h4>
+        <div>
+          <button class="filter-chip active">✅ Disponível</button>
+          <button class="filter-chip">🕐 Reservado</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- FEED -->
+    <main class="feed-area">
+      <div class="feed-header">
+        <h2>Itens disponíveis</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div class="search-bar">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Buscar item..." oninput="searchItems(this.value)"/>
+          </div>
+          <select class="sort-select" onchange="sortItems(this.value)">
+            <option value="recent">Mais recentes</option>
+            <option value="nearest">Mais próximos</option>
+            <option value="az">A–Z</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Feed Grid (populated by JS) -->
+      <div class="feed-grid" id="feed-grid"></div>
+    </main>
+  </div>
+
+  <!-- OFFCANVAS: Impact (mobile) -->
+  <div class="offcanvas offcanvas-start" id="impactOffcanvas" tabindex="-1">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" style="font-family:'Fraunces',serif;">Impacto Social</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
+          <div style="font-size:2rem;">📦</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">4.231</div>
+          <div style="font-size:.78rem;color:var(--text-muted);">Itens redistribuídos</div>
+        </div>
+        <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
+          <div style="font-size:2rem;">👨‍👩‍👧</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">1.847</div>
+          <div style="font-size:.78rem;color:var(--text-muted);">Famílias beneficiadas</div>
+        </div>
+        <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
+          <div style="font-size:2rem;">🤝</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">892</div>
+          <div style="font-size:.78rem;color:var(--text-muted);">Doadores ativos</div>
+        </div>
+        <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
+          <div style="font-size:2rem;">🏛️</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">67</div>
+          <div style="font-size:.78rem;color:var(--text-muted);">Instituições</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ── MOCK DATA ────────────────────────────────────────────
+    const mockItems = [
+      { id: 1, title: 'Sofá de 3 lugares',      category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🛋️',  condition: 'bom',    condLabel: 'Bom estado',   desc: 'Sofá em tecido cinza, leve desgaste nos braços, estrutura firme.',          location: 'Copacabana, RJ', donor: 'Maria S.',    donorRecurrent: true  },
+      { id: 2, title: 'Guarda-roupa 4 portas',  category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🪟',  condition: 'bom',    condLabel: 'Bom estado',   desc: 'Madeira clara, espelho interno, sem trincas.',                              location: 'Botafogo, RJ',   donor: 'João P.',     donorRecurrent: false },
+      { id: 3, title: 'Micro-ondas 30L',        category: 'eletro',     categoryLabel: 'Eletro',     emoji: '📱',  condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Funcionando perfeitamente, acompanha prato giratório.',                     location: 'Tijuca, RJ',     donor: 'Ana C.',      donorRecurrent: true  },
+      { id: 4, title: 'Kit roupas infantis',    category: 'roupas',     categoryLabel: 'Roupas',     emoji: '👕',  condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Tamanhos 4 a 8 anos, várias peças, bem conservadas.',                      location: 'Méier, RJ',      donor: 'Carlos M.',   donorRecurrent: true  },
+      { id: 5, title: 'Mesa de escritório',     category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🪑',  condition: 'usado',  condLabel: 'Usado',        desc: 'Mesa retangular 120x60cm, arranhões superficiais.',                         location: 'Centro, RJ',     donor: 'Lia F.',      donorRecurrent: false },
+      { id: 6, title: 'Conjunto de panelas',    category: 'utensilios', categoryLabel: 'Utensílios', emoji: '🍳',  condition: 'bom',    condLabel: 'Bom estado',   desc: '5 peças, antiaderente, sem lascas. Cabos firmes.',                          location: 'Realengo, RJ',   donor: 'Paulo T.',    donorRecurrent: false },
+      { id: 7, title: 'Tênis esportivo 42',     category: 'calcados',   categoryLabel: 'Calçados',   emoji: '👟',  condition: 'bom',    condLabel: 'Bom estado',   desc: 'Pouco uso, solado em bom estado.',                                          location: 'Jacarepaguá',    donor: 'Marcos L.',   donorRecurrent: true  },
+      { id: 8, title: 'Livros didáticos',       category: 'escolar',    categoryLabel: 'Escolar',    emoji: '📚',  condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Ensino médio, completos, sem anotações.',                                   location: 'Vila Isabel',    donor: 'Beatriz N.',  donorRecurrent: false },
+      { id: 9, title: 'Cama solteiro',          category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🛏️',  condition: 'bom',    condLabel: 'Bom estado',   desc: 'Cama de madeira com colchão incluso, sem mofos.',                           location: 'Bonsucesso',     donor: 'Fernanda R.', donorRecurrent: true  },
+      { id:10, title: 'Brinquedos variados',    category: 'brinquedos', categoryLabel: 'Brinquedos', emoji: '🧸',  condition: 'bom',    condLabel: 'Bom estado',   desc: 'Caixinha com quebra-cabeças, carrinhos e bonecas.',                         location: 'Sulacap',        donor: 'Renata M.',   donorRecurrent: false },
+      { id:11, title: 'Geladeira 280L',         category: 'eletro',     categoryLabel: 'Eletro',     emoji: '🧊',  condition: 'usado',  condLabel: 'Usado',        desc: 'Funciona bem, pequenas marcas externas.',                                   location: 'Bangu',          donor: 'Hugo S.',     donorRecurrent: true  },
+      { id:12, title: 'Mochila escolar',        category: 'escolar',    categoryLabel: 'Escolar',    emoji: '🎒',  condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Nova, nunca usada, tamanho médio.',                                         location: 'Santa Cruz',     donor: 'Olivia C.',   donorRecurrent: false },
+    ];
+
+    let currentFilter = 'all';
+    let currentSearch = '';
+
+    function renderFeed(items) {
+      const grid = document.getElementById('feed-grid');
+      if (!items.length) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)"><div style="font-size:3rem;margin-bottom:12px">🔍</div><p>Nenhum item encontrado</p></div>';
+        return;
+      }
+      grid.innerHTML = items.map(item => `
+        <a class="item-card" href="04-item.html?id=${item.id}" style="text-decoration:none;color:inherit;">
+          <div class="item-img">
+            <span>${item.emoji}</span>
+            <span class="badge-cond badge-${item.condition}">${item.condLabel}</span>
+          </div>
+          <div class="item-body">
+            <div class="item-category">${item.categoryLabel}</div>
+            ${item.donorRecurrent ? '<div class="donor-badge">⭐ Doador Recorrente</div>' : ''}
+            <div class="item-title">${item.title}</div>
+            <div class="item-desc">${item.desc}</div>
+            <div class="item-footer">
+              <span class="item-location"><i class="bi bi-geo-alt"></i>${item.location}</span>
+              <button class="reserve-btn" onclick="event.preventDefault();alert('Item reservado com sucesso!')">Reservar</button>
+            </div>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    function filterCategory(el, cat) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      currentFilter = cat;
+      applyFilters();
+    }
+
+    function searchItems(val) {
+      currentSearch = val.toLowerCase();
+      applyFilters();
+    }
+
+    function sortItems(val) {
+      applyFilters(val);
+    }
+
+    function applyFilters(sort) {
+      let items = [...mockItems];
+      if (currentFilter !== 'all') items = items.filter(i => i.category === currentFilter);
+      if (currentSearch) items = items.filter(i => i.title.toLowerCase().includes(currentSearch) || i.desc.toLowerCase().includes(currentSearch));
+      if (sort === 'az') items.sort((a,b) => a.title.localeCompare(b.title));
+      renderFeed(items);
+    }
+
+    // Initial render
+    renderFeed(mockItems);
+
+    // Animated counter
+    function animateCounter(el, target) {
+      let current = 0;
+      const step = Math.ceil(target / 60);
+      const interval = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current.toLocaleString('pt-BR');
+        if (current >= target) clearInterval(interval);
+      }, 25);
+    }
+
+    window.addEventListener('load', () => {
+      animateCounter(document.getElementById('stat-itens'), 4231);
+      animateCounter(document.getElementById('stat-familias'), 1847);
+      animateCounter(document.getElementById('stat-doadores'), 892);
+      animateCounter(document.getElementById('stat-inst'), 67);
+    });
+  </script>
+</body>
+</html>

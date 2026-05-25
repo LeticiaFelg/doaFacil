@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DoaFácil – Histórico</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green-deep:  #2D5A27;
+      --green-mid:   #4A7C3F;
+      --green-light: #7BAD6E;
+      --green-pale:  #C8E0C0;
+      --green-bg:    #EDF5EA;
+      --cream:       #F5F0E8;
+      --cream-dark:  #EDE5D5;
+      --text-dark:   #1C2B1A;
+      --text-muted:  #6B7E67;
+      --white:       #FFFFFF;
+      --radius-lg:   18px;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-dark); }
+
+    /* NAV */
+    .top-nav { background: var(--white); border-bottom: 1px solid var(--cream-dark); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-icon { width: 36px; height: 36px; background: var(--green-deep); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .brand-name { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; color: var(--green-deep); }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-link-btn { padding: 7px 16px; border: none; background: transparent; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 500; color: var(--text-muted); cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: background .15s, color .15s; }
+    .nav-link-btn:hover, .nav-link-btn.active { background: var(--green-bg); color: var(--green-deep); }
+
+    /* PAGE */
+    .page-container { max-width: 1100px; margin: 0 auto; padding: 32px 24px 48px; }
+
+    /* USER CONTEXT BAR */
+    .user-context-bar {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 20px rgba(45,90,39,.07);
+    }
+    .ctx-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--green-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      border: 2px solid var(--green-light);
+    }
+    .ctx-info .ctx-name { font-weight: 700; font-size: 1rem; }
+    .ctx-info .ctx-sub { font-size: .8rem; color: var(--text-muted); }
+    .ctx-badge {
+      margin-left: auto;
+      background: var(--green-bg);
+      color: var(--green-deep);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: .78rem;
+      font-weight: 600;
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    /* SUMMARY METRICS */
+    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .metric-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: 0 4px 20px rgba(45,90,39,.07);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .metric-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .metric-icon.green  { background: var(--green-bg); }
+    .metric-icon.yellow { background: #FEF9C3; }
+    .metric-icon.blue   { background: #DBEAFE; }
+    .metric-icon.orange { background: #FEE2E2; }
+    .metric-num {
+      font-family: 'Fraunces', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text-dark);
+    }
+    .metric-lbl { font-size: .78rem; color: var(--text-muted); }
+
+    /* TABS */
+    .tab-area { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .history-tabs {
+      display: flex;
+      background: var(--white);
+      border-radius: 14px;
+      padding: 4px;
+      gap: 0;
+      box-shadow: 0 2px 10px rgba(45,90,39,.06);
+    }
+    .h-tab {
+      padding: 9px 22px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .h-tab.active {
+      background: var(--green-deep);
+      color: var(--white);
+      box-shadow: 0 2px 10px rgba(45,90,39,.2);
+    }
+    .h-tab .tab-count {
+      background: rgba(255,255,255,.25);
+      border-radius: 20px;
+      padding: 1px 7px;
+      font-size: .72rem;
+    }
+    .h-tab:not(.active) .tab-count {
+      background: var(--cream-dark);
+      color: var(--text-muted);
+    }
+
+    /* FILTER ROW */
+    .filter-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .filter-select {
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      background: var(--white);
+      color: var(--text-dark);
+      outline: none;
+      cursor: pointer;
+    }
+    .search-sm {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--white);
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 10px;
+      padding: 8px 14px;
+    }
+    .search-sm input { border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: .85rem; color: var(--text-dark); background: transparent; width: 160px; }
+    .search-sm i { color: var(--text-muted); font-size: .9rem; }
+
+    /* MAIN CONTENT CARD */
+    .content-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 20px rgba(45,90,39,.07);
+      overflow: hidden;
+    }
+
+    /* TABLE HEADER */
+    .table-header {
+      display: grid;
+      padding: 12px 20px;
+      background: var(--cream);
+      border-bottom: 1px solid var(--cream-dark);
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-muted);
+    }
+    .cols-doado    { grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 80px; }
+    .cols-recebido { grid-template-columns: 2fr 1.2fr 1fr 1fr 80px; }
+
+    /* TABLE ROW */
+    .history-row {
+      display: grid;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--cream-dark);
+      align-items: center;
+      transition: background .15s;
+      animation: fadeUp .25s ease;
+    }
+    .history-row:last-child { border-bottom: none; }
+    .history-row:hover { background: var(--green-bg); }
+    @keyframes fadeUp { from { opacity:0;transform:translateY(5px); } to { opacity:1;transform:translateY(0); } }
+
+    /* Item cell */
+    .item-cell { display: flex; align-items: center; gap: 12px; }
+    .item-emoji-thumb {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: var(--cream);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .item-cell-name { font-weight: 600; font-size: .9rem; }
+    .item-cell-cat  { font-size: .75rem; color: var(--text-muted); }
+
+    /* Status pills */
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+    .pill-concluido { background: #D4EDD0; color: #2D5A27; }
+    .pill-reservado { background: #FFF3CD; color: #856404; }
+    .pill-disponivel{ background: #DBEAFE; color: #1E3A5F; }
+    .pill-cancelado { background: #FEE2E2; color: #7F1D1D; }
+
+    /* Action button mini */
+    .btn-mini {
+      border: 1.5px solid var(--cream-dark);
+      background: var(--white);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-mini:hover { border-color: var(--green-light); color: var(--green-mid); background: var(--green-bg); }
+
+    /* Empty state */
+    .empty-state {
+      padding: 64px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .empty-state .e-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-state p { font-size: .9rem; }
+
+    /* Timeline decoration on rows */
+    .row-date { font-size: .82rem; color: var(--text-muted); }
+    .recurrent-row { border-left: 3px solid var(--green-light); }
+
+    @media (max-width: 800px) {
+      .table-header { display: none; }
+      .history-row { grid-template-columns: 1fr; gap: 4px; }
+      .history-row > * { padding: 2px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAV -->
+  <nav class="top-nav">
+    <a class="brand" href="01-login.html">
+      <div class="brand-icon">🌿</div>
+      <span class="brand-name">DoaFácil</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link-btn" href="02-feed.html"><i class="bi bi-grid"></i> Feed</a>
+      <a class="nav-link-btn" href="03-perfil.html"><i class="bi bi-person"></i> Perfil</a>
+      <a class="nav-link-btn active" href="05-historico.html"><i class="bi bi-clock-history"></i> Histórico</a>
+    </div>
+  </nav>
+
+  <div class="page-container">
+
+    <!-- USER CONTEXT -->
+    <div class="user-context-bar">
+      <div class="ctx-avatar">👩‍💼</div>
+      <div class="ctx-info">
+        <div class="ctx-name">Maria Clara Souza</div>
+        <div class="ctx-sub">Histórico pessoal de doações e recebimentos</div>
+      </div>
+      <div class="ctx-badge"><i class="bi bi-star-fill"></i> Doadora Recorrente</div>
+    </div>
+
+    <!-- SUMMARY METRICS -->
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-icon green">📦</div>
+        <div>
+          <div class="metric-num">23</div>
+          <div class="metric-lbl">Itens doados</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon yellow">🏠</div>
+        <div>
+          <div class="metric-num">7</div>
+          <div class="metric-lbl">Itens recebidos</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon blue">✅</div>
+        <div>
+          <div class="metric-num">19</div>
+          <div class="metric-lbl">Concluídos</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon orange">⏳</div>
+        <div>
+          <div class="metric-num">4</div>
+          <div class="metric-lbl">Em andamento</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS + FILTERS -->
+    <div class="tab-area">
+      <div class="history-tabs">
+        <button class="h-tab active" onclick="switchTab('doado', this)">
+          <i class="bi bi-box-arrow-up"></i> Doações feitas <span class="tab-count">23</span>
+        </button>
+        <button class="h-tab" onclick="switchTab('recebido', this)">
+          <i class="bi bi-box-arrow-down"></i> Itens recebidos <span class="tab-count">7</span>
+        </button>
+      </div>
+      <div class="filter-row">
+        <div class="search-sm">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Buscar item..." oninput="filterHistory(this.value)"/>
+        </div>
+        <select class="filter-select" onchange="filterByStatus(this.value)">
+          <option value="all">Todos os status</option>
+          <option value="concluido">Concluído</option>
+          <option value="reservado">Reservado</option>
+          <option value="disponivel">Disponível</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+        <select class="filter-select">
+          <option>Mais recentes</option>
+          <option>Mais antigos</option>
+          <option>A–Z</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TABLE VIEW: DOADO -->
+    <div class="content-card" id="tab-doado">
+      <div class="table-header cols-doado">
+        <span>Item</span>
+        <span>Receptor</span>
+        <span>Categoria</span>
+        <span>Data</span>
+        <span>Status</span>
+        <span></span>
+      </div>
+      <div id="doado-rows"></div>
+    </div>
+
+    <!-- TABLE VIEW: RECEBIDO -->
+    <div class="content-card" id="tab-recebido" style="display:none;">
+      <div class="table-header cols-recebido">
+        <span>Item</span>
+        <span>Doador</span>
+        <span>Categoria</span>
+        <span>Data</span>
+        <span>Status</span>
+      </div>
+      <div id="recebido-rows"></div>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ── MOCK DATA ───────────────────────────────────────────────
+    const mockDoado = [
+      { id:1,  emoji:'🛋️', name:'Sofá de 3 lugares',        cat:'Móveis',      receptor:'Carlos M.',   date:'19/05/2026', status:'disponivel' },
+      { id:2,  emoji:'📱', name:'Micro-ondas 30L',           cat:'Eletro',      receptor:'Ana Lima',    date:'12/05/2026', status:'reservado'  },
+      { id:3,  emoji:'👕', name:'Kit roupas infantis',       cat:'Roupas',      receptor:'ONG Recomeço',date:'08/05/2026', status:'concluido'  },
+      { id:4,  emoji:'🪑', name:'Mesa escritório',           cat:'Móveis',      receptor:'João Alves',  date:'02/05/2026', status:'concluido'  },
+      { id:5,  emoji:'📚', name:'Livros didáticos (4 vol)',  cat:'Escolar',     receptor:'Projeto ABC', date:'28/04/2026', status:'concluido'  },
+      { id:6,  emoji:'🍳', name:'Conjunto de panelas',       cat:'Utensílios',  receptor:'Fernanda R.', date:'22/04/2026', status:'concluido'  },
+      { id:7,  emoji:'👟', name:'Tênis esportivo 42',        cat:'Calçados',    receptor:'Lucas T.',    date:'15/04/2026', status:'concluido'  },
+      { id:8,  emoji:'🧸', name:'Brinquedos variados',       cat:'Brinquedos',  receptor:'Casa Criança',date:'10/04/2026', status:'concluido'  },
+      { id:9,  emoji:'🛏️', name:'Cama solteiro c/ colchão', cat:'Móveis',      receptor:'Silvia N.',   date:'03/04/2026', status:'concluido'  },
+      { id:10, emoji:'🪟', name:'Guarda-roupa 4 portas',     cat:'Móveis',      receptor:'Pedro S.',    date:'28/03/2026', status:'cancelado'  },
+      { id:11, emoji:'🎒', name:'Mochila escolar',           cat:'Escolar',     receptor:'Inst. Educar',date:'20/03/2026', status:'concluido'  },
+      { id:12, emoji:'🧊', name:'Geladeira 280L',            cat:'Eletro',      receptor:'Maria F.',    date:'14/03/2026', status:'concluido'  },
+    ];
+
+    const mockRecebido = [
+      { id:1, emoji:'🪑', name:'Mesa escritório',        cat:'Móveis',     doador:'Lara C.',    date:'25/04/2026', status:'concluido' },
+      { id:2, emoji:'📚', name:'Livros didáticos',       cat:'Escolar',    doador:'Roberto S.', date:'18/04/2026', status:'concluido' },
+      { id:3, emoji:'👗', name:'Roupas tamanho M (lote)',cat:'Roupas',     doador:'Ana P.',     date:'10/04/2026', status:'concluido' },
+      { id:4, emoji:'🍳', name:'Frigideira antiaderente',cat:'Utensílios', doador:'Carlos M.',  date:'01/04/2026', status:'concluido' },
+      { id:5, emoji:'🎒', name:'Mochila infantil',       cat:'Escolar',    doador:'Vera N.',    date:'22/03/2026', status:'concluido' },
+      { id:6, emoji:'🧸', name:'Kit brinquedos',         cat:'Brinquedos', doador:'Inst.Vida',  date:'15/03/2026', status:'concluido' },
+      { id:7, emoji:'🛋️', name:'Poltrona de leitura',   cat:'Móveis',     doador:'Hugo B.',    date:'05/03/2026', status:'reservado' },
+    ];
+
+    const statusMap = {
+      concluido:  '<span class="pill pill-concluido">✅ Concluído</span>',
+      reservado:  '<span class="pill pill-reservado">⏳ Reservado</span>',
+      disponivel: '<span class="pill pill-disponivel">🔵 Disponível</span>',
+      cancelado:  '<span class="pill pill-cancelado">✗ Cancelado</span>',
+    };
+
+    function renderDoado(data) {
+      const container = document.getElementById('doado-rows');
+      if (!data.length) {
+        container.innerHTML = '<div class="empty-state"><div class="e-icon">📭</div><p>Nenhum item encontrado.</p></div>';
+        return;
+      }
+      container.innerHTML = data.map(item => `
+        <div class="history-row cols-doado ${item.status === 'concluido' ? 'recurrent-row' : ''}">
+          <div class="item-cell">
+            <div class="item-emoji-thumb">${item.emoji}</div>
+            <div>
+              <div class="item-cell-name">${item.name}</div>
+              <div class="item-cell-cat">${item.cat}</div>
+            </div>
+          </div>
+          <div style="font-size:.88rem;font-weight:500;">${item.receptor}</div>
+          <div style="font-size:.83rem;color:var(--text-muted);">${item.cat}</div>
+          <div class="row-date">${item.date}</div>
+          <div>${statusMap[item.status]}</div>
+          <div><button class="btn-mini" onclick="alert('Detalhes: ${item.name}')"><i class="bi bi-eye"></i></button></div>
+        </div>
+      `).join('');
+    }
+
+    function renderRecebido(data) {
+      const container = document.getElementById('recebido-rows');
+      if (!data.length) {
+        container.innerHTML = '<div class="empty-state"><div class="e-icon">📭</div><p>Nenhum item encontrado.</p></div>';
+        return;
+      }
+      container.innerHTML = data.map(item => `
+        <div class="history-row cols-recebido">
+          <div class="item-cell">
+            <div class="item-emoji-thumb">${item.emoji}</div>
+            <div>
+              <div class="item-cell-name">${item.name}</div>
+              <div class="item-cell-cat">${item.cat}</div>
+            </div>
+          </div>
+          <div style="font-size:.88rem;font-weight:500;">${item.doador}</div>
+          <div style="font-size:.83rem;color:var(--text-muted);">${item.cat}</div>
+          <div class="row-date">${item.date}</div>
+          <div>${statusMap[item.status]}</div>
+        </div>
+      `).join('');
+    }
+
+    // Initial render
+    renderDoado(mockDoado);
+    renderRecebido(mockRecebido);
+
+    let currentTab = 'doado';
+
+    function switchTab(tab, btn) {
+      currentTab = tab;
+      document.querySelectorAll('.h-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-doado').style.display    = tab === 'doado'    ? 'block' : 'none';
+      document.getElementById('tab-recebido').style.display = tab === 'recebido' ? 'block' : 'none';
+    }
+
+    function filterHistory(val) {
+      const q = val.toLowerCase();
+      if (currentTab === 'doado') {
+        renderDoado(mockDoado.filter(i => i.name.toLowerCase().includes(q) || i.receptor.toLowerCase().includes(q)));
+      } else {
+        renderRecebido(mockRecebido.filter(i => i.name.toLowerCase().includes(q) || i.doador.toLowerCase().includes(q)));
+      }
+    }
+
+    function filterByStatus(val) {
+      if (currentTab === 'doado') {
+        renderDoado(val === 'all' ? mockDoado : mockDoado.filter(i => i.status === val));
+      } else {
+        renderRecebido(val === 'all' ? mockRecebido : mockRecebido.filter(i => i.status === val));
+      }
+    }
+  </script>
+</body>
+</html>
