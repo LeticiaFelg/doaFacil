@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DoaFácil – Login</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- LEFT DECORATIVE PANEL -->
+  <div class="panel-left">
+    <div class="brand">
+      <div class="brand-icon">🌿</div>
+      <span class="brand-name">DoaFácil</span>
+    </div>
+
+    <div class="hero-text">
+      <h1>Conectar quem<br>doa com quem<br><em>mais precisa.</em></h1>
+      <p>Plataforma digital para redistribuição de bens materiais, promovendo solidariedade e impacto social real.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat">
+        <div class="num">4.2k+</div>
+        <div class="lbl">Itens doados</div>
+      </div>
+      <div class="stat">
+        <div class="num">1.8k</div>
+        <div class="lbl">Famílias atendidas</div>
+      </div>
+      <div class="stat">
+        <div class="num">320</div>
+        <div class="lbl">Instituições parceiras</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT AUTH PANEL -->
+  <div class="panel-right">
+    <div class="auth-card">
+
+      <!-- Tab switcher -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('login')">Entrar</button>
+        <button class="tab-btn" onclick="switchTab('register')">Criar conta</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div class="form-panel active" id="panel-login">
+        <h2>Bem-vindo de volta</h2>
+        <p class="subtitle">Entre com suas credenciais para continuar</p>
+
+        <div class="form-group-custom">
+          <label>E-mail</label>
+          <div class="input-wrap">
+            <i class="bi bi-envelope icon"></i>
+            <input type="email" placeholder="seu@email.com" />
+          </div>
+        </div>
+
+        <div class="form-group-custom">
+          <label>Senha</label>
+          <div class="input-wrap">
+            <i class="bi bi-lock icon"></i>
+            <input type="password" placeholder="••••••••" />
+          </div>
+        </div>
+
+        <a href="#" class="forgot-link">Esqueceu a senha?</a>
+
+        <button class="btn-primary-custom" onclick="goTo('02-feed.html')">
+          <i class="bi bi-arrow-right-circle"></i> Entrar
+        </button>
+
+        <div class="note">
+          Não tem conta? <a href="#" style="color:var(--green-mid);text-decoration:none;" onclick="switchTab('register')">Crie uma grátis</a>
+        </div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div class="form-panel" id="panel-register">
+        <h2>Criar sua conta</h2>
+        <p class="subtitle">Junte-se à rede de solidariedade</p>
+
+        <!-- Profile type -->
+        <div style="margin-bottom:20px;">
+          <label style="font-size:.82rem;font-weight:500;color:var(--text-dark);margin-bottom:10px;display:block;">Tipo de perfil <span style="color:var(--text-muted);font-weight:400">(pode selecionar mais de um)</span></label>
+          <div class="profile-grid">
+            <div class="profile-card selected" onclick="toggleProfile(this)">
+              <div class="p-icon">🤝</div>
+              <div class="p-name">Doador</div>
+            </div>
+            <div class="profile-card" onclick="toggleProfile(this)">
+              <div class="p-icon">🏠</div>
+              <div class="p-name">Receptor</div>
+            </div>
+            <div class="profile-card" onclick="toggleProfile(this)">
+              <div class="p-icon">🏛️</div>
+              <div class="p-name">Instituição</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group-custom">
+          <label>Nome completo / Razão social</label>
+          <div class="input-wrap">
+            <i class="bi bi-person icon"></i>
+            <input type="text" placeholder="Maria Oliveira" />
+          </div>
+        </div>
+
+        <div class="form-group-custom">
+          <label>E-mail</label>
+          <div class="input-wrap">
+            <i class="bi bi-envelope icon"></i>
+            <input type="email" placeholder="seu@email.com" />
+          </div>
+        </div>
+
+        <div class="form-group-custom">
+          <label>WhatsApp</label>
+          <div class="input-wrap">
+            <i class="bi bi-whatsapp icon"></i>
+            <input type="tel" placeholder="(11) 99999-0000" />
+          </div>
+        </div>
+
+        <div class="form-group-custom">
+          <label>Bairro / CEP</label>
+          <div class="input-wrap">
+            <i class="bi bi-geo-alt icon"></i>
+            <input type="text" placeholder="Copacabana, RJ" />
+          </div>
+        </div>
+
+        <div class="form-group-custom">
+          <label>Senha</label>
+          <div class="input-wrap">
+            <i class="bi bi-lock icon"></i>
+            <input type="password" placeholder="Mínimo 8 caracteres" />
+          </div>
+        </div>
+
+        <button class="btn-primary-custom" onclick="goTo('02-feed.html')">
+          <i class="bi bi-check-circle"></i> Criar conta
+        </button>
+
+        <div class="note" style="margin-top:14px;">
+          Ao criar uma conta, você concorda com nossos <a href="#" style="color:var(--green-mid);text-decoration:none;">Termos de uso</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+      });
+      document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+      document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+    }
+
+    function toggleProfile(el) {
+      el.classList.toggle('selected');
+    }
+
+    function goTo(page) {
+      window.location.href = page;
+    }
+  </script>
+</body>
+</html>
+
