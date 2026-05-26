@@ -307,17 +307,6 @@ _Coluna 2 (Direita - Fixa):_
 
 ---
 
-## 📊 Dados de Impacto (Mock)
-
-| Métrica                   | Valor |
-| ------------------------- | ----- |
-| 📦 Itens redistribuídos   | 4.231 |
-| 👨‍👩‍👧 Famílias beneficiadas  | 1.847 |
-| 🤝 Doadores ativos        | 892   |
-| 🏛️ Instituições parceiras | 67    |
-
----
-
 ## 🎨 Design System
 
 ### Paleta de Cores
@@ -341,43 +330,14 @@ _Coluna 2 (Direita - Fixa):_
 
 ---
 
-## 🚦 Roadmap
-
-### ✅ Fase 1 (MVP - Atual)
-
-- [x] Telas estáticas responsivas
-- [x] Filtros e busca com dados mock
-- [x] Sistema de múltiplos perfis
-- [x] Modals de reserva
-- [x] Integração WhatsApp
-
-### 📋 Fase 2 (Backend)
-
-- [ ] API REST com Node.js/Express
-- [ ] Banco de dados (MongoDB/PostgreSQL)
-- [ ] Autenticação real (JWT)
-- [ ] Upload de imagens
-- [ ] Sistema de notificações
-
-### 🔮 Fase 3 (Expansão)
-
-- [ ] App mobile (React Native)
-- [ ] Sistema de avaliações
-- [ ] Inteligência artificial de recomendações
-- [ ] Integração de pagamento
-- [ ] Mapa interativo
-
----
-
 ## 👥 Contribuindo
 
 Contribuições são bem-vindas! Para contribuir:
 
-1. **Fork** o repositório
-2. Crie uma **branch** para sua feature (`git checkout -b feature/MinhaFeature`)
-3. **Commit** suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
-4. **Push** para a branch (`git push origin feature/MinhaFeature`)
-5. Abra um **Pull Request**
+1. Crie uma **branch** para sua feature (`git checkout -b feature/MinhaFeature`)
+2. **Commit** suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
+3. **Push** para a branch (`git push origin feature/MinhaFeature`)
+4. Abra um **Pull Request**
 
 ### Diretrizes
 
@@ -394,16 +354,6 @@ Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) par
 
 ---
 
-## 📞 Suporte
-
-Tem dúvidas ou sugestões?
-
-- 📧 Email: suporte@doafacil.com
-- 💬 Issues: [GitHub Issues](https://github.com/seu-usuario/doafacil/issues)
-- 📱 WhatsApp: [Link WhatsApp](https://wa.me/5521999999999)
-
----
-
 ## 👨‍💻 Desenvolvedor
 
 **Projeto desenvolvido para**: IBMR - Usabilidade, Desenvolvimento Web e Mobile (2026.1)
@@ -416,6 +366,6 @@ Tem dúvidas ou sugestões?
 
 **Conectar quem doa com quem mais precisa** 🌿
 
-Made with ❤️ for impact
+Made by UI - Devs Squad - Way Ânima Hub
 
 </div>
