@@ -1,20 +1,37 @@
 <nav class="top-nav">
+
   <a class="brand" href="../index.html">
     <div class="brand-icon">🌿</div>
     <span class="brand-name">DoaFácil</span>
   </a>
 
   <div class="nav-links">
-    <a class="nav-link-btn" href="./feed.html">
-      <i class="bi bi-grid"></i> Feed
+
+    <a class="nav-link-btn" href="../index.html">
+      <i class="bi bi-grid"></i> Home
     </a>
 
-    <a class="nav-link-btn active" href="./perfil.html">
+    <a class="nav-link-btn" href="../pages/perfil.html">
       <i class="bi bi-person"></i> Perfil
     </a>
 
-    <a class="nav-link-btn" href="./historico.html">
+    <a class="nav-link-btn" href="../pages/historico.html">
       <i class="bi bi-clock-history"></i> Histórico
     </a>
+
+    <!-- Mobile impact toggle -->
+    <button
+      class="impact-toggle-btn impact-toggle-btn-mobile"
+      data-bs-toggle="offcanvas"
+      data-bs-target="#impactOffcanvas"
+    >
+      <i class="bi bi-graph-up"></i> Impacto
+    </button>
+
+    <a href="../pages/perfil.html" style="text-decoration:none">
+      <div class="nav-avatar">👤</div>
+    </a>
+
   </div>
+
 </nav>

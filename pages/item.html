@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Item</title>
   <link rel="stylesheet" href="../assets/css/item.css">
+  <link rel="stylesheet" href="../assets/css/components/footer.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -12,19 +13,7 @@
 <body>
 
   <!-- TOP NAV -->
-  <nav class="top-nav">
-    <a class="brand" href="/index.html">
-      <div class="brand-icon">🌿</div>
-      <span class="brand-name">DoaFácil</span>
-    </a>
-    <div class="nav-links">
-      <a class="nav-link-btn" href="/index.html"><i class="bi bi-grid"></i> Home</a>
-      <a class="nav-link-btn" href="pages/perfil.html"><i class="bi bi-person"></i> Perfil</a>
-      <a href="pages/perfil.html" style="text-decoration:none">
-        <div class="nav-avatar">👤</div>
-      </a>
-    </div>
-  </nav>
+  <div id="navbar"></div>
 
   <!-- BREADCRUMB -->
   <div class="breadcrumb-bar">
@@ -218,7 +207,9 @@
       </div>
     </div>
   </div>
-
+  <div id="footer"></div>
+  <script src="../assets/js/components/footer.js"></script>
+  <script src="../assets/js/components/navbar.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <script>
     const emojis = ['🛋️', '🔍', '📐'];

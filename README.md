@@ -113,7 +113,7 @@ DoaFacil/
 │   ├── components/
 │   │   └── navbar.html        # Componente de navegação
 │   └── css/
-│       ├── feed.css           # Estilos do feed
+│       ├── index.css           # Estilos do feed
 │       ├── historico.css      # Estilos do histórico
 │       ├── item.css           # Estilos de descrição do item
 │       ├── login.css          # Estilos de login/cadastro
