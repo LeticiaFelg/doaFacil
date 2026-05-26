@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="./assets/css/index.css">
   <link rel="stylesheet" href="./assets/css/components/footer.css">
   <link rel="stylesheet" href="./assets/css/components/navbar.css">
+    <link rel="stylesheet" href="./assets/css/components/heroCarousel.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -15,8 +16,56 @@
 
   <!-- TOP NAV -->
   <div id="navbar"></div>
-  <!-- MAIN LAYOUT -->
-  <div class="main-layout">
+
+  <!-- HERO CAROUSEL -->
+  <section id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <!-- Adicionando suporte a arraste via JS -->
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+    </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active hero-overlay">
+        <img src="./assets/img/image-1.webp" alt="Doação de alimentos">
+        <div class="container h-100 d-flex align-items-center hero-content">
+          <div class="text-white">
+            <h1 class="display-4 fw-bold" style="font-family: 'Fraunces', serif;">Transforme vidas com o que você não usa mais</h1>
+            <p class="lead">Conectamos doadores a famílias e instituições de forma rápida e segura.</p>
+            <button class="btn btn-success btn-lg mt-3" style="background-color: #4A7C3F; border: none;">Começar a doar</button>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-item hero-overlay">
+        <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=1600" alt="Crianças sorrindo">
+        <div class="container h-100 d-flex align-items-center hero-content">
+          <div class="text-white">
+            <h1 class="display-4 fw-bold" style="font-family: 'Fraunces', serif;">Impacto real na sua comunidade</h1>
+            <p class="lead">Mais de 4 mil itens já encontraram um novo lar através do DoaFácil.</p>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-item hero-overlay">
+        <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=1600" alt="Mãos dadas">
+        <div class="container h-100 d-flex align-items-center hero-content">
+          <div class="text-white">
+            <h1 class="display-4 fw-bold" style="font-family: 'Fraunces', serif;">Apoie Instituições Locais</h1>
+            <p class="lead">Fortaleça a rede de solidariedade do Rio de Janeiro.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="main-layout">
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -82,7 +131,7 @@
     </aside>
 
     <!-- FEED -->
-    <main class="feed-area">
+    <div class="feed-area">
       <div class="feed-header">
         <h2>Itens disponíveis</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -100,8 +149,8 @@
 
       <!-- Feed Grid (populated by JS) -->
       <div class="feed-grid" id="feed-grid"></div>
-    </main>
-  </div>
+    </div>
+  </main>
 
   <!-- FOOTER -->
   <div id="footer"></div>
@@ -223,6 +272,27 @@
         if (current >= target) clearInterval(interval);
       }, 25);
     }
+
+    // Suporte para arrastar o carrossel com o mouse
+    const carouselEl = document.getElementById('heroCarousel');
+    const carousel = new bootstrap.Carousel(carouselEl);
+    let startX = 0;
+
+    carouselEl.addEventListener('mousedown', e => {
+      startX = e.pageX;
+      carouselEl.style.cursor = 'grabbing';
+    });
+
+    carouselEl.addEventListener('mouseup', e => {
+      carouselEl.style.cursor = 'grab';
+      const endX = e.pageX;
+      const diff = startX - endX;
+
+      if (Math.abs(diff) > 50) { // Sensibilidade do arraste
+        if (diff > 0) carousel.next();
+        else carousel.prev();
+      }
+    });
 
     window.addEventListener('load', () => {
       animateCounter(document.getElementById('stat-itens'), 4231);
