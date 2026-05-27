@@ -1,12 +1,14 @@
 #heroCarousel {
     cursor: grab;
 }
+#heroCarousel > .carousel-inner .carousel-item {
+    height: 60vh;
+    min-height: 400px;
+}
 #heroCarousel:active {
     cursor: grabbing;
 }
 .carousel-item {
-    height: 60vh;
-    min-height: 400px;
     width: 100%;
     object-fit: cover;
 }

@@ -7,7 +7,8 @@
   <link rel="stylesheet" href="./assets/css/index.css">
   <link rel="stylesheet" href="./assets/css/components/footer.css">
   <link rel="stylesheet" href="./assets/css/components/navbar.css">
-    <link rel="stylesheet" href="./assets/css/components/heroCarousel.css">
+  <link rel="stylesheet" href="./assets/css/components/heroCarousel.css">
+  <link rel="stylesheet" href="./assets/css/components/featuredCarousel.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -38,9 +39,9 @@
         <img src="./assets/img/image-1.webp" alt="Doação de alimentos">
         <div class="container h-100 d-flex align-items-center hero-content">
           <div class="text-white">
-            <h1 class="display-4 fw-bold" style="font-family: 'Fraunces', serif;">Transforme vidas com o que você não usa mais</h1>
+            <h1 class="display-4 fw-bold hero-title">Transforme vidas com o que você não usa mais</h1>
             <p class="lead">Conectamos doadores a famílias e instituições de forma rápida e segura.</p>
-            <button class="btn btn-success btn-lg mt-3" style="background-color: #4A7C3F; border: none;">Começar a doar</button>
+            <button class="btn btn-success btn-lg mt-3 hero-btn-start">Começar a doar</button>
           </div>
         </div>
       </div>
@@ -48,7 +49,7 @@
         <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=1600" alt="Crianças sorrindo">
         <div class="container h-100 d-flex align-items-center hero-content">
           <div class="text-white">
-            <h1 class="display-4 fw-bold" style="font-family: 'Fraunces', serif;">Impacto real na sua comunidade</h1>
+            <h1 class="display-4 fw-bold hero-title">Impacto real na sua comunidade</h1>
             <p class="lead">Mais de 4 mil itens já encontraram um novo lar através do DoaFácil.</p>
           </div>
         </div>
@@ -57,7 +58,7 @@
         <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=1600" alt="Mãos dadas">
         <div class="container h-100 d-flex align-items-center hero-content">
           <div class="text-white">
-            <h1 class="display-4 fw-bold" style="font-family: 'Fraunces', serif;">Apoie Instituições Locais</h1>
+            <h1 class="display-4 fw-bold hero-title">Apoie Instituições Locais</h1>
             <p class="lead">Fortaleça a rede de solidariedade do Rio de Janeiro.</p>
           </div>
         </div>
@@ -66,6 +67,27 @@
   </section>
 
   <main class="main-layout">
+    
+    <section class="container m-5 mx-auto overflow-hidden" id="featured-section">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="featured-title">Destaques da Semana</h3>
+        <div class="carousel-controls">
+          <button class="btn btn-outline-success btn-sm rounded-circle" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button class="btn btn-outline-success btn-sm rounded-circle" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+      <div id="featuredCarousel" class="carousel slide" data-bs-ride="false">
+        <div class="carousel-inner" id="featured-content"></div>
+        <div class="carousel-indicators position-relative mt-3">
+          <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="0" class="active bg-success" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="1" class="bg-success" aria-label="Slide 2"></button>
+        </div>
+      </div>
+    </section>
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -150,42 +172,72 @@
       <!-- Feed Grid (populated by JS) -->
       <div class="feed-grid" id="feed-grid"></div>
     </div>
-  </main>
+      <section class="container my-5 py-4" id="about-section">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <h2 class="display-5 fw-bold mb-4" style="font-family: 'Fraunces', serif; color: var(--green-deep);">Sobre o DoaFácil</h2>
+            <p class="lead text-muted mb-4">
+              Nascemos com a missão de simplificar a solidariedade. O DoaFácil é uma plataforma que conecta pessoas que possuem itens em bom estado a quem realmente precisa, fortalecendo a economia circular e o apoio comunitário.
+            </p>
+            <div class="row g-4 mb-4">
+              <div class="col-sm-6">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-check-circle-fill text-success me-2" style="font-size: 1.5rem;"></i>
+                  <span class="fw-medium">Doação Segura</span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-check-circle-fill text-success me-2" style="font-size: 1.5rem;"></i>
+                  <span class="fw-medium">Impacto Local</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; align-items: center;">
+              <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=400" alt="Voluntários 1" class="img-fluid rounded-4 shadow-sm object-fit-cover" style="height: 300px; transform: translateY(20px);">
+              <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=400" alt="Voluntários 2" class="img-fluid rounded-4 shadow-sm object-fit-cover" style="height: 220px; transform: translateY(-20px);">
+              <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=400" alt="Voluntários 3" class="img-fluid rounded-4 shadow-sm object-fit-cover" style="height: 200px; transform: translateY(-20px);">
+              <img src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&q=80&w=400" alt="Voluntários 4" class="img-fluid rounded-4 shadow-sm object-fit-cover" style="height: 280px; transform: translateY(-60px);">
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
 
-  <!-- FOOTER -->
-  <div id="footer"></div>
+    <div id="footer"></div>
 
-  <!-- OFFCANVAS: Impact (mobile) -->
-  <div class="offcanvas offcanvas-start" id="impactOffcanvas" tabindex="-1">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" style="font-family:'Fraunces',serif;">Impacto Social</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-    </div>
-    <div class="offcanvas-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
-          <div style="font-size:2rem;">📦</div>
-          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">4.231</div>
-          <div style="font-size:.78rem;color:var(--text-muted);">Itens redistribuídos</div>
-        </div>
-        <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
-          <div style="font-size:2rem;">👨‍👩‍👧</div>
-          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">1.847</div>
-          <div style="font-size:.78rem;color:var(--text-muted);">Famílias beneficiadas</div>
-        </div>
-        <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
-          <div style="font-size:2rem;">🤝</div>
-          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">892</div>
-          <div style="font-size:.78rem;color:var(--text-muted);">Doadores ativos</div>
-        </div>
-        <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
-          <div style="font-size:2rem;">🏛️</div>
-          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">67</div>
-          <div style="font-size:.78rem;color:var(--text-muted);">Instituições</div>
+    <div class="offcanvas offcanvas-start" id="impactOffcanvas" tabindex="-1">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" style="font-family:'Fraunces',serif;">Impacto Social</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
+            <div style="font-size:2rem;">📦</div>
+            <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">4.231</div>
+            <div style="font-size:.78rem;color:var(--text-muted);">Itens redistribuídos</div>
+          </div>
+          <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
+            <div style="font-size:2rem;">👨‍👩‍👧</div>
+            <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">1.847</div>
+            <div style="font-size:.78rem;color:var(--text-muted);">Famílias beneficiadas</div>
+          </div>
+          <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
+            <div style="font-size:2rem;">🤝</div>
+            <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">892</div>
+            <div style="font-size:.78rem;color:var(--text-muted);">Doadores ativos</div>
+          </div>
+          <div style="background:var(--green-bg);border-radius:14px;padding:18px;text-align:center;">
+            <div style="font-size:2rem;">🏛️</div>
+            <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--green-deep);">67</div>
+            <div style="font-size:.78rem;color:var(--text-muted);">Instituições</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   <script src="../assets/js/components/footer.js"></script>
   <script src="../assets/js/components/navbar.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
@@ -259,8 +311,46 @@
       renderFeed(items);
     }
 
+    function renderFeatured() {
+      const content = document.getElementById('featured-content');
+      const isMobile = window.innerWidth < 768;
+      const itemsPerPage = isMobile ? 2 : 5;
+      const featuredItems = [...mockItems].reverse().slice(0, 10);
+
+      let html = '';
+      for (let i = 0; i < featuredItems.length; i += itemsPerPage) {
+        const chunk = featuredItems.slice(i, i + itemsPerPage);
+        html += `
+          <div class="carousel-item ${i === 0 ? 'active' : ''}">
+            <div class="row g-3 row-cols-2 row-cols-md-5">
+              ${chunk.map(item => `
+                <div class="col">
+                  <a href="04-item.html?id=${item.id}" class="card h-100 text-decoration-none border-0 shadow-sm" style="background: #f0f7ee;">
+                    <div class="card-body text-center p-3">
+                      <div style="font-size: 2.5rem; margin-bottom: 10px;">${item.emoji}</div>
+                      <h6 class="card-title text-dark mb-1 text-truncate">${item.title}</h6>
+                      <small class="text-muted">${item.location}</small>
+                    </div>
+                  </a>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      content.innerHTML = html;
+
+      const indicators = document.querySelector('#featuredCarousel .carousel-indicators');
+      const pageCount = Math.ceil(featuredItems.length / itemsPerPage);
+      indicators.innerHTML = Array.from({ length: pageCount }, (_, i) => `
+        <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="${i}" class="${i === 0 ? 'active' : ''} bg-success" aria-current="${i === 0}" aria-label="Slide ${i + 1}"></button>
+      `).join('');
+    }
+
     // Initial render
     renderFeed(mockItems);
+    renderFeatured();
+    window.addEventListener('resize', renderFeatured);
 
     // Animated counter
     function animateCounter(el, target) {
