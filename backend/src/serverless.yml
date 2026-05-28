@@ -1,0 +1,104 @@
+# serverless.yml
+# Deploy com: npx serverless deploy
+# Instale o framework: npm install -g serverless
+
+service: doafacil-api
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1          # Região mais barata / Free Tier
+  stage: ${opt:stage, 'dev'}
+  memorySize: 256            # Mínimo suficiente para a API
+  timeout: 15                # segundos
+
+  # Variáveis de ambiente injetadas na Lambda
+  environment:
+    NODE_ENV: production
+    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_EXPIRES_IN: "7d"
+    AWS_ACCOUNT_REGION: ${self:provider.region}
+    DYNAMODB_TABLE_USERS:        ${self:custom.tableUsers}
+    DYNAMODB_TABLE_ITEMS:        ${self:custom.tableItems}
+    DYNAMODB_TABLE_RESERVATIONS: ${self:custom.tableReservations}
+    CORS_ORIGIN: ${env:CORS_ORIGIN, '*'}
+
+  # Permissões IAM para a Lambda acessar o DynamoDB
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Scan
+            - dynamodb:Query
+          Resource:
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.tableUsers}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.tableItems}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.tableReservations}
+
+custom:
+  tableUsers:        doafacil_users_${self:provider.stage}
+  tableItems:        doafacil_items_${self:provider.stage}
+  tableReservations: doafacil_reservations_${self:provider.stage}
+
+functions:
+  api:
+    handler: src/app.handler
+    events:
+      - http:
+          path: /api/{proxy+}
+          method: ANY
+          cors: true
+      - http:
+          path: /api/health
+          method: GET
+          cors: true
+
+# Cria as tabelas DynamoDB automaticamente no deploy
+resources:
+  Resources:
+
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableUsers}
+        BillingMode: PAY_PER_REQUEST   # Free Tier: sem custo em baixo volume
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+
+    ItemsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableItems}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: itemId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: itemId
+            KeyType: HASH
+
+    ReservationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableReservations}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: reservationId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: reservationId
+            KeyType: HASH
+
+plugins:
+  - serverless-offline   # npm install --save-dev serverless-offline
