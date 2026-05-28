@@ -194,6 +194,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     font-size: 1.3rem;
     flex-shrink: 0;
 }
+.item-emoji-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
 .item-cell-name { font-weight: 600; font-size: .9rem; }
 .item-cell-cat  { font-size: .75rem; color: var(--text-muted); }
 

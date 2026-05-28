@@ -155,6 +155,10 @@
       cancelado:  '<span class="pill pill-cancelado">✗ Cancelado</span>',
     };
 
+    function getItemImage(id) {
+      return '../assets/img/items/item' + id + '.jpg';
+    }
+
     function renderDoado(data) {
       const container = document.getElementById('doado-rows');
       if (!data.length) {
@@ -164,7 +168,7 @@
       container.innerHTML = data.map(item => `
         <div class="history-row cols-doado ${item.status === 'concluido' ? 'recurrent-row' : ''}">
           <div class="item-cell">
-            <div class="item-emoji-thumb">${item.emoji}</div>
+            <div class="item-emoji-thumb"><img src="${getItemImage(item.id)}" alt="${item.name}" loading="lazy"></div>
             <div>
               <div class="item-cell-name">${item.name}</div>
               <div class="item-cell-cat">${item.cat}</div>
@@ -188,7 +192,7 @@
       container.innerHTML = data.map(item => `
         <div class="history-row cols-recebido">
           <div class="item-cell">
-            <div class="item-emoji-thumb">${item.emoji}</div>
+            <div class="item-emoji-thumb"><img src="${getItemImage(item.id)}" alt="${item.name}" loading="lazy"></div>
             <div>
               <div class="item-cell-name">${item.name}</div>
               <div class="item-cell-cat">${item.cat}</div>
