@@ -298,4 +298,12 @@
     .hero-text h1 { font-size: 2rem; }
     .stats-row { display: none; }
     .panel-right { padding: 32px 20px; }
+    .auth-card { max-width: 100%; }
+  }
+
+  @media (max-width: 576px) {
+    .panel-left { padding: 28px 20px 24px; }
+    .hero-text h1 { font-size: 1.85rem; }
+    .panel-right { padding: 28px 16px; }
+    .brand-name { font-size: 1.4rem; }
   }

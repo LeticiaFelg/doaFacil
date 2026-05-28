@@ -5,40 +5,69 @@
     <span class="brand-name">DoaFácil</span>
   </a>
 
-  <div class="nav-links">
-
+  <!-- Desktop nav links (hidden on tablet/mobile) -->
+  <div class="nav-links-desktop">
     <a class="nav-link-btn" href="../index.html">
       <i class="bi bi-grid"></i> Home
     </a>
-
     <a class="nav-link-btn" href="../pages/perfil.html">
       <i class="bi bi-person"></i> Perfil
     </a>
-
     <a class="nav-link-btn" href="../pages/historico.html">
       <i class="bi bi-clock-history"></i> Histórico
     </a>
+  </div>
 
+  <div class="nav-actions">
     <button id="doarBtn" class="impact-toggle-btn">
       <i class="bi bi-gift"></i> Doar
     </button>
 
-    <!-- Mobile impact toggle 
-    <button
-      class="impact-toggle-btn impact-toggle-btn-mobile"
-      data-bs-toggle="offcanvas"
-      data-bs-target="#impactOffcanvas"
-    >
-      <i class="bi bi-graph-up"></i> Impacto
-    </button>-->
+    <!-- Menu hamburger (visible on tablet/mobile) -->
+    <button class="nav-menu-btn" data-bs-toggle="offcanvas" data-bs-target="#navOffcanvas" aria-controls="navOffcanvas">
+      <i class="bi bi-list"></i>
+    </button>
 
     <a href="../pages/perfil.html" style="text-decoration:none">
       <div class="nav-avatar">👤</div>
     </a>
-
   </div>
 
 </nav>
+
+<!-- Offcanvas Menu (Mobile/Tablet) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="navOffcanvas" aria-labelledby="navOffcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="navOffcanvasLabel">Menu</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="offcanvas-nav">
+      <a class="offcanvas-nav-link" href="../index.html" data-bs-dismiss="offcanvas">
+        <i class="bi bi-grid"></i> Home
+      </a>
+      <a class="offcanvas-nav-link" href="../pages/perfil.html" data-bs-dismiss="offcanvas">
+        <i class="bi bi-person"></i> Perfil
+      </a>
+      <a class="offcanvas-nav-link" href="../pages/historico.html" data-bs-dismiss="offcanvas">
+        <i class="bi bi-clock-history"></i> Histórico
+      </a>
+      <hr style="margin: 16px 0; border: none; border-top: 1px solid var(--cream-dark);">
+      <div style="padding: 0 12px; color: var(--text-muted); font-size: .82rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px;">
+        Informações
+      </div>
+      <a class="offcanvas-nav-link" href="#" data-bs-dismiss="offcanvas">
+        <i class="bi bi-info-circle"></i> Sobre
+      </a>
+      <a class="offcanvas-nav-link" href="#" data-bs-dismiss="offcanvas">
+        <i class="bi bi-question-circle"></i> FAQ
+      </a>
+      <a class="offcanvas-nav-link" href="#" data-bs-dismiss="offcanvas">
+        <i class="bi bi-envelope"></i> Contato
+      </a>
+    </div>
+  </div>
+</div>
 
 <div id="doarModal" class="modal" aria-hidden="true">
   <div class="modal-content">
