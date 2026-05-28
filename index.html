@@ -208,7 +208,65 @@
       </section>
     </main>
 
-    <div id="footer"></div>
+  <!-- MODAL: Doação -->
+  <div id="doarModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Cadastrar Item para Doação</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      
+      <div class="modal-description">
+        <p>📦 Compartilhe itens que você não usa mais com quem precisa. Descreva bem o produto para ajudar outros usuários a encontrá-lo.</p>
+      </div>
+      
+      <form id="formDoacao" class="modal-form">
+        <div class="form-group">
+          <label for="itemNome">Nome do Item *</label>
+          <input type="text" id="itemNome" name="nome" required>
+        </div>
+
+        <div class="form-group">
+          <label for="itemCategoria">Categoria *</label>
+          <select id="itemCategoria" name="categoria" required>
+            <option value="">Selecione uma categoria</option>
+            <option value="moveis">Móveis</option>
+            <option value="eletro">Eletrônicos</option>
+            <option value="roupas">Roupas</option>
+            <option value="calcados">Calçados</option>
+            <option value="escolar">Escolar</option>
+            <option value="utensilios">Utensílios</option>
+            <option value="brinquedos">Brinquedos</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="itemDescricao">Descrição</label>
+          <textarea id="itemDescricao" name="descricao" rows="4" placeholder="Descreva o estado, características e detalhes do item..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="itemCondicao">Condição *</label>
+          <select id="itemCondicao" name="condicao" required>
+            <option value="">Selecione a condição</option>
+            <option value="otimo">Ótimo</option>
+            <option value="bom">Bom</option>
+            <option value="usado">Usado</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="itemLocalizacao">Localização *</label>
+          <input type="text" id="itemLocalizacao" name="localizacao" placeholder="Bairro e Cidade" required>
+        </div>
+
+        <button type="submit" class="btn-submit">Cadastrar Item</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer"></div>
 
     <div class="offcanvas offcanvas-start" id="impactOffcanvas" tabindex="-1">
       <div class="offcanvas-header">
@@ -393,5 +451,6 @@
       animateCounter(document.getElementById('stat-inst'), 67);
     });
   </script>
+  <script src="./assets/js/modal.js"></script>
 </body>
 </html>
