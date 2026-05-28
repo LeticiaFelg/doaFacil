@@ -265,7 +265,17 @@ body {
     color: var(--green-deep);
     font-weight: 700;
 }
-
+.featured-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+}
+.hero-title {
+    font-family: 'Fraunces', serif;
+}
+.hero-btn-start {
+    background-color: #4A7C3F;
+    border: none;
+}
 /* ── MAIN CONTENT ─────────────────────────────── */
 .feed-area {
     flex: 1;
