@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Item</title>
   <link rel="stylesheet" href="../assets/css/item.css">
+  <link rel="stylesheet" href="../assets/css/components/navbar.css">
   <link rel="stylesheet" href="../assets/css/components/footer.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
@@ -91,8 +92,8 @@
 
         <!-- Map placeholder -->
         <div class="detail-card">
-          <h3><i class="bi bi-map" style="color:var(--green-mid)"></i> Localização aproximada</h3>
-          <div style="background:var(--cream-dark);border-radius:14px;height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-muted);">
+          <h3 id="location-title"><i class="bi bi-map" style="color:var(--green-mid)"></i> Localização aproximada</h3>
+          <div id="location-map" style="background:var(--cream-dark);border-radius:14px;height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-muted);overflow:hidden;">
             <i class="bi bi-geo-alt" style="font-size:2.5rem;color:var(--green-light)"></i>
             <div style="font-weight:600;font-size:.95rem;">Copacabana, Rio de Janeiro – RJ</div>
             <div style="font-size:.8rem;">Endereço exato informado após reserva</div>
@@ -142,7 +143,7 @@
             <div class="loc-icon">📍</div>
             <div>
               <div class="loc-name">Copacabana</div>
-              <div class="loc-sub">Rio de Janeiro – RJ · aprox. 2.3 km</div>
+              <div class="loc-sub" id="loc-sub">Rio de Janeiro – RJ · aprox. 2.3 km</div>
             </div>
           </div>
 
@@ -224,11 +225,13 @@
       const modal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
       modal.hide();
       setTimeout(() => {
-        // Update UI
         document.querySelector('.status-pill').className = 'status-pill';
         document.querySelector('.status-pill').style.background = '#FFF3CD';
         document.querySelector('.status-pill').style.color = '#856404';
         document.querySelector('.status-pill').innerHTML = '<i class="bi bi-hourglass-split"></i> Reservado';
+        document.getElementById('location-title').innerHTML = '<i class="bi bi-map" style="color:var(--green-mid)"></i> Localização exata';
+        document.getElementById('location-map').innerHTML = '<iframe title="Mapa da localização exata" src="https://www.google.com/maps?q=Rua+Nascimento+Silva+107,+Copacabana,+Rio+de+Janeiro&output=embed" width="100%" height="100%" style="border:0;border-radius:14px;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>';
+        document.getElementById('loc-sub').textContent = 'Rua Nascimento Silva 107, Copacabana, Rio de Janeiro';
         alert('✅ Item reservado com sucesso!\nEntre em contato via WhatsApp para combinar a retirada.');
       }, 300);
     }
