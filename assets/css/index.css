@@ -145,7 +145,17 @@ body {
     border-color: var(--green-mid);
     color: var(--green-deep);
 }
-
+.featured-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+}
+.hero-title {
+    font-family: 'Fraunces', serif;
+}
+.hero-btn-start {
+    background-color: #4A7C3F;
+    border: none;
+}
 /* ── MAIN CONTENT ─────────────────────────────── */
 .feed-area { flex: 1; min-width: 0; }
 
@@ -159,7 +169,7 @@ body {
 }
 .feed-header h2 {
     font-family: 'Fraunces', serif;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 600;
 }
 .search-bar {

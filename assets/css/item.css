@@ -38,6 +38,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     background: var(--cream-dark);
     border-radius: 24px;
     height: 420px;
+    width: 100%;
+    max-width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
