@@ -1,0 +1,29 @@
+# ─── Dependências ────────────────────────────────────────
+node_modules/
+
+# ─── Variáveis de ambiente ────────────────────────────────
+.env
+!.env.example
+
+# ─── Banco de dados SQLite ────────────────────────────────
+# O arquivo .db é gerado automaticamente — não vai para o repo
+*.db
+*.db-shm
+*.db-wal
+
+# ─── Imagens enviadas por usuários ───────────────────────
+# A pasta uploads/ fica local no laptop
+uploads/*
+!uploads/.gitkeep
+
+# ─── Logs ────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ─── Sistema operacional ─────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── IDEs ────────────────────────────────────────────────
+.vscode/
+.idea/
