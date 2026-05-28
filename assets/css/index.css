@@ -313,6 +313,27 @@ body {
 .offcanvas-header { border-bottom: 1px solid var(--cream-dark); }
 .offcanvas { background: var(--white); }
 
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.btn-submit {
+    background: var(--green-deep);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-submit:hover {
+    background: var(--green-mid);
+}
+
 /* ── RESPONSIVE ───────────────────────────────── */
 @media (max-width: 992px) {
     .sidebar { display: none; }

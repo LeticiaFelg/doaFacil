@@ -1,4 +1,6 @@
-fetch('../assets/components/navbar.html')
+const navbarPath = window.location.pathname.includes('/pages/') ? '../assets/components/navbar.html' : './assets/components/navbar.html';
+
+fetch(navbarPath)
   .then(response => response.text())
   .then(data => {
 
