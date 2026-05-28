@@ -15,21 +15,26 @@
 * { box-sizing: border-box; }
 body {
     font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
+    background: #F7F6F3;
     color: var(--text-dark);
     min-height: 100vh;
 }
 
 /* ── NAVBAR ───────────────────────────────────── */
 .brand {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
     text-decoration: none;
 }
 .brand-icon {
-    width: 36px; height: 36px;
+    width: 36px; 
+    height: 36px;
     background: var(--green-deep);
     border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
     font-size: 18px;
 }
 .brand-name {
@@ -48,25 +53,66 @@ body {
     font-size: .85rem;
     font-weight: 600;
     cursor: pointer;
-    display: flex; align-items: center; gap: 6px;
+    display: flex; 
+    align-items: center; 
+    gap: 6px;
     transition: background .2s;
 }
-.impact-toggle-btn:hover { background: var(--green-mid); }
 
-/* ── LAYOUT ───────────────────────────────────── */
-.main-layout {
-    display: flex;
-    flex-direction: column;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 32px 24px;
-    gap: 28px;
+.impact-toggle-btn:hover {
+    background: var(--green-mid);
 }
 
-/* ── SIDEBAR ──────────────────────────────────── */
+/* ── LAYOUT GERAL DA HOME ─────────────────────── */
+.main-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    align-items: start;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    gap: 36px;
+}
+
+#featured-section,
+.impact-section,
+#about-section {
+    grid-column: 1 / -1;
+}
+
+/* ── CATEGORIAS NA LATERAL ────────────────────── */
 .sidebar {
-    width: 280px;
-    flex-shrink: 0;
+    width: 100%;
+    position: static;
+    top: auto;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    border: 1px solid rgba(0,0,0,.04);
+}
+
+.filter-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 8px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #E7E0D4;
+    border-radius: 999px;
+    background: #FAF8F4;
+    transition: all .18s ease;
 }
 
 /* Impact Panel */
@@ -313,6 +359,27 @@ body {
 .offcanvas-header { border-bottom: 1px solid var(--cream-dark); }
 .offcanvas { background: var(--white); }
 
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.btn-submit {
+    background: var(--green-deep);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-submit:hover {
+    background: var(--green-mid);
+}
+
 /* ── RESPONSIVE ───────────────────────────────── */
 @media (max-width: 992px) {
     .sidebar { display: none; }
@@ -324,4 +391,190 @@ body {
 @media (max-width: 576px) {
     .main-layout { padding: 16px; }
     .feed-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+
+/* ── LAYOUT GERAL DA HOME ─────────────────────── */
+.main-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    align-items: start;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    gap: 36px;
+}
+
+/* Faz destaque, impacto e sobre ocuparem a largura toda */
+#featured-section,
+.impact-section,
+#about-section {
+    grid-column: 1 / -1;
+}
+
+/* ── IMPACTO SOCIAL HORIZONTAL ────────────────── */
+.impact-section {
+    width: 100%;
+    margin: 0;
+}
+
+.impact-horizontal {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;
+    padding: 34px;
+    text-align: center;
+    border-radius: 28px;
+    background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+    box-shadow: 0 18px 45px rgba(45, 90, 39, 0.18);
+    color: var(--white);
+}
+
+.impact-horizontal::before {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    top: -140px;
+    right: -90px;
+    background: rgba(255,255,255,.10);
+    border-radius: 50%;
+}
+
+.impact-horizontal::after {
+    content: "";
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    bottom: -120px;
+    left: -90px;
+    background: rgba(255,255,255,.08);
+    border-radius: 50%;
+}
+
+.impact-horizontal h3 {
+    position: relative;
+    z-index: 1;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin-bottom: 28px;
+}
+
+.impact-stats-row {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.impact-horizontal .impact-stat {
+    min-height: 160px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px 18px;
+    border-bottom: none;
+    border-radius: 24px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(8px);
+    transition: all .25s ease;
+}
+
+.impact-horizontal .impact-stat:hover {
+    transform: translateY(-6px);
+    background: rgba(255,255,255,.20);
+    box-shadow: 0 14px 28px rgba(0,0,0,.12);
+}
+
+.impact-horizontal .impact-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    border-radius: 18px;
+    font-size: 1.8rem;
+}
+
+.impact-horizontal .impact-info .num {
+    font-size: 2.2rem;
+    color: var(--white);
+}
+
+.impact-horizontal .impact-info .lbl {
+    margin-top: 6px;
+    font-size: .9rem;
+    color: rgba(255,255,255,.78);
+}
+
+/* ── CATEGORIAS NA LATERAL ────────────────────── */
+.sidebar {
+    width: 100%;
+    align-self: start;
+}
+
+.filter-card {
+    position: sticky;
+    top: 24px;
+    background: var(--white);
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    border: 1px solid rgba(0,0,0,.04);
+}
+
+.filter-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 8px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #E7E0D4;
+    border-radius: 999px;
+    background: #FAF8F4;
+    transition: all .18s ease;
+}
+
+.filter-chip:hover {
+    transform: translateX(3px);
+    border-color: var(--green-light);
+    color: var(--green-deep);
+    background: #F2F8F0;
+}
+
+.filter-chip.active {
+    background: rgba(123,173,110,.12);
+    border-color: var(--green-mid);
+    color: var(--green-deep);
+    font-weight: 700;
+}
+
+/* ── RESPONSIVO ───────────────────────────────── */
+@media (max-width: 992px) {
+    .main-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .sidebar {
+        position: static;
+    }
+
+    .impact-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .main-layout {
+        padding: 20px 16px;
+    }
+
+    .impact-horizontal {
+        padding: 24px 18px;
+    }
+
+    .impact-stats-row {
+        grid-template-columns: 1fr;
+    }
 }
