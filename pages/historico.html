@@ -123,20 +123,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <script>
     // ── MOCK DATA ───────────────────────────────────────────────
+    const currentUser = 'Maria Clara Souza';
     const mockDoado = [
-      { id:1,  emoji:'🛋️', name:'Sofá de 3 lugares',        cat:'Móveis',      receptor:'Carlos M.',   date:'19/05/2026', status:'disponivel' },
-      { id:2,  emoji:'📱', name:'Micro-ondas 30L',           cat:'Eletro',      receptor:'Ana Lima',    date:'12/05/2026', status:'reservado'  },
-      { id:3,  emoji:'👕', name:'Kit roupas infantis',       cat:'Roupas',      receptor:'ONG Recomeço',date:'08/05/2026', status:'concluido'  },
-      { id:4,  emoji:'🪑', name:'Mesa escritório',           cat:'Móveis',      receptor:'João Alves',  date:'02/05/2026', status:'concluido'  },
-      { id:5,  emoji:'📚', name:'Livros didáticos (4 vol)',  cat:'Escolar',     receptor:'Projeto ABC', date:'28/04/2026', status:'concluido'  },
-      { id:6,  emoji:'🍳', name:'Conjunto de panelas',       cat:'Utensílios',  receptor:'Fernanda R.', date:'22/04/2026', status:'concluido'  },
-      { id:7,  emoji:'👟', name:'Tênis esportivo 42',        cat:'Calçados',    receptor:'Lucas T.',    date:'15/04/2026', status:'concluido'  },
-      { id:8,  emoji:'🧸', name:'Brinquedos variados',       cat:'Brinquedos',  receptor:'Casa Criança',date:'10/04/2026', status:'concluido'  },
-      { id:9,  emoji:'🛏️', name:'Cama solteiro c/ colchão', cat:'Móveis',      receptor:'Silvia N.',   date:'03/04/2026', status:'concluido'  },
-      { id:10, emoji:'🪟', name:'Guarda-roupa 4 portas',     cat:'Móveis',      receptor:'Pedro S.',    date:'28/03/2026', status:'cancelado'  },
-      { id:11, emoji:'🎒', name:'Mochila escolar',           cat:'Escolar',     receptor:'Inst. Educar',date:'20/03/2026', status:'concluido'  },
-      { id:12, emoji:'🧊', name:'Geladeira 280L',            cat:'Eletro',      receptor:'Maria F.',    date:'14/03/2026', status:'concluido'  },
+      { id:1,  emoji:'🛋️', name:'Sofá de 3 lugares',        cat:'Móveis',      receptor:'Carlos M.',   date:'19/05/2026', status:'disponivel', doador: 'Maria Clara Souza' },
+      { id:3,  emoji:'📱', name:'Micro-ondas 30L',          cat:'Eletro',      receptor:'Ana Lima',    date:'12/05/2026', status:'reservado',  doador: 'Maria Clara Souza' },
+      { id:4,  emoji:'👕', name:'Kit roupas infantis',      cat:'Roupas',      receptor:'ONG Recomeço',date:'08/05/2026', status:'concluido',  doador: 'Maria Clara Souza' },
+      { id:5,  emoji:'🪑', name:'Mesa escritório',          cat:'Móveis',      receptor:'João Alves',  date:'02/05/2026', status:'concluido',  doador: 'Maria Clara Souza' },
+      { id:6,  emoji:'📚', name:'Livros didáticos (4 vol)', cat:'Escolar',     receptor:'Projeto ABC', date:'28/04/2026', status:'concluido',  doador: 'Maria Clara Souza' },
     ];
+
+    // Show only entries donated by the logged-in user
+    const myDonations = mockDoado.filter(d => d.doador === currentUser);
 
     const mockRecebido = [
       { id:1, emoji:'🪑', name:'Mesa escritório',        cat:'Móveis',     doador:'Lara C.',    date:'25/04/2026', status:'concluido' },
@@ -206,8 +203,8 @@
       `).join('');
     }
 
-    // Initial render
-    renderDoado(mockDoado);
+    // Initial render (only show current user's donations)
+    renderDoado(myDonations);
     renderRecebido(mockRecebido);
 
     let currentTab = 'doado';
