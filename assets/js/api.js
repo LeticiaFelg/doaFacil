@@ -10,7 +10,7 @@
 // ─── Configuração base ─────────────────────────────────────
 const DoaFacilAPI = (() => {
   // Troque pela URL do API Gateway após o deploy
-  const BASE_URL = window.API_BASE_URL || 'http://localhost:3000/api';
+  const BASE_URL = window.API_BASE_URL || 'http://localhost:5000/';
 
   /**
    * Retorna os headers padrão. Inclui Authorization se houver token salvo.
