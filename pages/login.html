@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Login</title>
+  <link rel="stylesheet" href="../assets/css/login.css">
+  <link rel="stylesheet" href="../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../assets/css/components/navbar.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -43,9 +46,9 @@
     <div class="auth-card">
 
       <!-- Tab switcher -->
-      <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('login')">Entrar</button>
-        <button class="tab-btn" onclick="switchTab('register')">Criar conta</button>
+      <div class="tabs-custom">
+        <button class="tab-btn active" data-tab="login">Entrar</button>
+        <button class="tab-btn" data-tab="register">Criar conta</button>
       </div>
 
       <!-- LOGIN FORM -->
@@ -71,12 +74,12 @@
 
         <a href="#" class="forgot-link">Esqueceu a senha?</a>
 
-        <button class="btn-primary-custom" onclick="goTo('02-feed.html')">
+        <button class="btn-primary-custom" id="btn-entrar">
           <i class="bi bi-arrow-right-circle"></i> Entrar
         </button>
 
         <div class="note">
-          Não tem conta? <a href="#" style="color:var(--green-mid);text-decoration:none;" onclick="switchTab('register')">Crie uma grátis</a>
+          Não tem conta? <a href="#" style="color:var(--green-mid);text-decoration:none;" data-tab="register">Crie uma grátis</a>
         </div>
       </div>
 
@@ -89,15 +92,15 @@
         <div style="margin-bottom:20px;">
           <label style="font-size:.82rem;font-weight:500;color:var(--text-dark);margin-bottom:10px;display:block;">Tipo de perfil <span style="color:var(--text-muted);font-weight:400">(pode selecionar mais de um)</span></label>
           <div class="profile-grid">
-            <div class="profile-card selected" onclick="toggleProfile(this)">
+            <div class="profile-card selected">
               <div class="p-icon">🤝</div>
               <div class="p-name">Doador</div>
             </div>
-            <div class="profile-card" onclick="toggleProfile(this)">
+            <div class="profile-card">
               <div class="p-icon">🏠</div>
               <div class="p-name">Receptor</div>
             </div>
-            <div class="profile-card" onclick="toggleProfile(this)">
+            <div class="profile-card">
               <div class="p-icon">🏛️</div>
               <div class="p-name">Instituição</div>
             </div>
@@ -144,7 +147,7 @@
           </div>
         </div>
 
-        <button class="btn-primary-custom" onclick="goTo('02-feed.html')">
+        <button class="btn-primary-custom" id="btn-criar-conta">
           <i class="bi bi-check-circle"></i> Criar conta
         </button>
 
@@ -155,24 +158,47 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/modal.js"></script>
+
   <script>
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach((b, i) => {
-        b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+    $(function () {
+      // Troca Login / Cadastro usando o seletor curto '.tab-btn' e '$(this)'
+      $(document).on('click', '.tab-btn', function () {
+        const tab = $(this).data('tab');
+        $('.tab-btn').removeClass('active');
+        $(this).addClass('active');
+        $('.form-panel').removeClass('active');
+        $('#panel-' + tab).addClass('active');
       });
-      document.getElementById('panel-login').classList.toggle('active', tab === 'login');
-      document.getElementById('panel-register').classList.toggle('active', tab === 'register');
-    }
 
-    function toggleProfile(el) {
-      el.classList.toggle('selected');
-    }
+      // Ponte de ligação para o link <a> do rodapé (Garante compatibilidade total)
+      $(document).on('click', 'a[data-tab]', function (e) {
+        e.preventDefault();
+        const tab = $(this).data('tab');
+        // Simula o clique diretamente no botão superior correspondente
+        $(`.tab-btn[data-tab="${tab}"]`).trigger('click');
+      });
 
-    function goTo(page) {
-      window.location.href = page;
-    }
+      // Selecionar tipo de perfil
+      $(document).on('click', '.profile-card', function () {
+        $(this).toggleClass('selected');
+      });
+
+      // Botão Entrar com caminho corrigido
+      $(document).on('click', '#btn-entrar', function () {
+        window.location.href = '../index.html';
+      });
+
+      // Botão Criar conta com caminho corrigido
+      $(document).on('click', '#btn-criar-conta', function () {
+        window.location.href = '../index.html';
+      });
+    });
   </script>
-</body>
+  </body>
 </html>
 

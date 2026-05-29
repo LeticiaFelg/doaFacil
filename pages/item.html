@@ -18,7 +18,7 @@
 
   <!-- BREADCRUMB -->
   <div class="breadcrumb-bar">
-    <a href="02-feed.html">Feed</a>
+    <a href="../index.html">Feed</a>
     <i class="bi bi-chevron-right"></i>
     <a href="#" id="breadcrumb-category">Móveis</a>
     <i class="bi bi-chevron-right"></i>
@@ -34,9 +34,9 @@
         <div class="item-gallery" id="gallery-main">
           <div id="gallery-visual" class="gallery-visual"></div>
           <div class="img-nav">
-            <div class="img-dot active" onclick="switchImg(this, '🛋️')"></div>
-            <div class="img-dot" onclick="switchImg(this, '🔍')"></div>
-            <div class="img-dot" onclick="switchImg(this, '📐')"></div>
+            <div class="img-dot active" data-emoji="🛋️"></div>
+            <div class="img-dot" data-emoji="🔍"></div>
+            <div class="img-dot" data-emoji="📐"></div>
           </div>
         </div>
 
@@ -151,11 +151,11 @@
             <i class="bi bi-bookmark-check"></i> Reservar este item
           </button>
 
-          <button class="btn-whatsapp" onclick="alert('Abrindo WhatsApp...')">
+          <button class="btn-whatsapp" id="btn-whatsapp">
             <i class="bi bi-whatsapp"></i> Contato via WhatsApp
           </button>
 
-          <button class="btn-outline" onclick="alert('Item adicionado à lista de desejos!')">
+          <button class="btn-outline" id="btn-desejos">
             <i class="bi bi-heart"></i> Salvar na lista de desejos
           </button>
         </div>
@@ -203,124 +203,148 @@
         </div>
         <div class="modal-footer" style="gap:10px;">
           <button type="button" class="btn-outline" style="width:auto;padding:10px 20px;" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn-reserve" style="width:auto;padding:10px 24px;" onclick="confirmReserve()">Confirmar reserva</button>
+          <button type="button" class="btn-reserve" id="btn-confirmar-reserva" style="width:auto;padding:10px 24px;">Confirmar reserva</button>
         </div>
       </div>
     </div>
   </div>
   <div id="footer"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  
   <script src="../assets/js/components/footer.js"></script>
   <script src="../assets/js/components/navbar.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
   <script src="../assets/js/modal.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <script>
-    // ── MOCK DATA (same as index.html) ────────────────────
+  $(function () {
+  
+    // ── Dados mockados ──────────────────────────────────────
     const mockItems = [
-      { id: 1, title: 'Sofá de 3 lugares',      category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🛋️',  image: '../assets/img/items/item1.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: 'Sofá em tecido cinza, leve desgaste nos braços, estrutura firme.',          location: 'Ipanema, RJ', generalMapsQuery: 'Ipanema,+Rio+de+Janeiro', fullAddress: 'Rua Nascimento Silva 107, Ipanema, Rio de Janeiro', mapAddress: 'Rua+Nascimento+Silva+107,+Ipanema,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22421-000', donor: 'Maria S.',    donorRecurrent: true  },
-      { id: 2, title: 'Guarda-roupa 4 portas',  category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🪟',  image: '../assets/img/items/item2.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: 'Madeira clara, espelho interno, sem trincas.',                              location: 'Urca, RJ',   generalMapsQuery: 'Urca,+Rio+de+Janeiro', fullAddress: 'Av. Pasteur 520, Urca, Rio de Janeiro', mapAddress: 'Av.+Pasteur+520,+Urca,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22290-240', donor: 'João P.',     donorRecurrent: false },
-      { id: 3, title: 'Micro-ondas 30L',        category: 'eletro',     categoryLabel: 'Eletro',     emoji: '📱',  image: '../assets/img/items/item3.jpg', condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Funcionando perfeitamente, acompanha prato giratório.',                     location: 'Tijuca, RJ',     generalMapsQuery: 'Tijuca,+Rio+de+Janeiro', fullAddress: 'Rua Barão de Mesquita 1200, Tijuca, Rio de Janeiro', mapAddress: 'Rua+Barão+de+Mesquita+1200,+Tijuca,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+20540-003', donor: 'Ana C.',      donorRecurrent: true  },
-      { id: 4, title: 'Kit roupas infantis',    category: 'roupas',     categoryLabel: 'Roupas',     emoji: '👕',  image: '../assets/img/items/item4.jpg', condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Tamanhos 4 a 8 anos, várias peças, bem conservadas.',                      location: 'Méier, RJ',      generalMapsQuery: 'Meier,+Rio+de+Janeiro', fullAddress: 'Rua Barão do Bom Retiro 380, Méier, Rio de Janeiro', mapAddress: 'Rua+Barao+do+Bom+Retiro+380,+Meier,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+20755-041', donor: 'Carlos M.',   donorRecurrent: true  },
-      { id: 5, title: 'Mesa de escritório',     category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🪑',  image: '../assets/img/items/item5.jpg', condition: 'usado',  condLabel: 'Usado',        desc: 'Mesa retangular 120x60cm, arranhões superficiais.',                         location: 'Centro, RJ',     generalMapsQuery: 'Centro,+Rio+de+Janeiro', fullAddress: 'Rua Ouvidor 115, Centro, Rio de Janeiro', mapAddress: 'Rua+Ouvidor+115,+Centro,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+20040-030', donor: 'Lia F.',      donorRecurrent: false },
-      { id: 6, title: 'Conjunto de panelas',    category: 'utensilios', categoryLabel: 'Utensílios', emoji: '🍳',  image: '../assets/img/items/item6.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: '5 peças, antiaderente, sem lascas. Cabos firmes.',                          location: 'Realengo, RJ',   generalMapsQuery: 'Realengo,+Rio+de+Janeiro', fullAddress: 'Rua Itaguaí 900, Realengo, Rio de Janeiro', mapAddress: 'Rua+Itaguai+900,+Realengo,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+21735-770', donor: 'Paulo T.',    donorRecurrent: false },
-      { id: 7, title: 'Tênis esportivo 42',     category: 'calcados',   categoryLabel: 'Calçados',   emoji: '👟',  image: '../assets/img/items/item7.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: 'Pouco uso, solado em bom estado.',                                          location: 'Jacarepaguá, RJ', generalMapsQuery: 'Jacarepagua,+Rio+de+Janeiro', fullAddress: 'Av. Ayrton Senna 2150, Jacarepaguá, Rio de Janeiro', mapAddress: 'Av.+Ayrton+Senna+2150,+Jacarepagua,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22775-044', donor: 'Marcos L.',   donorRecurrent: true  },
-      { id: 8, title: 'Livros didáticos',       category: 'escolar',    categoryLabel: 'Escolar',    emoji: '📚',  image: '../assets/img/items/item8.jpg', condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Ensino médio, completos, sem anotações.',                                   location: 'Tijuca, RJ',    generalMapsQuery: 'Tijuca,+Rio+de+Janeiro', fullAddress: 'Rua Conde de Bonfim 702, Tijuca, Rio de Janeiro', mapAddress: 'Rua+Conde+de+Bonfim+702,+Tijuca,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+20560-051', donor: 'Beatriz N.',  donorRecurrent: false },
-      { id: 9, title: 'Cama solteiro',          category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🛏️',  image: '../assets/img/items/item9.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: 'Cama de madeira com colchão incluso, sem mofos.',                           location: 'Centro, RJ',     generalMapsQuery: 'Centro,+Rio+de+Janeiro', fullAddress: 'Rua Sete de Setembro 150, Centro, Rio de Janeiro', mapAddress: 'Rua+Sete+de+Setembro+150,+Centro,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+20050-009', donor: 'Fernanda R.', donorRecurrent: true  },
-      { id:10, title: 'Brinquedos variados',    category: 'brinquedos', categoryLabel: 'Brinquedos', emoji: '🧸',  image: '../assets/img/items/item10.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: 'Caixinha com quebra-cabeças, carrinhos e bonecas.',                         location: 'Catumbi, RJ',    generalMapsQuery: 'Catumbi,+Rio+de+Janeiro', fullAddress: 'Rua Itapiru 45, Catumbi, Rio de Janeiro', mapAddress: 'Rua+Itapiru+45,+Catumbi,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+20251-000', donor: 'Renata M.',   donorRecurrent: false },
-      { id:11, title: 'Geladeira 280L',         category: 'eletro',     categoryLabel: 'Eletro',     emoji: '🧊',  image: '../assets/img/items/item11.jpg', condition: 'usado',  condLabel: 'Usado',        desc: 'Funciona bem, pequenas marcas externas.',                                   location: 'Flamengo, RJ',   generalMapsQuery: 'Flamengo,+Rio+de+Janeiro', fullAddress: 'Rua Fernando Osório 68, Flamengo, Rio de Janeiro', mapAddress: 'Rua+Fernando+Osorio+68,+Flamengo,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22210-030', donor: 'Hugo S.',     donorRecurrent: true  },
-      { id:12, title: 'Mochila escolar',        category: 'escolar',    categoryLabel: 'Escolar',    emoji: '🎒',  image: '../assets/img/items/item12.jpg', condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Nova, nunca usada, tamanho médio.',                                         location: 'Santa Cruz, RJ', generalMapsQuery: 'Santa+Cruz,+Rio+de+Janeiro', fullAddress: 'Av. Santa Cruz 1500, Santa Cruz, Rio de Janeiro', mapAddress: 'Av.+Santa+Cruz+1500,+Santa+Cruz,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+23565-250', donor: 'Olivia C.',   donorRecurrent: false },
+      { id: 1, title: 'Sofá de 3 lugares',      category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🛋️',  image: '../assets/img/items/item1.jpg',  condition: 'bom',   condLabel: 'Bom estado', desc: 'Sofá em tecido cinza, leve desgaste nos braços, estrutura firme.',           location: 'Ipanema, RJ',      fullAddress: 'Rua Nascimento Silva 107, Ipanema, Rio de Janeiro',    mapAddress: 'Rua+Nascimento+Silva+107,+Ipanema,+Rio+de+Janeiro,+RJ',      donor: 'Maria S.',   donorRecurrent: true  },
+      { id: 2, title: 'Guarda-roupa 4 portas',  category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🪟',  image: '../assets/img/items/item2.jpg',  condition: 'bom',   condLabel: 'Bom estado', desc: 'Madeira clara, espelho interno, sem trincas.',                               location: 'Urca, RJ',         fullAddress: 'Av. Pasteur 520, Urca, Rio de Janeiro',                mapAddress: 'Av.+Pasteur+520,+Urca,+Rio+de+Janeiro,+RJ',                  donor: 'João P.',    donorRecurrent: false },
+      { id: 3, title: 'Micro-ondas 30L',        category: 'eletro',     categoryLabel: 'Eletro',     emoji: '📱',  image: '../assets/img/items/item3.jpg',  condition: 'otimo', condLabel: 'Ótimo',      desc: 'Funcionando perfeitamente, acompanha prato giratório.',                     location: 'Tijuca, RJ',       fullAddress: 'Rua Barão de Mesquita 1200, Tijuca, Rio de Janeiro',   mapAddress: 'Rua+Barao+de+Mesquita+1200,+Tijuca,+Rio+de+Janeiro,+RJ',    donor: 'Ana C.',     donorRecurrent: true  },
+      { id: 4, title: 'Kit roupas infantis',    category: 'roupas',     categoryLabel: 'Roupas',     emoji: '👕',  image: '../assets/img/items/item4.jpg',  condition: 'otimo', condLabel: 'Ótimo',      desc: 'Tamanhos 4 a 8 anos, várias peças, bem conservadas.',                      location: 'Méier, RJ',        fullAddress: 'Rua Barão do Bom Retiro 380, Méier, Rio de Janeiro',   mapAddress: 'Rua+Barao+do+Bom+Retiro+380,+Meier,+Rio+de+Janeiro,+RJ',    donor: 'Carlos M.',  donorRecurrent: true  },
+      { id: 5, title: 'Mesa de escritório',     category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🪑',  image: '../assets/img/items/item5.jpg',  condition: 'usado', condLabel: 'Usado',      desc: 'Mesa retangular 120x60cm, arranhões superficiais.',                         location: 'Centro, RJ',       fullAddress: 'Rua Ouvidor 115, Centro, Rio de Janeiro',              mapAddress: 'Rua+Ouvidor+115,+Centro,+Rio+de+Janeiro,+RJ',               donor: 'Lia F.',     donorRecurrent: false },
+      { id: 6, title: 'Conjunto de panelas',    category: 'utensilios', categoryLabel: 'Utensílios', emoji: '🍳',  image: '../assets/img/items/item6.jpg',  condition: 'bom',   condLabel: 'Bom estado', desc: '5 peças, antiaderente, sem lascas. Cabos firmes.',                          location: 'Realengo, RJ',     fullAddress: 'Rua Itaguaí 900, Realengo, Rio de Janeiro',            mapAddress: 'Rua+Itaguai+900,+Realengo,+Rio+de+Janeiro,+RJ',             donor: 'Paulo T.',   donorRecurrent: false },
+      { id: 7, title: 'Tênis esportivo 42',     category: 'calcados',   categoryLabel: 'Calçados',   emoji: '👟',  image: '../assets/img/items/item7.jpg',  condition: 'bom',   condLabel: 'Bom estado', desc: 'Pouco uso, solado em bom estado.',                                          location: 'Jacarepaguá, RJ',  fullAddress: 'Av. Ayrton Senna 2150, Jacarepaguá, Rio de Janeiro',   mapAddress: 'Av.+Ayrton+Senna+2150,+Jacarepagua,+Rio+de+Janeiro,+RJ',    donor: 'Marcos L.',  donorRecurrent: true  },
+      { id: 8, title: 'Livros didáticos',       category: 'escolar',    categoryLabel: 'Escolar',    emoji: '📚',  image: '../assets/img/items/item8.jpg',  condition: 'otimo', condLabel: 'Ótimo',      desc: 'Ensino médio, completos, sem anotações.',                                   location: 'Tijuca, RJ',       fullAddress: 'Rua Conde de Bonfim 702, Tijuca, Rio de Janeiro',      mapAddress: 'Rua+Conde+de+Bonfim+702,+Tijuca,+Rio+de+Janeiro,+RJ',       donor: 'Beatriz N.', donorRecurrent: false },
+      { id: 9, title: 'Cama solteiro',          category: 'moveis',     categoryLabel: 'Móveis',     emoji: '🛏️', image: '../assets/img/items/item9.jpg',  condition: 'bom',   condLabel: 'Bom estado', desc: 'Cama de madeira com colchão incluso, sem mofos.',                           location: 'Centro, RJ',       fullAddress: 'Rua Sete de Setembro 150, Centro, Rio de Janeiro',     mapAddress: 'Rua+Sete+de+Setembro+150,+Centro,+Rio+de+Janeiro,+RJ',      donor: 'Fernanda R.',donorRecurrent: true  },
+      { id:10, title: 'Brinquedos variados',    category: 'brinquedos', categoryLabel: 'Brinquedos', emoji: '🧸',  image: '../assets/img/items/item10.jpg', condition: 'bom',   condLabel: 'Bom estado', desc: 'Caixinha com quebra-cabeças, carrinhos e bonecas.',                         location: 'Catumbi, RJ',      fullAddress: 'Rua Itapiru 45, Catumbi, Rio de Janeiro',              mapAddress: 'Rua+Itapiru+45,+Catumbi,+Rio+de+Janeiro,+RJ',               donor: 'Renata M.',  donorRecurrent: false },
+      { id:11, title: 'Geladeira 280L',         category: 'eletro',     categoryLabel: 'Eletro',     emoji: '🧊',  image: '../assets/img/items/item11.jpg', condition: 'usado', condLabel: 'Usado',      desc: 'Funciona bem, pequenas marcas externas.',                                   location: 'Flamengo, RJ',     fullAddress: 'Rua Fernando Osório 68, Flamengo, Rio de Janeiro',     mapAddress: 'Rua+Fernando+Osorio+68,+Flamengo,+Rio+de+Janeiro,+RJ',      donor: 'Hugo S.',    donorRecurrent: true  },
+      { id:12, title: 'Mochila escolar',        category: 'escolar',    categoryLabel: 'Escolar',    emoji: '🎒',  image: '../assets/img/items/item12.jpg', condition: 'otimo', condLabel: 'Ótimo',      desc: 'Nova, nunca usada, tamanho médio.',                                         location: 'Santa Cruz, RJ',   fullAddress: 'Av. Santa Cruz 1500, Santa Cruz, Rio de Janeiro',      mapAddress: 'Av.+Santa+Cruz+1500,+Santa+Cruz,+Rio+de+Janeiro,+RJ',       donor: 'Olivia C.',  donorRecurrent: false },
     ];
-
-    // Get item ID from URL and render
+  
+    // ── Helper: monta iframe do Google Maps ─────────────────
+    function buildMapIframe(address, title) {
+      const query = encodeURIComponent(address.replace(/\+/g, ' '));
+      return `<iframe title="${title}" src="https://www.google.com/maps?q=${query}&output=embed"
+        width="100%" height="100%" style="border:0;border-radius:14px;"
+        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+    }
+  
+    // ── Carrega os dados do item conforme ?id= na URL ────────
+    // Substitui: loadItem() com document.getElementById x10 + document.querySelector
     function loadItem() {
       const params = new URLSearchParams(window.location.search);
       const itemId = Number(params.get('id')) || 1;
-      const item = mockItems.find(i => i.id === itemId) || mockItems[0];
-
-      // Update breadcrumb
-      document.getElementById('breadcrumb-category').textContent = item.categoryLabel;
-      document.getElementById('breadcrumb-title').textContent = item.title;
-
-      // Update gallery
-      const galleryVisual = document.getElementById('gallery-visual');
+      const item   = mockItems.find(i => i.id === itemId) || mockItems[0];
+    
+      // Breadcrumb
+      $('#breadcrumb-category').text(item.categoryLabel);
+      $('#breadcrumb-title').text(item.title);
+    
+      // Galeria
       if (item.image) {
-        galleryVisual.innerHTML = `<img id="gallery-img" src="${item.image}" alt="${item.title}" loading="lazy">`;
+        $('#gallery-visual').html(`<img id="gallery-img" src="${item.image}" alt="${item.title}" loading="lazy">`);
       } else {
-        galleryVisual.innerHTML = `<span id="gallery-emoji">${item.emoji}</span>`;
+        $('#gallery-visual').html(`<span id="gallery-emoji">${item.emoji}</span>`);
       }
-
-      // Update descriptions
-      document.getElementById('item-desc-main').textContent = item.desc;
-      document.getElementById('item-desc-extra').textContent = `${item.title} disponível para retirada a combinar.`;
-
-      // Update specs
-      document.getElementById('spec-category').textContent = item.categoryLabel;
-      document.getElementById('spec-condition').textContent = item.condLabel;
-
-      // Update location (general location before reservation)
-      document.getElementById('item-location-name').textContent = item.location.split(',')[0];
-      document.getElementById('item-location-sub').textContent = item.location;
-
-      // Update location map with general location
-      document.getElementById('location-map').innerHTML = buildMapIframe(item.location, 'Mapa da localização aproximada');
-
-      // Update action panel
-      document.getElementById('item-category-badge').textContent = item.categoryLabel;
-      document.getElementById('item-title-main').textContent = item.title;
-      document.getElementById('item-condition-text').textContent = item.condLabel;
-
-      // Update modal
-      document.getElementById('modal-item-emoji').textContent = item.emoji;
-      document.getElementById('modal-item-title').textContent = item.title;
-      document.getElementById('modal-item-sub').textContent = `${item.location} · ${item.condLabel}`;
+    
+      // Descrição
+      $('#item-desc-main').text(item.desc);
+      $('#item-desc-extra').text(`${item.title} disponível para retirada a combinar.`);
+    
+      // Especificações
+      $('#spec-category').text(item.categoryLabel);
+      $('#spec-condition').text(item.condLabel);
+    
+      // Localização (aproximada antes da reserva)
+      $('#item-location-name').text(item.location.split(',')[0]);
+      $('#item-location-sub').text(item.location);
+      $('#location-map').html(buildMapIframe(item.location, 'Mapa da localização aproximada'));
+    
+      // Painel de ação
+      $('#item-category-badge').text(item.categoryLabel);
+      $('#item-title-main').text(item.title);
+      $('#item-condition-text').text(item.condLabel);
+    
+      // Modal
+      $('#modal-item-emoji').text(item.emoji);
+      $('#modal-item-title').text(item.title);
+      $('#modal-item-sub').text(`${item.location} · ${item.condLabel}`);
     }
-
-    function buildMapIframe(address, title) {
-      const safeAddress = address.replace(/\+/g, ' ');
-      const query = encodeURIComponent(safeAddress);
-      return `<iframe title="${title}" src="https://www.google.com/maps?q=${query}&output=embed" width="100%" height="100%" style="border:0;border-radius:14px;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
-    }
-
-    // Load item when page loads
-    window.addEventListener('load', loadItem);
-
-    const emojis = ['🛋️', '🔍', '📐'];
-
-    function switchImg(dot, emoji) {
-      document.querySelectorAll('.img-dot').forEach(d => d.classList.remove('active'));
-      dot.classList.add('active');
-      const galleryEmoji = document.getElementById('gallery-emoji');
-      if (galleryEmoji) {
-        galleryEmoji.textContent = emoji;
+  
+    // Substitui: window.addEventListener('load', loadItem)
+    $(window).on('load', loadItem);
+  
+    // ── Navegação da galeria por dots ────────────────────────
+    // Substitui: switchImg() com querySelectorAll + classList + getElementById
+    $(document).on('click', '.img-dot', function () {
+      $('.img-dot').removeClass('active');
+      $(this).addClass('active');
+      // Só age quando a galeria exibe emoji (sem imagem real carregada)
+      const $emoji = $('#gallery-emoji');
+      if ($emoji.length) {
+        $emoji.text($(this).data('emoji'));
       }
-    }
-
-
-    function confirmReserve() {
+    });
+  
+    // ── Botão WhatsApp ───────────────────────────────────────
+    // Substitui: onclick="alert('Abrindo WhatsApp...')"
+    $(document).on('click', '#btn-whatsapp', function () {
+      alert('Abrindo WhatsApp...');
+    });
+  
+    // ── Botão Lista de desejos ───────────────────────────────
+    // Substitui: onclick="alert('Item adicionado à lista de desejos!')"
+    $(document).on('click', '#btn-desejos', function () {
+      alert('Item adicionado à lista de desejos!');
+    });
+  
+    // ── Confirmar reserva no modal ───────────────────────────
+    // Substitui: confirmReserve() com querySelector + getElementById + bootstrap.Modal.getInstance
+    $(document).on('click', '#btn-confirmar-reserva', function () {
       const modal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
       modal.hide();
-      setTimeout(() => {
-        // Get current item data
+    
+      setTimeout(function () {
         const params = new URLSearchParams(window.location.search);
         const itemId = Number(params.get('id')) || 1;
-        const item = mockItems.find(i => i.id === itemId) || mockItems[0];
-
-        // Update status pill
-        document.querySelector('.status-pill').className = 'status-pill';
-        document.querySelector('.status-pill').style.background = '#FFF3CD';
-        document.querySelector('.status-pill').style.color = '#856404';
-        document.querySelector('.status-pill').innerHTML = '<i class="bi bi-hourglass-split"></i> Reservado';
-        
-        // Update location-block with specific address
-        document.getElementById('item-location-name').textContent = item.fullAddress.split(',')[0];
-        document.getElementById('item-location-sub').textContent = item.fullAddress;
-        
-        // Update location-map with specific address
-        document.getElementById('location-title').innerHTML = '<i class="bi bi-map" style="color:var(--green-mid)"></i> Localização exata';
-        document.getElementById('location-map').innerHTML = buildMapIframe(item.mapAddress, 'Mapa da localização exata');
-        
+        const item   = mockItems.find(i => i.id === itemId) || mockItems[0];
+      
+        // Atualiza pill de status
+        // Substitui: document.querySelector('.status-pill').style... + innerHTML
+        $('.status-pill')
+          .removeClass('status-available')
+          .css({ background: '#FFF3CD', color: '#856404' })
+          .html('<i class="bi bi-hourglass-split"></i> Reservado');
+      
+        // Revela endereço exato após confirmação
+        $('#item-location-name').text(item.fullAddress.split(',')[0]);
+        $('#item-location-sub').text(item.fullAddress);
+      
+        // Atualiza mapa para localização exata
+        $('#location-title').html('<i class="bi bi-map" style="color:var(--green-mid)"></i> Localização exata');
+        $('#location-map').html(buildMapIframe(item.mapAddress, 'Mapa da localização exata'));
+      
         alert('✅ Item reservado com sucesso!\nEntre em contato via WhatsApp para combinar a retirada.');
       }, 300);
-    }
+    });
+  
+  });
   </script>
 </body>
 </html>
