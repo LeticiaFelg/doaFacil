@@ -31,9 +31,9 @@
           <div class="location-line"><i class="bi bi-geo-alt"></i> Copacabana, Rio de Janeiro – RJ</div>
 
           <!-- Multi-profile badges: click to switch view -->
-          <div class="profile-badges">
-            <button class="profile-type-badge type-doador active" onclick="switchProfile('doador', this)">🤝 Doadora</button>
-            <button class="profile-type-badge type-receptor" onclick="switchProfile('receptor', this)">🏠 Receptora</button>
+          <div class="profile-badges" style="margin-top: 12px;">
+            <button class="profile-type-badge type-doador active" data-profile="doador">🤝 Doadora</button>
+            <button class="profile-type-badge type-receptor" data-profile="receptor">🏠 Receptora</button>
           </div>
 
           <div class="join-date"><i class="bi bi-calendar3"></i> Membro desde março de 2024</div>
@@ -93,28 +93,28 @@
           <div class="section-card">
             <h3><i class="bi bi-box-seam" style="color:var(--green-mid)"></i> Doações ativas</h3>
             <div class="mini-grid">
-              <div class="mini-card" onclick="window.location.href='04-item.html?id=1'">
+              <div class="mini-card" data-href="item.html?id=1">
                 <div class="mini-img"><img src="../assets/img/items/item1.jpg" alt="Sofá 3 lugares" loading="lazy"></div>
                 <div class="mini-body">
                   <div class="mini-title">Sofá 3 lugares</div>
                   <span class="mini-status s-disponivel">Disponível</span>
                 </div>
               </div>
-              <div class="mini-card" onclick="window.location.href='04-item.html?id=3'">
+              <div class="mini-card" data-href="item.html?id=3">
                 <div class="mini-img"><img src="../assets/img/items/item3.jpg" alt="Micro-ondas 30L" loading="lazy"></div>
                 <div class="mini-body">
                   <div class="mini-title">Micro-ondas 30L</div>
                   <span class="mini-status s-reservado">Reservado</span>
                 </div>
               </div>
-              <div class="mini-card" onclick="window.location.href='04-item.html?id=4'">
+              <div class="mini-card" data-href="item.html?id=4">
                 <div class="mini-img"><img src="../assets/img/items/item4.jpg" alt="Kit roupas infantis" loading="lazy"></div>
                 <div class="mini-body">
                   <div class="mini-title">Kit roupas infantis</div>
                   <span class="mini-status s-disponivel">Disponível</span>
                 </div>
               </div>
-              <div class="mini-card" style="border:2px dashed var(--green-pale);display:flex;align-items:center;justify-content:center;flex-direction:column;height:120px;cursor:pointer;" onclick="alert('Publicar novo item')">
+              <div class="mini-card" id="btn-nova-doacao" style="border:2px dashed var(--green-pale);display:flex;align-items:center;justify-content:center;flex-direction:column;height:120px;cursor:pointer;" >
                 <div style="font-size:1.6rem;color:var(--green-light)">＋</div>
                 <div style="font-size:.78rem;color:var(--text-muted);margin-top:4px">Nova doação</div>
               </div>
@@ -169,26 +169,57 @@
         <div style="font-size:3rem;margin-bottom:12px">🏛️</div>
         <h3 style="justify-content:center;">Perfil Instituição</h3>
         <p style="color:var(--text-muted);font-size:.9rem;max-width:400px;margin:0 auto 20px;">Exemplo de como uma instituição apareceria abaixo. Este usuário não possui perfil institucional.</p>
-        <button class="btn-edit" onclick="alert('Solicitar perfil institucional')"><i class="bi bi-plus-circle"></i> Solicitar perfil institucional</button>
+        <button class="btn-edit" id="btn-solicitar-inst"><i class="bi bi-plus-circle"></i> Solicitar perfil institucional</button>
       </div>
     </div>
   </div><!-- end page-container -->
   <div id="footer"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/components/footer.js"></script>
   <script src="../assets/js/components/navbar.js"></script>
   <script src="../assets/js/modal.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
   <script>
-    function switchProfile(type, btn) {
-      // Update badge active state
-      document.querySelectorAll('.profile-type-badge').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    $(function () {
+    
+      // Troca de visão Doador / Receptor
+      // Substitui: switchProfile() com querySelectorAll + classList
+      $(document).on('click', '.profile-type-badge', function () {
+        const type = $(this).data('profile');
+        $('.profile-type-badge').removeClass('active');
+        $(this).addClass('active');
+        $('.profile-view').removeClass('active');
+        $('#view-' + type).addClass('active');
+      });
+    
+      // Mini-cards de doações ativas → navegam para item.html
+      // Substitui: onclick="window.location.href='04-item.html?id=...'"
+      // Bug corrigido: '04-item.html' → 'item.html' (mesma pasta pages/)
+      $(document).on('click', '.mini-card[data-href]', function () {
+        window.location.href = $(this).data('href');
+      });
+    
+      // Card "Nova doação"
+      $(document).on('click', '#btn-nova-doacao', function () {
+        alert('Publicar novo item');
+      });
+    
+      // Botão "Solicitar perfil institucional"
+      $(document).on('click', '#btn-solicitar-inst', function () {
+        alert('Solicitar perfil institucional');
+      });
 
-      // Show correct view
-      document.querySelectorAll('.profile-view').forEach(v => v.classList.remove('active'));
-      document.getElementById('view-' + type).classList.add('active');
-    }
-  </script>
+      // Botão Editar Perfil Centralizado
+      $(document).on('click', '.btn-edit', function (e) {
+        e.preventDefault();
+        // Sem Ajax
+        alert('Falta função Ajax para envio do HTTP PUT.');
+      });
+    
+    });
+</script>
 </body>
 </html>
 

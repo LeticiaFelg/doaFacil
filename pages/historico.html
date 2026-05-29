@@ -63,19 +63,19 @@
     <!-- TABS + FILTERS -->
     <div class="tab-area">
       <div class="history-tabs">
-        <button class="h-tab active" onclick="switchTab('doado', this)">
+        <button class="h-tab active" data-tab="doado">
           <i class="bi bi-box-arrow-up"></i> Doações feitas <span class="tab-count">23</span>
         </button>
-        <button class="h-tab" onclick="switchTab('recebido', this)">
+        <button class="h-tab" data-tab="recebido">
           <i class="bi bi-box-arrow-down"></i> Itens recebidos <span class="tab-count">7</span>
         </button>
       </div>
       <div class="filter-row">
         <div class="search-sm">
           <i class="bi bi-search"></i>
-          <input type="text" placeholder="Buscar item..." oninput="filterHistory(this.value)"/>
+          <input type="text" placeholder="Buscar item..." id="input-busca"/>
         </div>
-        <select class="filter-select" onchange="filterByStatus(this.value)">
+        <select class="filter-select" id="select-status">
           <option value="all">Todos os status</option>
           <option value="concluido">Concluído</option>
           <option value="reservado">Reservado</option>
@@ -117,122 +117,162 @@
 
   </div>
   <div id="footer"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  
   <script src="../assets/js/components/footer.js"></script>
   <script src="../assets/js/components/navbar.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
   <script src="../assets/js/modal.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <script>
-    // ── MOCK DATA ───────────────────────────────────────────────
-    const currentUser = 'Maria Clara Souza';
+  $(function () {
+  
+    // ── Dados mockados ──────────────────────────────────────
     const mockDoado = [
-      { id:1,  emoji:'🛋️', name:'Sofá de 3 lugares',        cat:'Móveis',      receptor:'Carlos M.',   date:'19/05/2026', status:'disponivel', doador: 'Maria Clara Souza' },
-      { id:3,  emoji:'📱', name:'Micro-ondas 30L',          cat:'Eletro',      receptor:'Ana Lima',    date:'12/05/2026', status:'reservado',  doador: 'Maria Clara Souza' },
-      { id:4,  emoji:'👕', name:'Kit roupas infantis',      cat:'Roupas',      receptor:'ONG Recomeço',date:'08/05/2026', status:'concluido',  doador: 'Maria Clara Souza' },
-      { id:5,  emoji:'🪑', name:'Mesa escritório',          cat:'Móveis',      receptor:'João Alves',  date:'02/05/2026', status:'concluido',  doador: 'Maria Clara Souza' },
-      { id:6,  emoji:'📚', name:'Livros didáticos (4 vol)', cat:'Escolar',     receptor:'Projeto ABC', date:'28/04/2026', status:'concluido',  doador: 'Maria Clara Souza' },
+      { id:1,  emoji:'🛋️', name:'Sofá de 3 lugares',        cat:'Móveis',     receptor:'Carlos M.',    date:'19/05/2026', status:'disponivel' },
+      { id:2,  emoji:'📱', name:'Micro-ondas 30L',           cat:'Eletro',     receptor:'Ana Lima',     date:'12/05/2026', status:'reservado'  },
+      { id:3,  emoji:'👕', name:'Kit roupas infantis',       cat:'Roupas',     receptor:'ONG Recomeço', date:'08/05/2026', status:'concluido'  },
+      { id:4,  emoji:'🪑', name:'Mesa escritório',           cat:'Móveis',     receptor:'João Alves',   date:'02/05/2026', status:'concluido'  },
+      { id:5,  emoji:'📚', name:'Livros didáticos (4 vol)',  cat:'Escolar',    receptor:'Projeto ABC',  date:'28/04/2026', status:'concluido'  },
+      { id:6,  emoji:'🍳', name:'Conjunto de panelas',       cat:'Utensílios', receptor:'Fernanda R.',  date:'22/04/2026', status:'concluido'  },
+      { id:7,  emoji:'👟', name:'Tênis esportivo 42',        cat:'Calçados',   receptor:'Lucas T.',     date:'15/04/2026', status:'concluido'  },
+      { id:8,  emoji:'🧸', name:'Brinquedos variados',       cat:'Brinquedos', receptor:'Casa Criança', date:'10/04/2026', status:'concluido'  },
+      { id:9,  emoji:'🛏️', name:'Cama solteiro c/ colchão', cat:'Móveis',     receptor:'Silvia N.',    date:'03/04/2026', status:'concluido'  },
+      { id:10, emoji:'🪟', name:'Guarda-roupa 4 portas',     cat:'Móveis',     receptor:'Pedro S.',     date:'28/03/2026', status:'cancelado'  },
+      { id:11, emoji:'🎒', name:'Mochila escolar',           cat:'Escolar',    receptor:'Inst. Educar', date:'20/03/2026', status:'concluido'  },
+      { id:12, emoji:'🧊', name:'Geladeira 280L',            cat:'Eletro',     receptor:'Maria F.',     date:'14/03/2026', status:'concluido'  },
     ];
-
-    // Show only entries donated by the logged-in user
-    const myDonations = mockDoado.filter(d => d.doador === currentUser);
-
+  
     const mockRecebido = [
-      { id:1, emoji:'🪑', name:'Mesa escritório',        cat:'Móveis',     doador:'Lara C.',    date:'25/04/2026', status:'concluido' },
-      { id:2, emoji:'📚', name:'Livros didáticos',       cat:'Escolar',    doador:'Roberto S.', date:'18/04/2026', status:'concluido' },
-      { id:3, emoji:'👗', name:'Roupas tamanho M (lote)',cat:'Roupas',     doador:'Ana P.',     date:'10/04/2026', status:'concluido' },
-      { id:4, emoji:'🍳', name:'Frigideira antiaderente',cat:'Utensílios', doador:'Carlos M.',  date:'01/04/2026', status:'concluido' },
-      { id:5, emoji:'🎒', name:'Mochila infantil',       cat:'Escolar',    doador:'Vera N.',    date:'22/03/2026', status:'concluido' },
-      { id:6, emoji:'🧸', name:'Kit brinquedos',         cat:'Brinquedos', doador:'Inst.Vida',  date:'15/03/2026', status:'concluido' },
-      { id:7, emoji:'🛋️', name:'Poltrona de leitura',   cat:'Móveis',     doador:'Hugo B.',    date:'05/03/2026', status:'reservado' },
+      { id:1, emoji:'🪑', name:'Mesa escritório',         cat:'Móveis',     doador:'Lara C.',    date:'25/04/2026', status:'concluido' },
+      { id:2, emoji:'📚', name:'Livros didáticos',        cat:'Escolar',    doador:'Roberto S.', date:'18/04/2026', status:'concluido' },
+      { id:3, emoji:'👗', name:'Roupas tamanho M (lote)', cat:'Roupas',     doador:'Ana P.',     date:'10/04/2026', status:'concluido' },
+      { id:4, emoji:'🍳', name:'Frigideira antiaderente', cat:'Utensílios', doador:'Carlos M.',  date:'01/04/2026', status:'concluido' },
+      { id:5, emoji:'🎒', name:'Mochila infantil',        cat:'Escolar',    doador:'Vera N.',    date:'22/03/2026', status:'concluido' },
+      { id:6, emoji:'🧸', name:'Kit brinquedos',          cat:'Brinquedos', doador:'Inst.Vida',  date:'15/03/2026', status:'concluido' },
+      { id:7, emoji:'🛋️', name:'Poltrona de leitura',    cat:'Móveis',     doador:'Hugo B.',    date:'05/03/2026', status:'reservado' },
     ];
-
+  
     const statusMap = {
       concluido:  '<span class="pill pill-concluido">✅ Concluído</span>',
       reservado:  '<span class="pill pill-reservado">⏳ Reservado</span>',
       disponivel: '<span class="pill pill-disponivel">🔵 Disponível</span>',
       cancelado:  '<span class="pill pill-cancelado">✗ Cancelado</span>',
     };
-
-    function getItemImage(id) {
-      return '../assets/img/items/item' + id + '.jpg';
-    }
-
-    function renderDoado(data) {
-      const container = document.getElementById('doado-rows');
-      if (!data.length) {
-        container.innerHTML = '<div class="empty-state"><div class="e-icon">📭</div><p>Nenhum item encontrado.</p></div>';
-        return;
-      }
-      container.innerHTML = data.map(item => `
-        <div class="history-row cols-doado ${item.status === 'concluido' ? 'recurrent-row' : ''}">
-          <div class="item-cell">
-            <div class="item-emoji-thumb"><img src="${getItemImage(item.id)}" alt="${item.name}" loading="lazy"></div>
-            <div>
-              <div class="item-cell-name">${item.name}</div>
-              <div class="item-cell-cat">${item.cat}</div>
-            </div>
-          </div>
-          <div style="font-size:.88rem;font-weight:500;">${item.receptor}</div>
-          <div style="font-size:.83rem;color:var(--text-muted);">${item.cat}</div>
-          <div class="row-date">${item.date}</div>
-          <div>${statusMap[item.status]}</div>
-          <div><button class="btn-mini" onclick="alert('Detalhes: ${item.name}')"><i class="bi bi-eye"></i></button></div>
-        </div>
-      `).join('');
-    }
-
-    function renderRecebido(data) {
-      const container = document.getElementById('recebido-rows');
-      if (!data.length) {
-        container.innerHTML = '<div class="empty-state"><div class="e-icon">📭</div><p>Nenhum item encontrado.</p></div>';
-        return;
-      }
-      container.innerHTML = data.map(item => `
-        <div class="history-row cols-recebido">
-          <div class="item-cell">
-            <div class="item-emoji-thumb"><img src="${getItemImage(item.id)}" alt="${item.name}" loading="lazy"></div>
-            <div>
-              <div class="item-cell-name">${item.name}</div>
-              <div class="item-cell-cat">${item.cat}</div>
-            </div>
-          </div>
-          <div style="font-size:.88rem;font-weight:500;">${item.doador}</div>
-          <div style="font-size:.83rem;color:var(--text-muted);">${item.cat}</div>
-          <div class="row-date">${item.date}</div>
-          <div>${statusMap[item.status]}</div>
-        </div>
-      `).join('');
-    }
-
-    // Initial render (only show current user's donations)
-    renderDoado(myDonations);
-    renderRecebido(mockRecebido);
-
+  
     let currentTab = 'doado';
-
-    function switchTab(tab, btn) {
+  
+    // ── Renderização ─────────────────────────────────────────
+    // Substitui: document.getElementById + innerHTML + .map() nativo
+  
+    function renderDoado(data) {
+      const $c = $('#doado-rows');
+      if (!data.length) {
+        $c.html('<div class="empty-state"><div class="e-icon">📭</div><p>Nenhum item encontrado.</p></div>');
+        return;
+      }
+      $c.html($.map(data, function (item) {
+        return `
+          <div class="history-row cols-doado ${item.status === 'concluido' ? 'recurrent-row' : ''}">
+            <div class="item-cell">
+              <div class="item-emoji-thumb">${item.emoji}</div>
+              <div>
+                <div class="item-cell-name">${item.name}</div>
+                <div class="item-cell-cat">${item.cat}</div>
+              </div>
+            </div>
+            <div style="font-size:.88rem;font-weight:500;">${item.receptor}</div>
+            <div style="font-size:.83rem;color:var(--text-muted);">${item.cat}</div>
+            <div class="row-date">${item.date}</div>
+            <div>${statusMap[item.status]}</div>
+            <div>
+              <button class="btn-mini" data-name="${item.name}">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>`;
+      }).join(''));
+    }
+  
+    function renderRecebido(data) {
+      const $c = $('#recebido-rows');
+      if (!data.length) {
+        $c.html('<div class="empty-state"><div class="e-icon">📭</div><p>Nenhum item encontrado.</p></div>');
+        return;
+      }
+      $c.html($.map(data, function (item) {
+        return `
+          <div class="history-row cols-recebido">
+            <div class="item-cell">
+              <div class="item-emoji-thumb">${item.emoji}</div>
+              <div>
+                <div class="item-cell-name">${item.name}</div>
+                <div class="item-cell-cat">${item.cat}</div>
+              </div>
+            </div>
+            <div style="font-size:.88rem;font-weight:500;">${item.doador}</div>
+            <div style="font-size:.83rem;color:var(--text-muted);">${item.cat}</div>
+            <div class="row-date">${item.date}</div>
+            <div>${statusMap[item.status]}</div>
+          </div>`;
+      }).join(''));
+    }
+  
+    renderDoado(mockDoado);
+    renderRecebido(mockRecebido);
+  
+    // ── Troca de abas ────────────────────────────────────────
+    // Substitui: switchTab() com querySelectorAll + style.display
+    $(document).on('click', '.h-tab', function () {
+      const tab = $(this).data('tab');
       currentTab = tab;
-      document.querySelectorAll('.h-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-doado').style.display    = tab === 'doado'    ? 'block' : 'none';
-      document.getElementById('tab-recebido').style.display = tab === 'recebido' ? 'block' : 'none';
-    }
-
-    function filterHistory(val) {
-      const q = val.toLowerCase();
+      $('.h-tab').removeClass('active');
+      $(this).addClass('active');
+      // .toggle(bool) substitui style.display = 'block'/'none'
+      $('#tab-doado').toggle(tab === 'doado');
+      $('#tab-recebido').toggle(tab === 'recebido');
+    });
+  
+    // ── Busca por texto ──────────────────────────────────────
+    // Substitui: oninput="filterHistory(this.value)" + .filter() nativo
+    $(document).on('input', '#input-busca', function () {
+      const q = $(this).val().toLowerCase();
       if (currentTab === 'doado') {
-        renderDoado(mockDoado.filter(i => i.name.toLowerCase().includes(q) || i.receptor.toLowerCase().includes(q)));
+        renderDoado($.grep(mockDoado, function (i) {
+          return i.name.toLowerCase().includes(q) || i.receptor.toLowerCase().includes(q);
+        }));
       } else {
-        renderRecebido(mockRecebido.filter(i => i.name.toLowerCase().includes(q) || i.doador.toLowerCase().includes(q)));
+        renderRecebido($.grep(mockRecebido, function (i) {
+          return i.name.toLowerCase().includes(q) || i.doador.toLowerCase().includes(q);
+        }));
       }
-    }
-
-    function filterByStatus(val) {
+    });
+  
+    // ── Filtro por status ────────────────────────────────────
+    // Substitui: onchange="filterByStatus(this.value)" + .filter() nativo
+    $(document).on('change', '#select-status', function () {
+      const val = $(this).val();
       if (currentTab === 'doado') {
-        renderDoado(val === 'all' ? mockDoado : mockDoado.filter(i => i.status === val));
+        renderDoado(val === 'all' ? mockDoado : $.grep(mockDoado, function (i) {
+          return i.status === val;
+        }));
       } else {
-        renderRecebido(val === 'all' ? mockRecebido : mockRecebido.filter(i => i.status === val));
+        renderRecebido(val === 'all' ? mockRecebido : $.grep(mockRecebido, function (i) {
+          return i.status === val;
+        }));
       }
-    }
+    });
+  
+    // ── Botão de detalhe (gerado dinamicamente) ──────────────
+    // Substitui: onclick="alert('Detalhes: ...')" injetado via innerHTML
+    // Usa delegação porque o elemento é criado após o carregamento da página
+    $(document).on('click', '.btn-mini', function () {
+      alert('Detalhes: ' + $(this).data('name'));
+    });
+  
+  });
   </script>
 </body>
 </html>

@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Login</title>
+  <link rel="stylesheet" href="../assets/css/login.css">
+  <link rel="stylesheet" href="../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../assets/css/components/navbar.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -43,9 +46,9 @@
     <div class="auth-card">
 
       <!-- Tab switcher -->
-      <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('login')">Entrar</button>
-        <button class="tab-btn" onclick="switchTab('register')">Criar conta</button>
+      <div class="tabs-custom">
+        <button class="tab-btn active" data-tab="login">Entrar</button>
+        <button class="tab-btn" data-tab="register">Criar conta</button>
       </div>
 
       <!-- LOGIN FORM -->
@@ -57,7 +60,7 @@
           <label>E-mail</label>
           <div class="input-wrap">
             <i class="bi bi-envelope icon"></i>
-            <input type="email" placeholder="seu@email.com" />
+            <input type="email" id="login-email" placeholder="seu@email.com" />
           </div>
         </div>
 
@@ -65,18 +68,19 @@
           <label>Senha</label>
           <div class="input-wrap">
             <i class="bi bi-lock icon"></i>
-            <input type="password" placeholder="••••••••" />
+            <input type="password" id="login-password" placeholder="••••••••" />
           </div>
         </div>
 
         <a href="#" class="forgot-link">Esqueceu a senha?</a>
 
-        <button class="btn-primary-custom" onclick="goTo('02-feed.html')">
+        <button class="btn-primary-custom" id="btn-entrar">
           <i class="bi bi-arrow-right-circle"></i> Entrar
         </button>
 
+        <div id="login-erro" class="alert alert-danger mt-2" style="display:none;font-size:.85rem;border-radius:10px;"></div>
         <div class="note">
-          Não tem conta? <a href="#" style="color:var(--green-mid);text-decoration:none;" onclick="switchTab('register')">Crie uma grátis</a>
+          Não tem conta? <a href="#" style="color:var(--green-mid);text-decoration:none;" data-tab="register">Crie uma grátis</a>
         </div>
       </div>
 
@@ -89,15 +93,15 @@
         <div style="margin-bottom:20px;">
           <label style="font-size:.82rem;font-weight:500;color:var(--text-dark);margin-bottom:10px;display:block;">Tipo de perfil <span style="color:var(--text-muted);font-weight:400">(pode selecionar mais de um)</span></label>
           <div class="profile-grid">
-            <div class="profile-card selected" onclick="toggleProfile(this)">
+            <div class="profile-card selected">
               <div class="p-icon">🤝</div>
               <div class="p-name">Doador</div>
             </div>
-            <div class="profile-card" onclick="toggleProfile(this)">
+            <div class="profile-card">
               <div class="p-icon">🏠</div>
               <div class="p-name">Receptor</div>
             </div>
-            <div class="profile-card" onclick="toggleProfile(this)">
+            <div class="profile-card">
               <div class="p-icon">🏛️</div>
               <div class="p-name">Instituição</div>
             </div>
@@ -108,7 +112,7 @@
           <label>Nome completo / Razão social</label>
           <div class="input-wrap">
             <i class="bi bi-person icon"></i>
-            <input type="text" placeholder="Maria Oliveira" />
+            <input type="text" id="reg-nome" placeholder="Maria Oliveira" />
           </div>
         </div>
 
@@ -116,7 +120,7 @@
           <label>E-mail</label>
           <div class="input-wrap">
             <i class="bi bi-envelope icon"></i>
-            <input type="email" placeholder="seu@email.com" />
+            <input type="email" id="reg-email" placeholder="seu@email.com" />
           </div>
         </div>
 
@@ -124,7 +128,7 @@
           <label>WhatsApp</label>
           <div class="input-wrap">
             <i class="bi bi-whatsapp icon"></i>
-            <input type="tel" placeholder="(11) 99999-0000" />
+            <input type="tel" id="reg-phone" placeholder="(11) 99999-0000" />
           </div>
         </div>
 
@@ -132,7 +136,7 @@
           <label>Bairro / CEP</label>
           <div class="input-wrap">
             <i class="bi bi-geo-alt icon"></i>
-            <input type="text" placeholder="Copacabana, RJ" />
+            <input type="text" id="reg-endereco" placeholder="Copacabana, RJ" />
           </div>
         </div>
 
@@ -140,14 +144,15 @@
           <label>Senha</label>
           <div class="input-wrap">
             <i class="bi bi-lock icon"></i>
-            <input type="password" placeholder="Mínimo 8 caracteres" />
+            <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" />
           </div>
         </div>
 
-        <button class="btn-primary-custom" onclick="goTo('02-feed.html')">
+        <button class="btn-primary-custom" id="btn-criar-conta">
           <i class="bi bi-check-circle"></i> Criar conta
         </button>
 
+        <div id="reg-erro" class="alert alert-danger mt-2" style="display:none;font-size:.85rem;border-radius:10px;"></div>
         <div class="note" style="margin-top:14px;">
           Ao criar uma conta, você concorda com nossos <a href="#" style="color:var(--green-mid);text-decoration:none;">Termos de uso</a>
         </div>
@@ -155,24 +160,101 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/modal.js"></script>
+
   <script>
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach((b, i) => {
-        b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+    $(function () {
+      // Troca Login / Cadastro usando o seletor curto '.tab-btn' e '$(this)'
+      $(document).on('click', '.tab-btn', function () {
+        const tab = $(this).data('tab');
+        $('.tab-btn').removeClass('active');
+        $(this).addClass('active');
+        $('.form-panel').removeClass('active');
+        $('#panel-' + tab).addClass('active');
       });
-      document.getElementById('panel-login').classList.toggle('active', tab === 'login');
-      document.getElementById('panel-register').classList.toggle('active', tab === 'register');
-    }
 
-    function toggleProfile(el) {
-      el.classList.toggle('selected');
-    }
+      // Ponte de ligação para o link <a> do rodapé (Garante compatibilidade total)
+      $(document).on('click', 'a[data-tab]', function (e) {
+        e.preventDefault();
+        const tab = $(this).data('tab');
+        // Simula o clique diretamente no botão superior correspondente
+        $(`.tab-btn[data-tab="${tab}"]`).trigger('click');
+      });
 
-    function goTo(page) {
-      window.location.href = page;
-    }
+      // Selecionar tipo de perfil
+      $(document).on('click', '.profile-card', function () {
+        $(this).toggleClass('selected');
+      });
+
+      // ── Login ────────────────────────────────────────────────
+      $(document).on('click', '#btn-entrar', function () {
+        const email    = $('#login-email').val().trim();
+        const password = $('#login-password').val();
+      
+        if (!email || !password) {
+          $('#login-erro').text('Preencha e-mail e senha.').show();
+          return;
+        }
+      
+        const $btn = $(this).prop('disabled', true)
+          .html('<span class="spinner-border spinner-border-sm me-1"></span>Entrando...');
+      
+        $('#login-erro').hide();
+      
+        DoaFacilAPI.Auth.login({ email, password })
+          .done(function () {
+            window.location.href = '../index.html';
+          })
+          .fail(function (jqXHR) {
+            const msg = jqXHR.responseJSON?.error || 'E-mail ou senha incorretos.';
+            $('#login-erro').text(msg).show();
+            $btn.prop('disabled', false).html('<i class="bi bi-arrow-right-circle"></i> Entrar');
+          });
+      });
+
+      // ── Cadastro ─────────────────────────────────────────────
+      $(document).on('click', '#btn-criar-conta', function () {
+        const name     = $('#reg-nome').val().trim();
+        const email    = $('#reg-email').val().trim();
+        const phone    = $('#reg-phone').val().trim();
+        const password = $('#reg-password').val();
+        const address  = { neighborhood: $('#reg-endereco').val().trim() };
+      
+        // Lê os cards de perfil que estão selecionados
+        const selecionados = [];
+        $('.profile-card.selected .p-name').each(function () {
+          selecionados.push($(this).text().toLowerCase());
+        });
+        const profileType = selecionados.includes('doador') && selecionados.includes('receptor')
+          ? 'both'
+          : selecionados.includes('receptor') ? 'receiver' : 'donor';
+      
+        if (!name || !email || !password) {
+          $('#reg-erro').text('Nome, e-mail e senha são obrigatórios.').show();
+          return;
+        }
+      
+        const $btn = $(this).prop('disabled', true)
+          .html('<span class="spinner-border spinner-border-sm me-1"></span>Criando...');
+      
+        $('#reg-erro').hide();
+      
+        DoaFacilAPI.Auth.register({ name, email, password, phone, address, profileType })
+          .done(function () {
+            window.location.href = '../index.html';
+          })
+          .fail(function (jqXHR) {
+            const msg = jqXHR.responseJSON?.error || 'Erro ao criar conta. Tente novamente.';
+            $('#reg-erro').text(msg).show();
+            $btn.prop('disabled', false).html('<i class="bi bi-check-circle"></i> Criar conta');
+          });
+      });
+    });
   </script>
-</body>
+  </body>
 </html>
 

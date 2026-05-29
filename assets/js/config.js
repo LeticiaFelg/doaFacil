@@ -9,11 +9,11 @@
  *   <script src="../assets/js/config.js"></script>
  *   <script src="../assets/js/api.js"></script>
  */
-
-window.API_BASE_URL = 'https://doafacil-api.SEU-DOMINIO.workers.dev/api';
+// Para produção, utilizando Cloudflare Tunnel
+// window.API_BASE_URL = 'https://doafacil-api.SEU-DOMINIO.workers.dev/api';
 //
 // ↑ Troque pelo seu subdomínio Cloudflare após configurar o tunnel.
 //   Exemplo real: 'https://doafacil-api.meugrupo.workers.dev/api'
 //
 // Para testes locais (sem o tunnel), troque por:
-//   window.API_BASE_URL = 'http://localhost:3000/api';
+window.API_BASE_URL = 'http://localhost:3000/api';
