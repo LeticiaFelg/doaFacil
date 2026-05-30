@@ -10,11 +10,7 @@
 // ─── Configuração base ─────────────────────────────────────
 const DoaFacilAPI = (() => {
   // Troque pela URL do API Gateway após o deploy
-  const BASE_URL = window.API_BASE_URL || 'http://localhost:5000/api';
-
-  function _endpoint(path) {
-    return `${BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
-  }
+  const BASE_URL = window.API_BASE_URL || 'http://localhost:3000/';
 
   /**
    * Retorna os headers padrão. Inclui Authorization se houver token salvo.
@@ -31,15 +27,14 @@ const DoaFacilAPI = (() => {
    */
   function _request(method, endpoint, data = null) {
     return $.ajax({
-      url: _endpoint(endpoint),
+      url: `${BASE_URL}${endpoint}`,
       method,
       headers: _getHeaders(),
       contentType: 'application/json',
       data: data ? JSON.stringify(data) : null,
     }).fail((jqXHR) => {
       // Token expirado: redireciona para login
-      const isAuthRequest = endpoint.includes('/auth/login') || endpoint.includes('/auth/register');
-      if (jqXHR.status === 401 && !isAuthRequest) {
+      if (jqXHR.status === 401) {
         localStorage.removeItem('doafacil_token');
         localStorage.removeItem('doafacil_user');
         window.location.href = '/pages/login.html';
@@ -54,22 +49,8 @@ const DoaFacilAPI = (() => {
      * @param {{ name, email, password, phone, address, profileType }} data
      */
     register(data) {
-      const roles = data.roles || (
-        data.profileType === 'both' ? ['doador', 'receptor'] :
-        data.profileType === 'receiver' ? ['receptor'] :
-        ['doador']
-      );
-      const payload = {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-        location: data.location || data.address?.neighborhood || '',
-        roles,
-        avatar: data.avatar
-      };
-
-      return _request('POST', '/auth/register', payload).done(({ user, access_token }) => {
-        localStorage.setItem('doafacil_token', access_token);
+      return _request('POST', '/users/register', data).done(({ user, token }) => {
+        localStorage.setItem('doafacil_token', token);
         localStorage.setItem('doafacil_user', JSON.stringify(user));
       });
     },
@@ -79,8 +60,8 @@ const DoaFacilAPI = (() => {
      * @param {{ email, password }} credentials
      */
     login(credentials) {
-      return _request('POST', '/auth/login', credentials).done(({ user, access_token }) => {
-        localStorage.setItem('doafacil_token', access_token);
+      return _request('POST', '/users/login', credentials).done(({ user, token }) => {
+        localStorage.setItem('doafacil_token', token);
         localStorage.setItem('doafacil_user', JSON.stringify(user));
       });
     },
@@ -103,10 +84,10 @@ const DoaFacilAPI = (() => {
 
   // ── Usuários ─────────────────────────────────────────────
   const Users = {
-    getMe()              { return _request('GET',    '/users/me/profile'); },
+    getMe()              { return _request('GET',    '/users/me');    },
     getById(id)          { return _request('GET',    `/users/${id}`); },
-    updateMe(data)       { return _request('PUT',    '/users/me/profile', data); },
-    listMyDonations()    { return _request('GET',    '/users/me/donations'); },
+    updateMe(data)       { return _request('PUT',    '/users/me', data); },
+    deleteMe()           { return _request('DELETE', '/users/me'); },
   };
 
   // ── Itens ────────────────────────────────────────────────
@@ -115,7 +96,7 @@ const DoaFacilAPI = (() => {
       const params = $.param(filters);
       return _request('GET', `/items${params ? '?' + params : ''}`);
     },
-    listMine()           { return _request('GET',    '/users/me/donations'); },
+    listMine()           { return _request('GET',    '/items/my');    },
     getById(id)          { return _request('GET',    `/items/${id}`); },
     create(data)         { return _request('POST',   '/items', data); },
     update(id, data)     { return _request('PUT',    `/items/${id}`, data); },
@@ -124,31 +105,16 @@ const DoaFacilAPI = (() => {
 
   // ── Reservas ─────────────────────────────────────────────
   const Reservations = {
-    create(itemId, message = '') {
-      return _request('POST', '/reservations', { item_id: itemId, message });
-    },
-    getPending()           { return _request('GET',   '/reservations/my/pending'); },
-    getByItem(itemId)      { return _request('GET',   `/reservations/item/${itemId}`); },
+    create(itemId)         { return _request('POST',  '/reservations', { itemId }); },
+    getReceived()          { return _request('GET',   '/reservations/received'); },
+    getDonated()           { return _request('GET',   '/reservations/donated'); },
     getById(id)            { return _request('GET',   `/reservations/${id}`); },
-    confirm(id)            { return _request('PUT',   `/reservations/${id}/confirm`); },
-    complete(id)           { return _request('PUT',   `/reservations/${id}/complete`); },
-    cancel(id)             { return _request('PUT',   `/reservations/${id}/cancel`); },
+    updateStatus(id, status) {
+      return _request('PATCH', `/reservations/${id}/status`, { status });
+    },
   };
 
-  const History = {
-    myDonations(filters = {}) {
-      const params = $.param(filters);
-      return _request('GET', `/history/my/donations${params ? '?' + params : ''}`);
-    },
-    myReceived(filters = {}) {
-      const params = $.param(filters);
-      return _request('GET', `/history/my/received${params ? '?' + params : ''}`);
-    },
-    myStatistics()         { return _request('GET', '/history/my/statistics'); },
-    statistics()           { return _request('GET', '/history/statistics'); },
-  };
-
-  return { Auth, Users, Items, Reservations, History };
+  return { Auth, Users, Items, Reservations };
 })();
 
 // ─── Exemplos de uso (jQuery) nos HTMLs ────────────────────
@@ -168,5 +134,5 @@ const DoaFacilAPI = (() => {
 //     .fail(() => alert('Item indisponível.'));
 //
 // HISTÓRICO:
-//   DoaFacilAPI.History.myDonations()
-//     .done(({ donations }) => renderHistorico(donations));
+//   DoaFacilAPI.Reservations.getReceived()
+//     .done(({ reservations }) => renderHistorico(reservations));
