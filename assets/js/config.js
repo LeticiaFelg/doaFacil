@@ -16,4 +16,4 @@
 //   Exemplo real: 'https://doafacil-api.meugrupo.workers.dev/api'
 //
 // Para testes locais (sem o tunnel), troque por:
-window.API_BASE_URL = 'http://localhost:3000/api';
+window.API_BASE_URL = 'http://localhost:5000/api';

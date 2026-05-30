@@ -1,0 +1,310 @@
+DoaFacil - instalacao e execucao com Docker
+===========================================
+
+Arquitetura atual
+-----------------
+
+O projeto usa:
+
+- Frontend estatico em HTML, CSS, Bootstrap e jQuery.
+- API Express/Sequelize em container Node.
+- PostgreSQL em container Docker.
+- Volume Docker persistente para os dados do banco.
+- API exposta em http://localhost:5000/api.
+- Frontend exposto em http://localhost:8000.
+
+O frontend roda fora do Docker por simplicidade. Banco e API sobem via Docker Compose.
+
+
+Pre-requisitos
+--------------
+
+Instale:
+
+1. Docker Desktop.
+2. Node.js LTS, se quiser usar npm.
+3. Bun, se quiser usar Bun.
+4. Git.
+
+Depois de instalar o Docker Desktop, confirme:
+
+```bash
+docker --version
+docker compose version
+```
+
+
+Imagens Docker usadas
+---------------------
+
+O Compose usa imagens oficiais:
+
+- PostgreSQL: postgres:17-alpine3.23
+- API: node:lts-alpine3.22
+
+A API usa npm dentro do container.
+
+
+Persistencia do banco
+---------------------
+
+O PostgreSQL usa o volume:
+
+```text
+doafacil_postgres_data
+```
+
+Esse volume preserva os dados mesmo que os containers sejam parados/removidos.
+
+Para parar containers sem apagar dados:
+
+```bash
+docker compose down
+```
+
+Para resetar completamente o banco e apagar os dados:
+
+```bash
+docker compose down -v
+```
+
+
+Como subir o projeto inteiro
+----------------------------
+
+Na raiz do projeto:
+
+Com npm:
+
+```bash
+npm run dev
+```
+
+Com Bun:
+
+```bash
+bun run dev
+```
+
+Esse comando executa a seguinte ordem:
+
+1. Sobe o PostgreSQL via Docker Compose.
+2. Aguarda o healthcheck do PostgreSQL.
+3. Sobe a API via Docker Compose.
+4. Aguarda http://localhost:5000/api/health responder.
+5. Sobe o frontend em http://localhost:8000.
+
+
+Como subir apenas banco e API
+-----------------------------
+
+Na raiz:
+
+```bash
+docker compose up --build
+```
+
+Em segundo plano:
+
+```bash
+docker compose up --build -d
+```
+
+Ver status:
+
+```bash
+docker compose ps
+```
+
+Ver logs:
+
+```bash
+docker compose logs -f
+```
+
+Ver logs apenas da API:
+
+```bash
+docker compose logs -f api
+```
+
+Ver logs apenas do banco:
+
+```bash
+docker compose logs -f postgres
+```
+
+
+URLs
+----
+
+Frontend:
+
+```text
+http://localhost:8000
+```
+
+API:
+
+```text
+http://localhost:5000/api
+```
+
+Health check:
+
+```text
+http://localhost:5000/api/health
+```
+
+
+Variaveis de ambiente
+---------------------
+
+O docker-compose.yml ja define as variaveis principais com valores padrao.
+
+Banco:
+
+```text
+POSTGRES_DB=doafacil
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+```
+
+API dentro do Docker:
+
+```text
+DATABASE_URL=postgres://postgres:postgres@postgres:5432/doafacil
+```
+
+API acessivel pela maquina:
+
+```text
+http://localhost:5000
+```
+
+Frontend autorizado no CORS:
+
+```text
+FRONTEND_URL=http://localhost:8000
+```
+
+Se quiser sobrescrever valores, crie um arquivo .env na raiz do projeto com:
+
+```env
+POSTGRES_DB=doafacil
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_PORT=5432
+API_PORT=5000
+FRONTEND_URL=http://localhost:8000
+JWT_SECRET=dev-secret-key
+JWT_EXPIRES_IN=24h
+```
+
+
+Rodar API fora do Docker, opcional
+----------------------------------
+
+Se quiser rodar a API localmente e usar apenas o banco em container:
+
+```bash
+docker compose up -d postgres
+cd node
+npm install
+Copy-Item .env.example .env
+npm start
+```
+
+Nesse caso, node/.env deve usar:
+
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/doafacil
+```
+
+
+Comandos uteis
+--------------
+
+Recriar a API depois de mudar package.json ou Dockerfile:
+
+```bash
+docker compose up --build api
+```
+
+Recriar tudo:
+
+```bash
+docker compose up --build
+```
+
+Parar tudo:
+
+```bash
+docker compose down
+```
+
+Apagar banco e volumes:
+
+```bash
+docker compose down -v
+```
+
+
+Problemas comuns
+----------------
+
+1. "docker: command not found"
+
+Instale Docker Desktop e reabra o terminal.
+
+2. API nao sobe porque o banco ainda nao esta pronto
+
+O Compose ja usa healthcheck no Postgres e depends_on na API. Rode:
+
+```bash
+docker compose logs -f postgres
+docker compose logs -f api
+```
+
+3. Porta 5432 ou 5000 ocupada
+
+Crie .env na raiz e altere:
+
+```env
+POSTGRES_PORT=5433
+API_PORT=5001
+```
+
+Se alterar API_PORT, atualize tambem assets/js/config.js para a nova porta.
+
+4. Quero limpar o banco
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+
+Rotas principais
+----------------
+
+- GET /api/health
+- POST /api/auth/register
+- POST /api/auth/login
+- GET /api/auth/me
+- GET /api/items
+- GET /api/items/:id
+- POST /api/items
+- PUT /api/items/:id
+- DELETE /api/items/:id
+- POST /api/reservations
+- GET /api/reservations/my/pending
+- PUT /api/reservations/:id/confirm
+- PUT /api/reservations/:id/complete
+- PUT /api/reservations/:id/cancel
+- GET /api/users/me/profile
+- PUT /api/users/me/profile
+- GET /api/users/me/donations
+- GET /api/history/my/donations
+- GET /api/history/my/received
+- GET /api/history/statistics

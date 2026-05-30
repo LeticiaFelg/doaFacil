@@ -163,6 +163,8 @@
     };
   
     let currentTab = 'doado';
+    let dadosDoado = mockDoado;
+    let dadosRecebido = mockRecebido;
   
     // ── Renderização ─────────────────────────────────────────
     // Substitui: document.getElementById + innerHTML + .map() nativo
@@ -220,8 +222,100 @@
       }).join(''));
     }
   
-    renderDoado(mockDoado);
-    renderRecebido(mockRecebido);
+    function loadHistory() {
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const catEmoji = {
+        moveis: '🛋️',
+        eletro: '📱',
+        roupas: '👕',
+        calcados: '👟',
+        utensilios: '🍳',
+        escolar: '📚',
+        brinquedos: '🧸',
+        outros: '📦'
+      };
+      const catLabel = {
+        moveis: 'Móveis',
+        eletro: 'Eletro',
+        roupas: 'Roupas',
+        calcados: 'Calçados',
+        utensilios: 'Utensílios',
+        escolar: 'Escolar',
+        brinquedos: 'Brinquedos',
+        outros: 'Outros'
+      };
+
+      DoaFacilAPI.Items.listMine()
+        .done(function ({ donations }) {
+          dadosDoado = $.map(donations || [], function (item) {
+            return {
+              id: item.id,
+              emoji: item.emoji || catEmoji[item.category] || '📦',
+              name: item.title,
+              cat: catLabel[item.category] || item.category || 'Outros',
+              receptor: '—',
+              date: new Date(item.createdAt).toLocaleDateString('pt-BR'),
+              status: item.status || 'disponivel'
+            };
+          });
+          $('.metric-num').eq(0).text(dadosDoado.length);
+          $('.metric-num').eq(2).text(dadosDoado.filter(i => i.status === 'concluido').length);
+          $('.metric-num').eq(3).text(dadosDoado.filter(i => i.status !== 'concluido').length);
+          $('.h-tab[data-tab="doado"] .tab-count').text(dadosDoado.length);
+          renderDoado(dadosDoado);
+        })
+        .fail(function () {
+          renderDoado(dadosDoado);
+        });
+
+      DoaFacilAPI.Reservations.getPending()
+        .done(function ({ reservations_made }) {
+          const made = reservations_made || [];
+          if (!made.length) {
+            dadosRecebido = [];
+            $('.metric-num').eq(1).text(0);
+            $('.h-tab[data-tab="recebido"] .tab-count').text(0);
+            renderRecebido(dadosRecebido);
+            return;
+          }
+
+          const requests = $.map(made, function (reservation) {
+            return DoaFacilAPI.Items.getById(reservation.item_id).then(function (itemResp) {
+              const item = itemResp.item || itemResp;
+              return {
+                id: reservation.id,
+                emoji: item.emoji || catEmoji[item.category] || '📦',
+                name: item.title,
+                cat: catLabel[item.category] || item.category || 'Outros',
+                doador: item.donor?.name || '—',
+                date: new Date(reservation.createdAt).toLocaleDateString('pt-BR'),
+                status: {
+                  pendente: 'reservado',
+                  confirmada: 'reservado',
+                  concluida: 'concluido',
+                  cancelada: 'cancelado'
+                }[reservation.status] || reservation.status
+              };
+            });
+          });
+
+          $.when.apply($, requests).done(function () {
+            dadosRecebido = requests.length === 1 ? [arguments[0]] : Array.from(arguments);
+            $('.metric-num').eq(1).text(dadosRecebido.length);
+            $('.h-tab[data-tab="recebido"] .tab-count').text(dadosRecebido.length);
+            renderRecebido(dadosRecebido);
+          });
+        })
+        .fail(function () {
+          renderRecebido(dadosRecebido);
+        });
+    }
+
+    loadHistory();
   
     // ── Troca de abas ────────────────────────────────────────
     // Substitui: switchTab() com querySelectorAll + style.display
@@ -240,11 +334,11 @@
     $(document).on('input', '#input-busca', function () {
       const q = $(this).val().toLowerCase();
       if (currentTab === 'doado') {
-        renderDoado($.grep(mockDoado, function (i) {
+        renderDoado($.grep(dadosDoado, function (i) {
           return i.name.toLowerCase().includes(q) || i.receptor.toLowerCase().includes(q);
         }));
       } else {
-        renderRecebido($.grep(mockRecebido, function (i) {
+        renderRecebido($.grep(dadosRecebido, function (i) {
           return i.name.toLowerCase().includes(q) || i.doador.toLowerCase().includes(q);
         }));
       }
@@ -255,11 +349,11 @@
     $(document).on('change', '#select-status', function () {
       const val = $(this).val();
       if (currentTab === 'doado') {
-        renderDoado(val === 'all' ? mockDoado : $.grep(mockDoado, function (i) {
+        renderDoado(val === 'all' ? dadosDoado : $.grep(dadosDoado, function (i) {
           return i.status === val;
         }));
       } else {
-        renderRecebido(val === 'all' ? mockRecebido : $.grep(mockRecebido, function (i) {
+        renderRecebido(val === 'all' ? dadosRecebido : $.grep(dadosRecebido, function (i) {
           return i.status === val;
         }));
       }

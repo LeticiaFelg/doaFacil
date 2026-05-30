@@ -211,11 +211,105 @@
         alert('Solicitar perfil institucional');
       });
 
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      DoaFacilAPI.Users.getMe()
+        .done(function (user) {
+          const location = user.location || '';
+
+          $('h1').first().text(user.name);
+          $('.avatar-circle').first().text(user.avatar || '👤');
+          $('.location-line').html(`<i class="bi bi-geo-alt"></i> ${location || 'Localização não informada'}`);
+          $('.join-date').html(`<i class="bi bi-calendar3"></i> Membro desde ${new Date(user.createdAt).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`);
+
+          $('.hero-stat .s-num').eq(0).text(user.stats?.donated ?? 0);
+          $('.hero-stat .s-num').eq(1).text(user.stats?.received ?? 0);
+          $('.hero-stat .s-num').eq(2).text(user.stats?.is_recurrent ? '⭐' : '-');
+
+          $(".info-item").filter(function() {
+            return $(this).find('label').text() === 'Nome';
+          }).find('.value').text(user.name);
+          $(".info-item").filter(function() {
+            return $(this).find('label').text() === 'E-mail';
+          }).find('.value').text(user.email);
+          $(".info-item").filter(function() {
+            return $(this).find('label').text() === 'Bairro';
+          }).find('.value').text(location || '—');
+          $(".info-item").filter(function() {
+            return $(this).find('label').text() === 'WhatsApp';
+          }).find('.value').text('—');
+
+          localStorage.setItem('doafacil_user', JSON.stringify(user));
+        });
+
+      DoaFacilAPI.Items.listMine()
+        .done(function ({ donations }) {
+          const items = donations || [];
+          const catEmoji = {
+            moveis: '🛋️',
+            eletro: '📱',
+            roupas: '👕',
+            calcados: '👟',
+            utensilios: '🍳',
+            escolar: '📚',
+            brinquedos: '🧸',
+            outros: '📦'
+          };
+          const statusClass = {
+            disponivel: 's-disponivel',
+            reservado: 's-reservado',
+            concluido: 's-concluido'
+          };
+          const statusLabel = {
+            disponivel: 'Disponível',
+            reservado: 'Reservado',
+            concluido: 'Concluído'
+          };
+
+          const $miniGrid = $('.mini-grid').first();
+          const $novaDoacao = $miniGrid.children('#btn-nova-doacao').detach();
+          $miniGrid.empty();
+
+          $.each(items.filter(i => i.status !== 'concluido').slice(0, 3), function (_, item) {
+            const image = Array.isArray(item.images) && item.images.length ? item.images[0] : '';
+            $miniGrid.append(`
+              <div class="mini-card" data-href="item.html?id=${item.id}">
+                <div class="mini-img">
+                  ${image
+                    ? `<img src="${image}" alt="${item.title}" loading="lazy">`
+                    : `<span>${catEmoji[item.category] || '📦'}</span>`}
+                </div>
+                <div class="mini-body">
+                  <div class="mini-title">${item.title}</div>
+                  <span class="mini-status ${statusClass[item.status] || ''}">${statusLabel[item.status] || item.status}</span>
+                </div>
+              </div>
+            `);
+          });
+
+          $miniGrid.append($novaDoacao);
+        });
+
       // Botão Editar Perfil Centralizado
       $(document).on('click', '.btn-edit', function (e) {
         e.preventDefault();
-        // Sem Ajax
-        alert('Falta função Ajax para envio do HTTP PUT.');
+        if ($(this).is('#btn-solicitar-inst')) return;
+        const atual = DoaFacilAPI.Auth.getCurrentUser()?.name || $('h1').first().text();
+        const novoNome = prompt('Novo nome:', atual);
+        if (!novoNome) return;
+
+        DoaFacilAPI.Users.updateMe({ name: novoNome.trim() })
+          .done(function ({ user }) {
+            $('h1').first().text(user.name);
+            localStorage.setItem('doafacil_user', JSON.stringify(user));
+            alert('Perfil atualizado com sucesso!');
+          })
+          .fail(function (jqXHR) {
+            alert(jqXHR.responseJSON?.error || 'Erro ao atualizar perfil.');
+          });
       });
     
     });

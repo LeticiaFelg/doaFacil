@@ -241,15 +241,16 @@
         </div>
       </div>
     </div>
-  <script src="./assets/js/components/footer.js"></script>
-  <script src="./assets/js/components/navbar.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-  <script src="./assets/js/modal.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="./assets/js/modal.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="./assets/js/config.js"></script>
   <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/components/footer.js"></script>
+  <script src="./assets/js/components/navbar.js"></script>
   <script>
     $(function () {
+
       // ── Dados mockados (remover quando a API estiver conectada) ──
       const mockItems = [
         { id: 1, title: 'Sofá de 3 lugares', category: 'moveis', categoryLabel: 'Móveis', emoji: '🛋️', condition: 'bom', condLabel: 'Bom estado', desc: 'Sofá em tecido cinza, leve desgaste nos braços.', location: 'Copacabana, RJ', donor: 'Maria S.', donorRecurrent: true },
@@ -266,15 +267,60 @@
         { id: 12, title: 'Mochila escolar', category: 'escolar', categoryLabel: 'Escolar', emoji: '🎒', condition: 'otimo', condLabel: 'Ótimo', desc: 'Nova, nunca usada, tamanho médio.', location: 'Santa Cruz', donor: 'Olivia C.', donorRecurrent: false }
       ];
 
+
       let currentFilter = 'all';
       let currentSearch = '';
+      let currentStatus = 'disponivel';
+      let currentItems = mockItems;
+
+      const categoryLabel = {
+        moveis: 'Móveis',
+        eletro: 'Eletro',
+        roupas: 'Roupas',
+        calcados: 'Calçados',
+        utensilios: 'Utensílios',
+        escolar: 'Escolar',
+        brinquedos: 'Brinquedos',
+        outros: 'Outros'
+      };
+      const conditionLabel = { otimo: 'Ótimo', bom: 'Bom estado', usado: 'Usado' };
+      const categoryEmoji = {
+        moveis: '🛋️',
+        eletro: '📱',
+        roupas: '👕',
+        calcados: '👟',
+        utensilios: '🍳',
+        escolar: '📚',
+        brinquedos: '🧸',
+        outros: '📦'
+      };
+
+      function normalizeItem(item) {
+        const cat = item.category || 'outros';
+        const cond = item.condition || 'usado';
+        const image = Array.isArray(item.images) && item.images.length ? item.images[0] : item.image;
+        return {
+          id: item.id,
+          title: item.title,
+          category: cat,
+          categoryLabel: item.categoryLabel || categoryLabel[cat] || cat,
+          emoji: item.emoji || categoryEmoji[cat] || '📦',
+          condition: cond,
+          condLabel: item.condLabel || conditionLabel[cond] || cond,
+          desc: item.description || item.desc || '',
+          location: item.location || 'Localização não informada',
+          image,
+          donorRecurrent: !!(item.donor?.stats?.is_recurrent || item.donorRecurrent)
+        };
+      }
 
       // ── Renderiza os cards no feed ──────────────────────────
       function renderFeed(items) {
         const $grid = $('#feed-grid');
         if (!$grid.length) return;
+        const normalized = $.map(items, normalizeItem);
 
-        if (!items.length) {
+        if (!normalized.length) {
           $grid.html(`
             <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)">
               <div style="font-size:3rem;margin-bottom:12px">🔍</div>
@@ -284,11 +330,14 @@
           return;
         }
 
-        const html = $.map(items, function (item) {
+        const html = $.map(normalized, function (item) {
+          const visual = item.image
+            ? `<img src="${item.image}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+            : `<span>${item.emoji}</span>`;
           return `
             <a class="item-card" href="pages/item.html?id=${item.id}" style="text-decoration:none;color:inherit;">
               <div class="item-img">
-                <span>${item.emoji}</span>
+                ${visual}
                 <span class="badge-cond badge-${item.condition}">${item.condLabel}</span>
               </div>
               <div class="item-body">
@@ -314,7 +363,7 @@
 
         const isMobile = $(window).width() < 768;
         const itemsPerPage = isMobile ? 2 : 5;
-        const featuredItems = [...mockItems].reverse().slice(0, 10);
+        const featuredItems = $.map(currentItems, normalizeItem).reverse().slice(0, 10);
 
         let html = '';
         for (let i = 0; i < featuredItems.length; i += itemsPerPage) {
@@ -350,7 +399,7 @@
 
       // ── Filtro por categoria ────────────────────────────────
       $(document).on('click', '.filter-chip[data-cat]', function () {
-        $('.filter-chip').removeClass('active');
+        $('.filter-chip[data-cat]').removeClass('active');
         $(this).addClass('active');
         currentFilter = $(this).data('cat');
         applyFilters();
@@ -358,7 +407,10 @@
 
       // ── Filtro de disponibilidade ───────────────────────────
       $(document).on('click', '.filter-chip[data-status]', function () {
-        // Implementar quando conectar à API real
+        $('.filter-chip[data-status]').removeClass('active');
+        $(this).addClass('active');
+        currentStatus = $(this).data('status') === 'reserved' ? 'reservado' : 'disponivel';
+        applyFilters();
       });
 
       // ── Busca por texto ─────────────────────────────────────
@@ -374,18 +426,41 @@
 
       // ── Aplica todos os filtros e re-renderiza ──────────────
       function applyFilters(sort) {
-        let items = $.grep(mockItems, function (item) {
-          const matchCat    = currentFilter === 'all' || item.category === currentFilter;
-          const matchSearch = !currentSearch ||
-            item.title.toLowerCase().includes(currentSearch) ||
-            item.desc.toLowerCase().includes(currentSearch);
-          return matchCat && matchSearch;
-        });
+        const filters = { status: currentStatus };
+        if (currentFilter !== 'all') filters.category = currentFilter;
+        if (currentSearch) filters.search = currentSearch;
 
-        if (sort === 'az') {
-          items.sort(function (a, b) { return a.title.localeCompare(b.title); });
-        }
-        renderFeed(items);
+        $('#feed-grid').html(`
+          <div style="grid-column:1/-1;text-align:center;padding:60px;">
+            <div class="spinner-border text-success"></div>
+          </div>
+        `);
+
+        DoaFacilAPI.Items.list(filters)
+          .done(function ({ items }) {
+            if (sort === 'az') {
+              items.sort(function (a, b) { return a.title.localeCompare(b.title); });
+            }
+            currentItems = items;
+            renderFeed(items);
+            renderFeatured();
+          })
+          .fail(function () {
+            let items = $.grep(mockItems, function (item) {
+              const matchCat = currentFilter === 'all' || item.category === currentFilter;
+              const matchSearch = !currentSearch ||
+                item.title.toLowerCase().includes(currentSearch) ||
+                item.desc.toLowerCase().includes(currentSearch);
+              return matchCat && matchSearch;
+            });
+
+            if (sort === 'az') {
+              items.sort(function (a, b) { return a.title.localeCompare(b.title); });
+            }
+            currentItems = items;
+            renderFeed(items);
+            renderFeatured();
+          });
       }
 
       // ── Botão Reservar dentro do card ──────────────────────
@@ -441,8 +516,7 @@
       $(window).on('resize', renderFeatured);
 
       // Execuções iniciais
-      renderFeed(mockItems);
-      renderFeatured();
+      applyFilters();
     });
   </script>
 </body>

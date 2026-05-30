@@ -2,3 +2,4 @@
 node_modules/
 doafacil.db
 .DS_Store
+bun.lock

@@ -24,10 +24,11 @@ const User = sequelize.define('User', {
   },
   location: {
     type: DataTypes.STRING(255),
-    allowNull: false
+    allowNull: false,
+    defaultValue: ''
   },
   avatar: {
-    type: DataTypes.STRING(2),
+    type: DataTypes.STRING(16),
     defaultValue: '👤'
   },
   bio: {
@@ -39,16 +40,8 @@ const User = sequelize.define('User', {
     defaultValue: false
   },
   roles: {
-    type: DataTypes.JSON,
+    type: DataTypes.JSONB,
     defaultValue: ['doador']
-  },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
   }
 }, {
   hooks: {
@@ -63,7 +56,7 @@ User.prototype.comparePassword = async function(password) {
 };
 
 User.prototype.toJSON = function() {
-  const { password, ...user } = this.dataValues;
+  const { password, ...user } = this.get({ plain: true });
   return user;
 };
 

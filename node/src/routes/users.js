@@ -7,44 +7,13 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Obter perfil de um usuário
-router.get('/:id', async (req, res) => {
-  try {
-    const user = await User.findByPk(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
-    }
-
-    const donated_count = await Item.count({ where: { donor_id: req.params.id } });
-    const donations_completed = await Reservation.count({
-      where: { donor_id: req.params.id, status: 'concluida' }
-    });
-    const received_count = await Reservation.count({
-      where: { user_id: req.params.id, status: 'concluida' }
-    });
-
-    const userData = user.toJSON();
-    userData.stats = {
-      donated: donated_count,
-      donations_completed,
-      received: received_count,
-      is_recurrent: donated_count >= 3
-    };
-
-    return res.json(userData);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
-
 // Obter meu perfil
 router.get('/me/profile', auth, async (req, res) => {
   try {
     const user = await User.findByPk(req.userId);
 
     if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
+      return res.status(404).json({ error: 'Usuario nao encontrado' });
     }
 
     const donated_count = await Item.count({ where: { donor_id: req.userId } });
@@ -71,7 +40,7 @@ router.put('/me/profile', auth, async (req, res) => {
     const user = await User.findByPk(req.userId);
 
     if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
+      return res.status(404).json({ error: 'Usuario nao encontrado' });
     }
 
     const { name, bio, location, avatar, roles } = req.body;
@@ -93,7 +62,7 @@ router.put('/me/profile', auth, async (req, res) => {
   }
 });
 
-// Minhas doações
+// Minhas doacoes
 router.get('/me/donations', auth, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -116,7 +85,7 @@ router.get('/me/donations', auth, async (req, res) => {
   }
 });
 
-// Buscar usuários
+// Buscar usuarios
 router.get('/search', async (req, res) => {
   try {
     const q = req.query.q || '';
@@ -128,27 +97,57 @@ router.get('/search', async (req, res) => {
     const users = await User.findAll({
       where: {
         [Op.or]: [
-          { name: { [Op.like]: `%${q}%` } },
-          { email: { [Op.like]: `%${q}%` } }
+          { name: { [Op.iLike]: `%${q}%` } },
+          { email: { [Op.iLike]: `%${q}%` } }
         ]
       },
-      limit: 20,
-      attributes: { exclude: ['password'] }
+      limit: 20
     });
 
-    return res.json({ users });
+    return res.json({ users: users.map(user => user.toJSON()) });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 });
 
-// Estatísticas de usuário
+// Obter perfil de um usuario
+router.get('/:id', async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario nao encontrado' });
+    }
+
+    const donated_count = await Item.count({ where: { donor_id: req.params.id } });
+    const donations_completed = await Reservation.count({
+      where: { donor_id: req.params.id, status: 'concluida' }
+    });
+    const received_count = await Reservation.count({
+      where: { user_id: req.params.id, status: 'concluida' }
+    });
+
+    const userData = user.toJSON();
+    userData.stats = {
+      donated: donated_count,
+      donations_completed,
+      received: received_count,
+      is_recurrent: donated_count >= 3
+    };
+
+    return res.json(userData);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Estatisticas de usuario
 router.get('/:id/statistics', async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id);
 
     if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
+      return res.status(404).json({ error: 'Usuario nao encontrado' });
     }
 
     const donated = await Item.count({ where: { donor_id: req.params.id } });

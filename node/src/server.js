@@ -6,8 +6,8 @@ const sequelize = require('./config/database');
 // Modelos
 const User = require('./models/User');
 const Item = require('./models/Item');
-const Reservation = require('./models/Reservation');
-const History = require('./models/History');
+require('./models/Reservation');
+require('./models/History');
 
 // Rotas
 const authRoutes = require('./routes/auth');
@@ -24,7 +24,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Definir associações
+// Associações
 Item.belongsTo(User, { as: 'donor', foreignKey: 'donor_id' });
 User.hasMany(Item, { foreignKey: 'donor_id' });
 
@@ -39,13 +39,13 @@ app.use('/api/history', historyRoutes);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    message: 'API DoaFácil está funcionando'
+    message: 'API DoaFacil esta funcionando'
   });
 });
 
 // Error handlers
 app.use((req, res) => {
-  res.status(404).json({ error: 'Rota não encontrada' });
+  res.status(404).json({ error: 'Rota nao encontrada' });
 });
 
 app.use((err, req, res, next) => {
@@ -58,8 +58,8 @@ const PORT = process.env.PORT || 5000;
 
 sequelize.sync().then(() => {
   app.listen(PORT, () => {
-    console.log(`🌿 DoaFácil API rodando em http://localhost:${PORT}`);
-    console.log(`📊 Banco de dados sincronizado`);
+    console.log(`DoaFacil API rodando em http://localhost:${PORT}`);
+    console.log('Banco de dados sincronizado');
   });
 }).catch(err => {
   console.error('Erro ao conectar ao banco de dados:', err);

@@ -17,10 +17,11 @@ const Item = sequelize.define('Item', {
   },
   category: {
     type: DataTypes.STRING(50),
-    allowNull: false
+    allowNull: false,
+    defaultValue: 'outros'
   },
   emoji: {
-    type: DataTypes.STRING(2),
+    type: DataTypes.STRING(16),
     defaultValue: '📦'
   },
   condition: {
@@ -29,7 +30,8 @@ const Item = sequelize.define('Item', {
   },
   location: {
     type: DataTypes.STRING(255),
-    allowNull: false
+    allowNull: false,
+    defaultValue: ''
   },
   status: {
     type: DataTypes.STRING(20),
@@ -40,16 +42,8 @@ const Item = sequelize.define('Item', {
     allowNull: false
   },
   images: {
-    type: DataTypes.JSON,
+    type: DataTypes.JSONB,
     defaultValue: []
-  },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
   }
 });
 

@@ -1,0 +1,8 @@
+{
+  "name": "doafacil-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.js || bun scripts/dev.js",
+    "dev:bun": "bun scripts/dev.js"
+  }
+}

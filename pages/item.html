@@ -240,47 +240,86 @@
         width="100%" height="100%" style="border:0;border-radius:14px;"
         loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
     }
+
+    const categoryLabel = {
+      moveis: 'Móveis',
+      eletro: 'Eletro',
+      roupas: 'Roupas',
+      calcados: 'Calçados',
+      utensilios: 'Utensílios',
+      escolar: 'Escolar',
+      brinquedos: 'Brinquedos',
+      outros: 'Outros'
+    };
+    const conditionLabel = { otimo: 'Ótimo', bom: 'Bom estado', usado: 'Usado' };
   
     // ── Carrega os dados do item conforme ?id= na URL ────────
     // Substitui: loadItem() com document.getElementById x10 + document.querySelector
     function loadItem() {
       const params = new URLSearchParams(window.location.search);
       const itemId = Number(params.get('id')) || 1;
-      const item   = mockItems.find(i => i.id === itemId) || mockItems[0];
-    
-      // Breadcrumb
-      $('#breadcrumb-category').text(item.categoryLabel);
-      $('#breadcrumb-title').text(item.title);
-    
-      // Galeria
-      if (item.image) {
-        $('#gallery-visual').html(`<img id="gallery-img" src="${item.image}" alt="${item.title}" loading="lazy">`);
-      } else {
-        $('#gallery-visual').html(`<span id="gallery-emoji">${item.emoji}</span>`);
+
+      function renderItem(rawItem) {
+        const item = rawItem || mockItems[0];
+        const cat = item.category || 'outros';
+        const cond = item.condition || 'usado';
+        const catText = item.categoryLabel || categoryLabel[cat] || cat;
+        const condText = item.condLabel || conditionLabel[cond] || cond;
+        const location = item.location || 'Localização não informada';
+        const image = Array.isArray(item.images) && item.images.length ? item.images[0] : item.image;
+        const emoji = item.emoji || '📦';
+
+        $('#breadcrumb-category').text(catText);
+        $('#breadcrumb-title').text(item.title);
+
+        if (image) {
+          $('#gallery-visual').html(`<img id="gallery-img" src="${image}" alt="${item.title}" loading="lazy">`);
+        } else {
+          $('#gallery-visual').html(`<span id="gallery-emoji">${emoji}</span>`);
+        }
+
+        $('#item-desc-main').text(item.description || item.desc || '');
+        $('#item-desc-extra').text(`${item.title} disponível para retirada a combinar.`);
+        $('#spec-category').text(catText);
+        $('#spec-condition').text(condText);
+
+        $('#item-location-name').text(location.split(',')[0]);
+        $('#item-location-sub').text(location);
+        $('#location-map').html(buildMapIframe(location, 'Mapa da localização aproximada'));
+
+        $('#item-category-badge').text(catText);
+        $('#item-title-main').text(item.title);
+        $('#item-condition-text').text(condText);
+        $('#btn-confirmar-reserva').data('item-id', item.id);
+
+        $('#modal-item-emoji').text(emoji);
+        $('#modal-item-title').text(item.title);
+        $('#modal-item-sub').text(`${location} · ${condText}`);
+
+        if (item.donor) {
+          $('#donor-avatar').text(item.donor.avatar || '👤');
+          $('#donor-name').text(item.donor.name || 'Doador');
+          $('#donor-donations').text(item.donor.location || '');
+          $('#donor-recurrent').toggle(!!item.donor.verified);
+        }
+
+        if (item.status && item.status !== 'disponivel') {
+          $('.status-pill')
+            .removeClass('status-available')
+            .css({ background: '#FFF3CD', color: '#856404' })
+            .html('<i class="bi bi-hourglass-split"></i> Reservado');
+          $('#btn-confirmar-reserva').prop('disabled', true).text('Indisponível');
+        }
       }
-    
-      // Descrição
-      $('#item-desc-main').text(item.desc);
-      $('#item-desc-extra').text(`${item.title} disponível para retirada a combinar.`);
-    
-      // Especificações
-      $('#spec-category').text(item.categoryLabel);
-      $('#spec-condition').text(item.condLabel);
-    
-      // Localização (aproximada antes da reserva)
-      $('#item-location-name').text(item.location.split(',')[0]);
-      $('#item-location-sub').text(item.location);
-      $('#location-map').html(buildMapIframe(item.location, 'Mapa da localização aproximada'));
-    
-      // Painel de ação
-      $('#item-category-badge').text(item.categoryLabel);
-      $('#item-title-main').text(item.title);
-      $('#item-condition-text').text(item.condLabel);
-    
-      // Modal
-      $('#modal-item-emoji').text(item.emoji);
-      $('#modal-item-title').text(item.title);
-      $('#modal-item-sub').text(`${item.location} · ${item.condLabel}`);
+
+      DoaFacilAPI.Items.getById(itemId)
+        .done(function (resp) {
+          renderItem(resp.item || resp);
+        })
+        .fail(function () {
+          const fallback = mockItems.find(i => i.id === itemId) || mockItems[0];
+          renderItem(fallback);
+        });
     }
   
     // Substitui: window.addEventListener('load', loadItem)
@@ -313,31 +352,35 @@
     // ── Confirmar reserva no modal ───────────────────────────
     // Substitui: confirmReserve() com querySelector + getElementById + bootstrap.Modal.getInstance
     $(document).on('click', '#btn-confirmar-reserva', function () {
-      const modal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
-      modal.hide();
-    
-      setTimeout(function () {
-        const params = new URLSearchParams(window.location.search);
-        const itemId = Number(params.get('id')) || 1;
-        const item   = mockItems.find(i => i.id === itemId) || mockItems[0];
-      
-        // Atualiza pill de status
-        // Substitui: document.querySelector('.status-pill').style... + innerHTML
-        $('.status-pill')
-          .removeClass('status-available')
-          .css({ background: '#FFF3CD', color: '#856404' })
-          .html('<i class="bi bi-hourglass-split"></i> Reservado');
-      
-        // Revela endereço exato após confirmação
-        $('#item-location-name').text(item.fullAddress.split(',')[0]);
-        $('#item-location-sub').text(item.fullAddress);
-      
-        // Atualiza mapa para localização exata
-        $('#location-title').html('<i class="bi bi-map" style="color:var(--green-mid)"></i> Localização exata');
-        $('#location-map').html(buildMapIframe(item.mapAddress, 'Mapa da localização exata'));
-      
-        alert('✅ Item reservado com sucesso!\nEntre em contato via WhatsApp para combinar a retirada.');
-      }, 300);
+      const itemId = $(this).data('item-id');
+      const message = $('#reserveModal textarea').val() || '';
+
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const $btn = $(this).prop('disabled', true)
+        .html('<span class="spinner-border spinner-border-sm me-1"></span>Reservando...');
+
+      DoaFacilAPI.Reservations.create(itemId, message)
+        .done(function () {
+          const modal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
+          if (modal) modal.hide();
+
+          $('.status-pill')
+            .removeClass('status-available')
+            .css({ background: '#FFF3CD', color: '#856404' })
+            .html('<i class="bi bi-hourglass-split"></i> Reserva pendente');
+
+          $btn.prop('disabled', true).html('Reserva solicitada');
+          alert('Reserva solicitada com sucesso! Aguarde a confirmação do doador.');
+        })
+        .fail(function (jqXHR) {
+          const msg = jqXHR.responseJSON?.error || 'Erro ao reservar. Tente novamente.';
+          alert(msg);
+          $btn.prop('disabled', false).text('Confirmar reserva');
+        });
     });
   
   });

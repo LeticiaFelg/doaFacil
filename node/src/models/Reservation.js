@@ -30,14 +30,6 @@ const Reservation = sequelize.define('Reservation', {
   completed_at: {
     type: DataTypes.DATE,
     allowNull: true
-  },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
   }
 });
 
