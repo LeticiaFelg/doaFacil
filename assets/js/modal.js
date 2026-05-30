@@ -1,7 +1,7 @@
 function initModal() {
   const doarBtn = document.getElementById('doarBtn');
   const doarModal = document.getElementById('doarModal');
-  const modalClose = document.querySelector('.modal-close');
+  const modalClose = doarModal ? doarModal.querySelector('.modal-close') : null;
   const formDoacao = document.getElementById('formDoacao');
 
   if (!doarBtn || !doarModal || !modalClose || !formDoacao) {
