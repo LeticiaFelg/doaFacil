@@ -35,12 +35,26 @@ function initModal() {
   formDoacao.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const images = Array.from(document.getElementById('itemImages').files);
+    if (images.length > 3) {
+      alert('Por favor, selecione no máximo 3 imagens.');
+      return;
+    }
+
     const formData = {
       nome: document.getElementById('itemNome').value,
       categoria: document.getElementById('itemCategoria').value,
+      imagens: images.map(file => file.name),
       descricao: document.getElementById('itemDescricao').value,
       condicao: document.getElementById('itemCondicao').value,
-      localizacao: document.getElementById('itemLocalizacao').value,
+      dimensoes: document.getElementById('itemDimensoes').value,
+      material: document.getElementById('itemMaterial').value,
+      cor: document.getElementById('itemCor').value,
+      retirada: document.getElementById('itemRetirada').value,
+      rua: document.getElementById('itemRua').value,
+      numero: document.getElementById('itemNumero').value,
+      bairro: document.getElementById('itemBairro').value,
+      cidade: document.getElementById('itemCidade').value,
     };
 
     console.log('Item cadastrado:', formData);

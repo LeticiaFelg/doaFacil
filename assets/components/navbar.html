@@ -97,6 +97,11 @@
         </select>
       </div>
       <div class="form-group">
+        <label for="itemImages">Fotos do item</label>
+        <input type="file" id="itemImages" name="images" accept="image/*" multiple>
+        <small style="display:block;margin-top:.35rem;color:var(--text-muted);font-size:.82rem;">Máximo 3 imagens.</small>
+      </div>
+      <div class="form-group">
         <label for="itemDescricao">Descrição</label>
         <textarea id="itemDescricao" name="descricao" rows="4" placeholder="Descreva o estado, características e detalhes do item..."></textarea>
       </div>
@@ -110,8 +115,36 @@
         </select>
       </div>
       <div class="form-group">
-        <label for="itemLocalizacao">Localização *</label>
-        <input type="text" id="itemLocalizacao" name="localizacao" placeholder="Bairro e Cidade" required>
+        <label for="itemDimensoes">Dimensões</label>
+        <input type="text" id="itemDimensoes" name="dimensoes" placeholder="Ex: 220 x 85 x 90 cm">
+      </div>
+      <div class="form-group">
+        <label for="itemMaterial">Material</label>
+        <input type="text" id="itemMaterial" name="material" placeholder="Ex: Madeira / Tecido">
+      </div>
+      <div class="form-group">
+        <label for="itemCor">Cor</label>
+        <input type="text" id="itemCor" name="cor" placeholder="Ex: Cinza claro">
+      </div>
+      <div class="form-group">
+        <label for="itemRetirada">Retirada</label>
+        <input type="text" id="itemRetirada" name="retirada" placeholder="Ex: A combinar, Retirar no local">
+      </div>
+      <div class="form-group">
+        <label for="itemRua">Rua *</label>
+        <input type="text" id="itemRua" name="rua" placeholder="Nome da rua" required>
+      </div>
+      <div class="form-group">
+        <label for="itemNumero">Número *</label>
+        <input type="text" id="itemNumero" name="numero" placeholder="Número" required>
+      </div>
+      <div class="form-group">
+        <label for="itemBairro">Bairro *</label>
+        <input type="text" id="itemBairro" name="bairro" placeholder="Bairro" required>
+      </div>
+      <div class="form-group">
+        <label for="itemCidade">Cidade *</label>
+        <input type="text" id="itemCidade" name="cidade" placeholder="Cidade" required>
       </div>
       <button type="submit" class="btn-submit">Cadastrar Item</button>
     </form>
