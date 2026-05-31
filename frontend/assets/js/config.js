@@ -17,7 +17,7 @@
 const PROD_API = 'https://doafacil-api.SEU-DOMINIO.workers.dev/api';
 
 // URL para desenvolvimento local
-const DEV_API = 'http://localhost:8000/api';
+const DEV_API = 'http://localhost:5000/api';
 
 // Auto-detecção: quando estiver em localhost, usa o DEV_API; caso contrário, usa PROD_API
 // Isso evita editar o arquivo manualmente em muitos lugares durante testes locais.
@@ -28,4 +28,4 @@ const DEV_API = 'http://localhost:8000/api';
   } else {
     window.API_BASE_URL = PROD_API;
   }
-});
+})();

@@ -1,6 +1,9 @@
 # ─── Dependências ────────────────────────────────────────
 node_modules/
 
+# Pasta antiga antes do refactor para backend/frontend.
+node/
+
 # ─── Variáveis de ambiente ────────────────────────────────
 .env
 !.env.example

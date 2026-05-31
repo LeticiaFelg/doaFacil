@@ -5,9 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node ../scripts/dev.js || bun ../scripts/dev.js",
-    "start:bun": "bun src/server.js",
-    "dev:bun": "bun ../scripts/dev.js",
+    "dev": "node ../scripts/dev.js",
     "test": "jest"
   },
   "keywords": ["doacao", "solidariedade", "api"],

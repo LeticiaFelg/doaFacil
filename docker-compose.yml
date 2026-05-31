@@ -20,7 +20,8 @@ services:
 
   api:
     build:
-      context: ./node
+      context: ./backend
+      dockerfile: src/Dockerfile
     container_name: doafacil-api
     restart: unless-stopped
     depends_on:

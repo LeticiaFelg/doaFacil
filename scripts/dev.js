@@ -8,7 +8,6 @@ function run(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: root,
-      shell: process.platform === 'win32',
       stdio: options.stdio || 'inherit'
     });
 
@@ -62,7 +61,6 @@ async function main() {
   console.log('API pronta. Subindo frontend em http://localhost:8000 ...');
   const frontend = spawn(process.execPath, [path.join('scripts', 'frontend-server.js')], {
     cwd: root,
-    shell: process.platform === 'win32',
     stdio: 'inherit'
   });
 

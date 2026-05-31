@@ -6,7 +6,7 @@ const sequelize = require('./config/database');
 // Modelos
 const User = require('./models/User');
 const Item = require('./models/Item');
-require('./models/Reservation');
+const Reservation = require('./models/Reservation');
 require('./models/History');
 
 // Rotas
@@ -48,6 +48,9 @@ app.use(express.json());
 // Associações
 Item.belongsTo(User, { as: 'donor', foreignKey: 'donor_id' });
 User.hasMany(Item, { foreignKey: 'donor_id' });
+Reservation.belongsTo(User, { as: 'receiver', foreignKey: 'user_id' });
+Reservation.belongsTo(User, { as: 'donor', foreignKey: 'donor_id' });
+Reservation.belongsTo(Item, { as: 'item', foreignKey: 'item_id' });
 
 // Rotas
 app.use('/api/auth', authRoutes);

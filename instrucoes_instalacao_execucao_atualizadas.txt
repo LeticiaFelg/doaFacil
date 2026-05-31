@@ -7,13 +7,18 @@ Arquitetura atual
 O projeto usa:
 
 - Frontend estatico em HTML, CSS, Bootstrap e jQuery.
-- API Express/Sequelize em container Node.
+- API Express/Sequelize em container Node/npm.
 - PostgreSQL em container Docker.
 - Volume Docker persistente para os dados do banco.
 - API exposta em http://localhost:5000/api.
 - Frontend exposto em http://localhost:8000.
 
 O frontend roda fora do Docker por simplicidade. Banco e API sobem via Docker Compose.
+A estrutura atual do repositorio e:
+
+- backend/: API Node/Express.
+- frontend/: paginas HTML, CSS e JS.
+- scripts/: automacao local de desenvolvimento.
 
 
 Pre-requisitos
@@ -22,8 +27,7 @@ Pre-requisitos
 Instale:
 
 1. Docker Desktop.
-2. Node.js LTS, se quiser usar npm.
-3. Bun, se quiser usar Bun.
+2. Node.js LTS, que ja inclui npm.
 4. Git.
 
 Depois de instalar o Docker Desktop, confirme:
@@ -69,21 +73,34 @@ docker compose down -v
 ```
 
 
+Instalacao
+----------
+
+Na raiz do projeto:
+
+```bash
+npm install
+```
+
+Depois, instale as dependencias da API:
+
+```bash
+cd backend
+npm install
+cd ..
+```
+
+Observacao: a API tambem instala dependencias dentro do container no primeiro build.
+Mesmo assim, rodar `npm install` localmente ajuda quem for usar scripts, testes ou editor com autocomplete.
+
+
 Como subir o projeto inteiro
 ----------------------------
 
 Na raiz do projeto:
 
-Com npm:
-
 ```bash
 npm run dev
-```
-
-Com Bun:
-
-```bash
-bun run dev
 ```
 
 Esse comando executa a seguinte ordem:
@@ -209,13 +226,13 @@ Se quiser rodar a API localmente e usar apenas o banco em container:
 
 ```bash
 docker compose up -d postgres
-cd node
+cd backend
 npm install
 Copy-Item .env.example .env
 npm start
 ```
 
-Nesse caso, node/.env deve usar:
+Nesse caso, backend/.env deve usar:
 
 ```env
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/doafacil
