@@ -1,0 +1,98 @@
+Comandos para testar o projeto DoaFacil
+=======================================
+
+1. Abrir o PowerShell na raiz do projeto:
+
+```powershell
+cd "C:\Users\Lucas R\Documents\IBMR\2026.1\A3"
+```
+
+2. Conferir se as ferramentas estao instaladas:
+
+```powershell
+node --version
+npm --version
+docker --version
+docker compose version
+```
+
+3. Subir o projeto inteiro:
+
+```powershell
+npm run dev
+```
+
+Esse comando sobe:
+
+- PostgreSQL em container Docker.
+- API Node/Express em container Docker.
+- Frontend local em http://localhost:8000.
+
+4. Abrir o frontend no navegador:
+
+```text
+http://localhost:8000
+```
+
+5. Testar a API em outro PowerShell:
+
+```powershell
+Invoke-RestMethod http://localhost:5000/api/health
+```
+
+Resposta esperada:
+
+```json
+{
+  "status": "ok",
+  "message": "API DoaFacil esta funcionando"
+}
+```
+
+6. Verificar status dos containers:
+
+```powershell
+docker compose ps
+```
+
+7. Ver logs da API:
+
+```powershell
+docker compose logs -f api
+```
+
+8. Ver logs do banco:
+
+```powershell
+docker compose logs -f postgres
+```
+
+9. Parar banco e API sem apagar dados:
+
+```powershell
+docker compose down
+```
+
+10. Resetar banco local apagando todos os dados:
+
+```powershell
+docker compose down -v
+```
+
+11. Se a porta 8000 estiver ocupada, subir o frontend em outra porta:
+
+```powershell
+$env:FRONTEND_PORT=8001
+npm run dev
+```
+
+Depois abrir:
+
+```text
+http://localhost:8001
+```
+
+Observacao
+----------
+
+Se `npm` nao for reconhecido, fechar e reabrir o PowerShell. Se continuar falhando, verificar se `C:\Program Files\nodejs\` esta no PATH do Windows.
