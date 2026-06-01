@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Histórico</title>
+  <link rel="icon" type="image/png" href="../public/faveicon4.png">
   <link rel="stylesheet" href="../assets/css/historico.css">
   <link rel="stylesheet" href="../assets/css/components/navbar.css">
   <link rel="stylesheet" href="../assets/css/components/footer.css">
@@ -131,28 +132,28 @@
   
     // ── Dados mockados ──────────────────────────────────────
     const mockDoado = [
-      { id:1,  emoji:'🛋️', image:'../assets/img/items/item1.jpg', name:'Sofá de 3 lugares',        cat:'Móveis',     receptor:'Carlos M.',    date:'19/05/2026', status:'disponivel' },
-      { id:2,  emoji:'📱', image:'../assets/img/items/item3.jpg', name:'Micro-ondas 30L',           cat:'Eletro',     receptor:'Ana Lima',     date:'12/05/2026', status:'reservado'  },
-      { id:3,  emoji:'👕', image:'../assets/img/items/item4.jpg', name:'Kit roupas infantis',       cat:'Roupas',     receptor:'ONG Recomeço', date:'08/05/2026', status:'concluido'  },
-      { id:4,  emoji:'🪑', image:'../assets/img/items/item5.jpg', name:'Mesa escritório',           cat:'Móveis',     receptor:'João Alves',   date:'02/05/2026', status:'concluido'  },
-      { id:5,  emoji:'📚', image:'../assets/img/items/item8.jpg', name:'Livros didáticos (4 vol)',  cat:'Escolar',    receptor:'Projeto ABC',  date:'28/04/2026', status:'concluido'  },
-      { id:6,  emoji:'🍳', image:'../assets/img/items/item6.jpg', name:'Conjunto de panelas',       cat:'Utensílios', receptor:'Fernanda R.',  date:'22/04/2026', status:'concluido'  },
-      { id:7,  emoji:'👟', image:'../assets/img/items/item7.jpg', name:'Tênis esportivo 42',        cat:'Calçados',   receptor:'Lucas T.',     date:'15/04/2026', status:'concluido'  },
-      { id:8,  emoji:'🧸', image:'../assets/img/items/item10.jpg', name:'Brinquedos variados',       cat:'Brinquedos', receptor:'Casa Criança', date:'10/04/2026', status:'concluido'  },
-      { id:9,  emoji:'🛏️', image:'../assets/img/items/item9.jpg', name:'Cama solteiro c/ colchão', cat:'Móveis',     receptor:'Silvia N.',    date:'03/04/2026', status:'concluido'  },
-      { id:10, emoji:'🪟', image:'../assets/img/items/item2.jpg', name:'Guarda-roupa 4 portas',     cat:'Móveis',     receptor:'Pedro S.',     date:'28/03/2026', status:'cancelado'  },
-      { id:11, emoji:'🎒', image:'../assets/img/items/item12.jpg', name:'Mochila escolar',           cat:'Escolar',    receptor:'Inst. Educar', date:'20/03/2026', status:'concluido'  },
-      { id:12, emoji:'🧊', image:'../assets/img/items/item11.jpg', name:'Geladeira 280L',            cat:'Eletro',     receptor:'Maria F.',     date:'14/03/2026', status:'concluido'  },
+      { id:1,  image:'../assets/img/items/item1.jpg', name:'Sofá de 3 lugares',        cat:'Móveis',     receptor:'Carlos M.',    date:'19/05/2026', status:'disponivel' },
+      { id:2,  image:'../assets/img/items/item3.jpg', name:'Micro-ondas 30L',           cat:'Eletro',     receptor:'Ana Lima',     date:'12/05/2026', status:'reservado'  },
+      { id:3,  image:'../assets/img/items/item4.jpg', name:'Kit roupas infantis',       cat:'Roupas',     receptor:'ONG Recomeço', date:'08/05/2026', status:'concluido'  },
+      { id:4,  image:'../assets/img/items/item5.jpg', name:'Mesa escritório',           cat:'Móveis',     receptor:'João Alves',   date:'02/05/2026', status:'concluido'  },
+      { id:5,  image:'../assets/img/items/item8.jpg', name:'Livros didáticos (4 vol)',  cat:'Escolar',    receptor:'Projeto ABC',  date:'28/04/2026', status:'concluido'  },
+      { id:6,  image:'../assets/img/items/item6.jpg', name:'Conjunto de panelas',       cat:'Utensílios', receptor:'Fernanda R.',  date:'22/04/2026', status:'concluido'  },
+      { id:7,  image:'../assets/img/items/item7.jpg', name:'Tênis esportivo 42',        cat:'Calçados',   receptor:'Lucas T.',     date:'15/04/2026', status:'concluido'  },
+      { id:8,  image:'../assets/img/items/item10.jpg', name:'Brinquedos variados',       cat:'Brinquedos', receptor:'Casa Criança', date:'10/04/2026', status:'concluido'  },
+      { id:9,  image:'../assets/img/items/item9.jpg', name:'Cama solteiro c/ colchão', cat:'Móveis',     receptor:'Silvia N.',    date:'03/04/2026', status:'concluido'  },
+      { id:10, image:'../assets/img/items/item2.jpg', name:'Guarda-roupa 4 portas',     cat:'Móveis',     receptor:'Pedro S.',     date:'28/03/2026', status:'cancelado'  },
+      { id:11, image:'../assets/img/items/item12.jpg', name:'Mochila escolar',           cat:'Escolar',    receptor:'Inst. Educar', date:'20/03/2026', status:'concluido'  },
+      { id:12, image:'../assets/img/items/item11.jpg', name:'Geladeira 280L',            cat:'Eletro',     receptor:'Maria F.',     date:'14/03/2026', status:'concluido'  },
     ];
   
     const mockRecebido = [
-      { id:1, emoji:'🪑', image:'../assets/img/items/item5.jpg', name:'Mesa escritório',         cat:'Móveis',     doador:'Lara C.',    date:'25/04/2026', status:'concluido' },
-      { id:2, emoji:'📚', image:'../assets/img/items/item8.jpg', name:'Livros didáticos',        cat:'Escolar',    doador:'Roberto S.', date:'18/04/2026', status:'concluido' },
-      { id:3, emoji:'👗', image:'../assets/img/items/item4.jpg', name:'Roupas tamanho M (lote)', cat:'Roupas',     doador:'Ana P.',     date:'10/04/2026', status:'concluido' },
-      { id:4, emoji:'🍳', image:'../assets/img/items/item6.jpg', name:'Frigideira antiaderente', cat:'Utensílios', doador:'Carlos M.',  date:'01/04/2026', status:'concluido' },
-      { id:5, emoji:'🎒', image:'../assets/img/items/item12.jpg', name:'Mochila infantil',        cat:'Escolar',    doador:'Vera N.',    date:'22/03/2026', status:'concluido' },
-      { id:6, emoji:'🧸', image:'../assets/img/items/item10.jpg', name:'Kit brinquedos',          cat:'Brinquedos', doador:'Inst.Vida',  date:'15/03/2026', status:'concluido' },
-      { id:7, emoji:'🛋️', image:'../assets/img/items/item1.jpg', name:'Poltrona de leitura',    cat:'Móveis',     doador:'Hugo B.',    date:'05/03/2026', status:'reservado' },
+      { id:1, image:'../assets/img/items/item5.jpg', name:'Mesa escritório',         cat:'Móveis',     doador:'Lara C.',    date:'25/04/2026', status:'concluido' },
+      { id:2, image:'../assets/img/items/item8.jpg', name:'Livros didáticos',        cat:'Escolar',    doador:'Roberto S.', date:'18/04/2026', status:'concluido' },
+      { id:3, image:'../assets/img/items/item4.jpg', name:'Roupas tamanho M (lote)', cat:'Roupas',     doador:'Ana P.',     date:'10/04/2026', status:'concluido' },
+      { id:4, image:'../assets/img/items/item6.jpg', name:'Frigideira antiaderente', cat:'Utensílios', doador:'Carlos M.',  date:'01/04/2026', status:'concluido' },
+      { id:5, image:'../assets/img/items/item12.jpg', name:'Mochila infantil',        cat:'Escolar',    doador:'Vera N.',    date:'22/03/2026', status:'concluido' },
+      { id:6, image:'../assets/img/items/item10.jpg', name:'Kit brinquedos',          cat:'Brinquedos', doador:'Inst.Vida',  date:'15/03/2026', status:'concluido' },
+      { id:7, image:'../assets/img/items/item1.jpg', name:'Poltrona de leitura',    cat:'Móveis',     doador:'Hugo B.',    date:'05/03/2026', status:'reservado' },
     ];
   
     const statusMap = {
@@ -177,7 +178,7 @@
         return `
           <div class="history-row cols-doado ${item.status === 'concluido' ? 'recurrent-row' : ''}">
             <div class="item-cell">
-              <div class="item-emoji-thumb">${item.image ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` : item.emoji}</div>
+              <div class="item-emoji-thumb" style="overflow:hidden;background:#eee;"><img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;"></div>
               <div>
                 <div class="item-cell-name">${item.name}</div>
                 <div class="item-cell-cat">${item.cat}</div>
@@ -206,7 +207,7 @@
         return `
           <div class="history-row cols-recebido">
             <div class="item-cell">
-              <div class="item-emoji-thumb">${item.image ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` : item.emoji}</div>
+              <div class="item-emoji-thumb" style="overflow:hidden;background:#eee;"><img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;"></div>
               <div>
                 <div class="item-cell-name">${item.name}</div>
                 <div class="item-cell-cat">${item.cat}</div>

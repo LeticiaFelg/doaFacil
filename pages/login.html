@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Login</title>
+  <link rel="icon" type="image/png" href="../public/faveicon4.png">
   <link rel="stylesheet" href="../assets/css/login.css">
   <link rel="stylesheet" href="../assets/css/components/footer.css">
   <link rel="stylesheet" href="../assets/css/components/navbar.css">
@@ -46,7 +47,7 @@
     <div class="auth-card">
 
       <!-- Tab switcher -->
-      <div class="tabs-custom">
+      <div class="tab-bar">
         <button class="tab-btn active" data-tab="login">Entrar</button>
         <button class="tab-btn" data-tab="register">Criar conta</button>
       </div>
@@ -78,35 +79,15 @@
           <i class="bi bi-arrow-right-circle"></i> Entrar
         </button>
 
-        <div id="login-erro" class="alert alert-danger mt-2" style="display:none;font-size:.85rem;border-radius:10px;"></div>
+        <div id="login-erro" class="alert alert-danger" style="display:none;"></div>
         <div class="note">
           Não tem conta? <a href="#" style="color:var(--green-mid);text-decoration:none;" data-tab="register">Crie uma grátis</a>
         </div>
       </div>
 
-      <!-- REGISTER FORM -->
       <div class="form-panel" id="panel-register">
         <h2>Criar sua conta</h2>
         <p class="subtitle">Junte-se à rede de solidariedade</p>
-
-        <!-- Profile type -->
-        <div style="margin-bottom:20px;">
-          <label style="font-size:.82rem;font-weight:500;color:var(--text-dark);margin-bottom:10px;display:block;">Tipo de perfil <span style="color:var(--text-muted);font-weight:400">(pode selecionar mais de um)</span></label>
-          <div class="profile-grid">
-            <div class="profile-card selected">
-              <div class="p-icon">🤝</div>
-              <div class="p-name">Doador</div>
-            </div>
-            <div class="profile-card">
-              <div class="p-icon">🏠</div>
-              <div class="p-name">Receptor</div>
-            </div>
-            <div class="profile-card">
-              <div class="p-icon">🏛️</div>
-              <div class="p-name">Instituição</div>
-            </div>
-          </div>
-        </div>
 
         <div class="form-group-custom">
           <label>Nome completo / Razão social</label>
@@ -133,10 +114,18 @@
         </div>
 
         <div class="form-group-custom">
-          <label>Bairro / CEP</label>
+          <label>CPF</label>
+          <div class="input-wrap">
+            <i class="bi bi-credit-card-2-front icon"></i>
+            <input type="text" id="reg-cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" />
+          </div>
+        </div>
+
+        <div class="form-group-custom">
+          <label>Bairro</label>
           <div class="input-wrap">
             <i class="bi bi-geo-alt icon"></i>
-            <input type="text" id="reg-endereco" placeholder="Copacabana, RJ" />
+            <input type="text" id="reg-bairro" placeholder="Copacabana" />
           </div>
         </div>
 
@@ -152,107 +141,178 @@
           <i class="bi bi-check-circle"></i> Criar conta
         </button>
 
-        <div id="reg-erro" class="alert alert-danger mt-2" style="display:none;font-size:.85rem;border-radius:10px;"></div>
-        <div class="note" style="margin-top:14px;">
+        <div id="reg-erro" class="alert alert-danger mt-2" style="display:none;"></div>
+        <div class="note">
           Ao criar uma conta, você concorda com nossos <a href="#" style="color:var(--green-mid);text-decoration:none;">Termos de uso</a>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/config.js"></script>
-  <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/modal.js"></script>
-
   <script>
-    $(function () {
-      // Troca Login / Cadastro usando o seletor curto '.tab-btn' e '$(this)'
-      $(document).on('click', '.tab-btn', function () {
-        const tab = $(this).data('tab');
-        $('.tab-btn').removeClass('active');
-        $(this).addClass('active');
-        $('.form-panel').removeClass('active');
-        $('#panel-' + tab).addClass('active');
+    // ─── Tab navigation ─────────────────────────────────────────
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
       });
+      document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+      document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+    }
 
-      // Ponte de ligação para o link <a> do rodapé (Garante compatibilidade total)
-      $(document).on('click', 'a[data-tab]', function (e) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    document.querySelectorAll('a[data-tab]').forEach(link => {
+      link.addEventListener('click', (e) => {
         e.preventDefault();
-        const tab = $(this).data('tab');
-        // Simula o clique diretamente no botão superior correspondente
-        $(`.tab-btn[data-tab="${tab}"]`).trigger('click');
+        switchTab(link.dataset.tab);
       });
+    });
 
-      // Selecionar tipo de perfil
-      $(document).on('click', '.profile-card', function () {
-        $(this).toggleClass('selected');
-      });
+    function toggleProfile(el) {
+      el.classList.toggle('selected');
+    }
 
-      // ── Login ────────────────────────────────────────────────
-      $(document).on('click', '#btn-entrar', function () {
-        const email    = $('#login-email').val().trim();
-        const password = $('#login-password').val();
+    // ─── Register Validation ────────────────────────────────────
+    function showRegisterError(message, fieldId = null) {
+      const errorBox = document.getElementById('reg-erro');
+      errorBox.textContent = message;
+      errorBox.style.display = 'block';
       
-        if (!email || !password) {
-          $('#login-erro').text('Preencha e-mail e senha.').show();
-          return;
-        }
-      
-        const $btn = $(this).prop('disabled', true)
-          .html('<span class="spinner-border spinner-border-sm me-1"></span>Entrando...');
-      
-        $('#login-erro').hide();
-      
-        DoaFacilAPI.Auth.login({ email, password })
-          .done(function () {
-            window.location.href = '../index.html';
-          })
-          .fail(function (jqXHR) {
-            const msg = jqXHR.responseJSON?.error || 'E-mail ou senha incorretos.';
-            $('#login-erro').text(msg).show();
-            $btn.prop('disabled', false).html('<i class="bi bi-arrow-right-circle"></i> Entrar');
-          });
+      // Limpar erros anteriores de todos os campos
+      document.querySelectorAll('#panel-register input').forEach(input => {
+        input.classList.remove('error');
       });
+      
+      // Adicionar erro ao campo específico se fornecido
+      if (fieldId) {
+        const field = document.getElementById(fieldId);
+        if (field) field.classList.add('error');
+      }
+    }
 
-      // ── Cadastro ─────────────────────────────────────────────
-      $(document).on('click', '#btn-criar-conta', function () {
-        const name     = $('#reg-nome').val().trim();
-        const email    = $('#reg-email').val().trim();
-        const phone    = $('#reg-phone').val().trim();
-        const password = $('#reg-password').val();
-        const address  = { neighborhood: $('#reg-endereco').val().trim() };
-      
-        // Lê os cards de perfil que estão selecionados
-        const selecionados = [];
-        $('.profile-card.selected .p-name').each(function () {
-          selecionados.push($(this).text().toLowerCase());
-        });
-        const profileType = selecionados.includes('doador') && selecionados.includes('receptor')
-          ? 'both'
-          : selecionados.includes('receptor') ? 'receiver' : 'donor';
-      
-        if (!name || !email || !password) {
-          $('#reg-erro').text('Nome, e-mail e senha são obrigatórios.').show();
-          return;
-        }
-      
-        const $btn = $(this).prop('disabled', true)
-          .html('<span class="spinner-border spinner-border-sm me-1"></span>Criando...');
-      
-        $('#reg-erro').hide();
-      
-        DoaFacilAPI.Auth.register({ name, email, password, phone, address, profileType })
-          .done(function () {
-            window.location.href = '../index.html';
-          })
-          .fail(function (jqXHR) {
-            const msg = jqXHR.responseJSON?.error || 'Erro ao criar conta. Tente novamente.';
-            $('#reg-erro').text(msg).show();
-            $btn.prop('disabled', false).html('<i class="bi bi-check-circle"></i> Criar conta');
-          });
+    function hideRegisterError() {
+      document.getElementById('reg-erro').style.display = 'none';
+      // Remover classe error de todos os campos
+      document.querySelectorAll('#panel-register input').forEach(input => {
+        input.classList.remove('error');
       });
+    }
+
+    function normalizeDigits(value) {
+      return value.replace(/\D/g, '');
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function isValidPhone(phone) {
+      const allowed = /^[0-9\s()+-]*$/;
+      if (!allowed.test(phone)) {
+        return false;
+      }
+      const digits = normalizeDigits(phone);
+      return digits.length === 10 || digits.length === 11;
+    }
+
+    function formatPhone(phone) {
+      const digits = normalizeDigits(phone).slice(0, 11);
+      if (digits.length <= 2) return digits ? `(${digits}` : '';
+      if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+      if (digits.length <= 10) {
+        return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+      }
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+    }
+
+    function isValidCPF(cpf) {
+      const digits = normalizeDigits(cpf);
+      return digits.length === 11;
+    }
+
+    function formatCPF(cpf) {
+      const digits = normalizeDigits(cpf).slice(0, 11);
+      if (digits.length <= 3) return digits;
+      if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+      if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+      return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+    }
+
+    function emailAlreadyRegistered(email) {
+      const registered = JSON.parse(localStorage.getItem('doafacil_registered_emails') || '[]');
+      return registered.includes(email.toLowerCase());
+    }
+
+    function saveRegisteredEmail(email) {
+      const registered = JSON.parse(localStorage.getItem('doafacil_registered_emails') || '[]');
+      const normalized = email.toLowerCase();
+      if (!registered.includes(normalized)) {
+        registered.push(normalized);
+        localStorage.setItem('doafacil_registered_emails', JSON.stringify(registered));
+      }
+    }
+
+    document.getElementById('btn-criar-conta')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      hideRegisterError();
+
+      const nome = document.getElementById('reg-nome').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const cpf = document.getElementById('reg-cpf').value.trim();
+      const bairro = document.getElementById('reg-bairro').value.trim();
+      const password = document.getElementById('reg-password').value;
+
+      if (!nome || nome.length < 3) {
+        return showRegisterError('Nome completo obrigatório', 'reg-nome');
+      }
+      if (!email || !isValidEmail(email)) {
+        return showRegisterError('Email Inválido', 'reg-email');
+      }
+      if (!phone || !isValidPhone(phone)) {
+        return showRegisterError('Telefone Inválido', 'reg-phone');
+      }
+      if (!cpf || !isValidCPF(cpf)) {
+        return showRegisterError('CPF Inválido', 'reg-cpf');
+      }
+      if (!bairro) {
+        return showRegisterError('Bairro obrigatório.', 'reg-bairro');
+      }
+      if (!password || password.length < 6) {
+        return showRegisterError('Senha obrigatória com pelo menos 6 caracteres.', 'reg-password');
+      }
+      if (emailAlreadyRegistered(email)) {
+        return showRegisterError('Este e-mail já possui conta associada.', 'reg-email');
+      }
+
+      saveRegisteredEmail(email);
+      window.location.href = '../index.html';
+    });
+
+    document.getElementById('reg-phone')?.addEventListener('input', function(e) {
+      e.target.value = formatPhone(e.target.value);
+    });
+
+    document.getElementById('reg-cpf')?.addEventListener('input', function(e) {
+      e.target.value = formatCPF(e.target.value);
+    });
+
+    // ─── Login ──────────────────────────────────────────────────
+    document.getElementById('btn-entrar')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!email || !password) {
+        document.getElementById('login-erro').textContent = 'Preencha e-mail e senha.';
+        document.getElementById('login-erro').style.display = 'block';
+        return;
+      }
+
+      alert('Login implementado (integrar com API)');
     });
   </script>
   </body>
