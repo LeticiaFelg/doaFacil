@@ -1,31 +1,43 @@
 #heroCarousel {
     cursor: grab;
-}
-#heroCarousel > .carousel-inner .carousel-item {
-    height: 60vh;
-    min-height: 400px;
+    min-height: 520px;
 }
 #heroCarousel:active {
     cursor: grabbing;
 }
-#heroCarousel .carousel-item {
+#heroCarousel .hero-carousel-item {
+    position: relative;
     width: 100%;
     object-fit: cover;
+    min-height: 520px;
 }
-#heroCarousel .carousel-item img {
+#heroCarousel .hero-carousel-item img {
     position: absolute;
     top: 0;
     left: 0;
-    min-height: 400px;
     width: 100%;
-    height: 60vh;
     object-fit: cover;
     z-index: -1;
+    min-height: 520px;
+}
+#heroCarousel .hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 520px;
+    height: 100%;
+    text-align: center;
+    padding: 0 1rem;
+}
+#heroCarousel .hero-content .text-white {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 .hero-overlay {
     background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));
 }
-#heroCarousel .carousel-item {
+#heroCarousel .hero-carousel-item {
     transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
 }
 #heroCarousel .carousel-control-prev,

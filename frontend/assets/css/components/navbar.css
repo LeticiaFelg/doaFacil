@@ -9,12 +9,14 @@
     position: sticky; 
     top: 0; 
     z-index: 100;
+    position: fixed;
+    width: 100%;
 }
 
 .brand {
     display: flex; 
     align-items: center; 
-    gap: 10px;
+    gap: 0;
     text-decoration: none;
     flex-shrink: 0;
 }
@@ -45,7 +47,13 @@
     flex: 1;
     justify-content: center;
 }
-
+.brand-logo {
+    width: 50px;
+    height: 26px;
+    border-radius: 10px;
+    max-width: 50px;
+    max-height: 26px
+}
 .nav-link-btn {
     padding: 7px 16px;
     border: none;

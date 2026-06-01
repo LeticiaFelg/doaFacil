@@ -18,9 +18,21 @@ body {
     background: #F7F6F3;
     color: var(--text-dark);
     min-height: 100vh;
+    scroll-behavior: smooth;
+}
+html {
+    scroll-behavior: smooth;
+}
+section,div {
+    scroll-margin-top: 100px;
+}
+#impacto-social,
+#destaques-semana,
+#itens-disponiveis,
+#sobre-doafacil {
+    scroll-margin-top: 100px;
 }
 
-/* ── NAVBAR ───────────────────────────────────── */
 .brand {
     display: flex; 
     align-items: center; 
@@ -79,8 +91,9 @@ body {
 #about-section {
     grid-column: 1 / -1;
 }
-
-/* ── CATEGORIAS NA LATERAL ────────────────────── */
+.card-body {
+    background: #f0f7ee;
+}
 .sidebar {
     width: 100%;
     position: static;
