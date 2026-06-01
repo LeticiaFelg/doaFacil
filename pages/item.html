@@ -240,6 +240,10 @@
         width="100%" height="100%" style="border:0;border-radius:14px;"
         loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
     }
+
+    function getCurrentUser() {
+      return JSON.parse(localStorage.getItem('doafacil_current_user') || 'null');
+    }
   
     // ── Carrega os dados do item conforme ?id= na URL ────────
     // Substitui: loadItem() com document.getElementById x10 + document.querySelector
@@ -352,18 +356,35 @@
           .removeAttr('data-bs-target')
           .addClass('disabled');
       
+        // Salva reserva em memória para histórico
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+          const reservations = JSON.parse(localStorage.getItem('doafacil_reservations') || '[]');
+          reservations.push({
+            itemId: item.id,
+            name: item.title,
+            image: item.image,
+            cat: item.categoryLabel,
+            doador: item.donor,
+            receiverEmail: currentUser.email,
+            date: new Date().toLocaleDateString('pt-BR'),
+            status: 'reservado',
+          });
+          localStorage.setItem('doafacil_reservations', JSON.stringify(reservations));
+        }
+
         // Revela endereço exato após confirmação
         $('#item-location-name').text(item.fullAddress.split(',')[0]);
         $('#item-location-sub').text(item.fullAddress);
-      
+
         // Atualiza mapa para localização exata
         $('#location-title').html('<i class="bi bi-map" style="color:var(--green-mid)"></i> Localização exata');
         $('#location-map').html(buildMapIframe(item.mapAddress, 'Mapa da localização exata'));
-      
+
         alert('✅ Item reservado com sucesso!\nEntre em contato via WhatsApp para combinar a retirada.');
       }, 300);
     });
-  
+
   });
   </script>
 </body>

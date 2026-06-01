@@ -244,19 +244,44 @@
       return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
     }
 
-    function emailAlreadyRegistered(email) {
-      const registered = JSON.parse(localStorage.getItem('doafacil_registered_emails') || '[]');
-      return registered.includes(email.toLowerCase());
+    const STORAGE_USERS_KEY = 'doafacil_users';
+    const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
+
+    function getStoredUsers() {
+      return JSON.parse(localStorage.getItem(STORAGE_USERS_KEY) || '[]');
     }
 
-    function saveRegisteredEmail(email) {
-      const registered = JSON.parse(localStorage.getItem('doafacil_registered_emails') || '[]');
-      const normalized = email.toLowerCase();
-      if (!registered.includes(normalized)) {
-        registered.push(normalized);
-        localStorage.setItem('doafacil_registered_emails', JSON.stringify(registered));
+    function saveStoredUsers(users) {
+      localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+    }
+
+    function findUserByEmail(email) {
+      return getStoredUsers().find(user => user.email.toLowerCase() === email.toLowerCase());
+    }
+
+    function getCurrentUser() {
+      return JSON.parse(localStorage.getItem(STORAGE_CURRENT_USER_KEY) || 'null');
+    }
+
+    function setCurrentUser(user) {
+      localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(user));
+    }
+
+    function clearCurrentUser() {
+      localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
+    }
+
+    function emailAlreadyRegistered(email) {
+      return !!findUserByEmail(email);
+    }
+
+    function redirectIfLoggedIn() {
+      if (getCurrentUser()) {
+        window.location.href = '../pages/perfil.html';
       }
     }
+
+    redirectIfLoggedIn();
 
     document.getElementById('btn-criar-conta')?.addEventListener('click', function(e) {
       e.preventDefault();
