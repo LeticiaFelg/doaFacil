@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Item</title>
-  <link rel="icon" type="image/png" href="./public/faveicon4.png">
+  <link rel="icon" type="image/png" href="../public/faveicon4.png">
   <link rel="stylesheet" href="../assets/css/item.css">
   <link rel="stylesheet" href="../assets/css/components/navbar.css">
   <link rel="stylesheet" href="../assets/css/components/footer.css">
@@ -152,9 +152,6 @@
             <i class="bi bi-whatsapp"></i> Contato via WhatsApp
           </button>
 
-          <button class="btn-outline" id="btn-desejos">
-            <i class="bi bi-heart"></i> Salvar na lista de desejos
-          </button>
         </div>
 
         <!-- Donor card -->
@@ -307,12 +304,6 @@
     // Substitui: onclick="alert('Abrindo WhatsApp...')"
     $(document).on('click', '#btn-whatsapp', function () {
       alert('Abrindo WhatsApp...');
-    });
-  
-    // ── Botão Lista de desejos ───────────────────────────────
-    // Substitui: onclick="alert('Item adicionado à lista de desejos!')"
-    $(document).on('click', '#btn-desejos', function () {
-      alert('Item adicionado à lista de desejos!');
     });
   
     // ── Confirmar reserva no modal ───────────────────────────

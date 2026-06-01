@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Perfil</title>
-  <link rel="icon" type="image/png" href="./public/faveicon4.png">
+  <link rel="icon" type="image/png" href="../public/faveicon4.png">
   <link rel="stylesheet" href="../assets/css/perfil.css">
   <link rel="stylesheet" href="../assets/css/components/navbar.css">
   <link rel="stylesheet" href="../assets/css/components/footer.css">
@@ -75,21 +75,17 @@
           <div class="section-card">
             <h3><i class="bi bi-person-lines-fill" style="color:var(--green-mid)"></i> Dados do doador</h3>
             <div class="info-grid">
-              <div class="info-item"><label>Nome</label><div class="value">Maria Clara Souza</div></div>
-              <div class="info-item"><label>E-mail</label><div class="value">maria@email.com</div></div>
-              <div class="info-item"><label>Bairro</label><div class="value">Copacabana</div></div>
-              <div class="info-item"><label>WhatsApp</label><div class="value">(21) 99812-3456</div></div>
-              <div class="info-item"><label>Tipo</label><div class="value">Pessoa Física</div></div>
-              <div class="info-item"><label>Status</label><div class="value" style="color:var(--green-mid);">✅ Verificado</div></div>
+              <div class="info-item"><label>Nome</label><div class="value" id="profileNameValue">Maria Clara Souza</div></div>
+              <div class="info-item"><label>E-mail</label><div class="value" id="profileEmailValue">maria@email.com</div></div>
+              <div class="info-item"><label>Telefone</label><div class="value" id="profilePhoneValue">(21) 99812-3456</div></div>
+              <div class="info-item"><label>Bairro</label><div class="value" id="profileNeighborhoodValue">Copacabana</div></div>
+              <div class="info-item"><label>CPF</label><div class="value" id="profileCpfValue">940.340.740-94</div></div>
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
               <button class="btn-edit"><i class="bi bi-pencil"></i> Editar perfil</button>
-<<<<<<< Updated upstream
-              <button class="btn-whatsapp"><i class="bi bi-whatsapp"></i> Contato</button>
-=======
               <button id="btn-logout" class="btn-edit" style="background:#F8F9FA;color:#212529;border:1px solid #CED4DA;"><i class="bi bi-box-arrow-right"></i> Sair</button>
               <button id="btn-delete-account" class="btn-edit" style="background:#F8D7DA;color:#842029;border:1px solid #F5C2C7;"><i class="bi bi-trash"></i> Apagar conta</button>
->>>>>>> Stashed changes
+
             </div>
           </div>
         </div>
@@ -180,6 +176,42 @@
     </div>
   </div><!-- end page-container -->
   <div id="footer"></div>
+
+  <div id="editProfileModal" class="modal custom-modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar perfil</h2>
+        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-description">
+        Atualize seus dados de contato e informações pessoais para manter seu perfil sempre correto.
+      </div>
+      <form id="editProfileForm" class="modal-form">
+        <div class="form-group">
+          <label for="profileName">Nome</label>
+          <input type="text" id="profileName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="profileEmail">E-mail</label>
+          <input type="email" id="profileEmail" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="profilePhone">Telefone</label>
+          <input type="text" id="profilePhone" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="profileNeighborhood">Bairro</label>
+          <input type="text" id="profileNeighborhood" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="profileCpf">CPF</label>
+          <input type="text" id="profileCpf" class="form-control" required>
+        </div>
+        <button type="submit" class="btn-submit">Salvar alterações</button>
+      </form>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/components/footer.js"></script>
@@ -255,13 +287,6 @@
         alert('Solicitar perfil institucional');
       });
 
-<<<<<<< Updated upstream
-      // Botão Editar Perfil Centralizado
-      $(document).on('click', '.btn-edit', function (e) {
-        e.preventDefault();
-        // Sem Ajax
-        alert('Falta função Ajax para envio do HTTP PUT.');
-=======
       $(document).on('click', '#btn-logout', function () {
         localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
         window.location.href = 'login.html';
@@ -357,11 +382,13 @@
 
         closeEditProfileModal();
         alert('Perfil atualizado com sucesso!');
->>>>>>> Stashed changes
+
+        closeEditProfileModal();
+        alert('Perfil atualizado com sucesso!');
+
       });
     
     });
 </script>
 </body>
 </html>
-
