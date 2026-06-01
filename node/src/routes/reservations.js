@@ -11,7 +11,8 @@ const router = express.Router();
 // Criar reserva
 router.post('/', auth, async (req, res) => {
   try {
-    const { item_id, message } = req.body;
+    const { itemId, message } = req.body;
+    const item_id = req.body.item_id || itemId;
 
     if (!item_id) {
       return res.status(400).json({ error: 'Item ID é obrigatório' });
@@ -46,6 +47,83 @@ router.post('/', auth, async (req, res) => {
 
     return res.status(201).json({
       message: 'Reserva criada com sucesso',
+      reservation
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Reservas recebidas pelo contrato esperado pelo frontend: /api/reservations/received
+router.get('/received', auth, async (req, res) => {
+  try {
+    const reservations = await Reservation.findAll({
+      where: { donor_id: req.userId },
+      include: [
+        { model: Item, as: 'item' },
+        { model: User, as: 'receiver', attributes: ['id', 'name', 'avatar', 'verified', 'location'] }
+      ]
+    });
+
+    return res.json({ reservations });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Reservas feitas pelo usuário autenticado: /api/reservations/donated
+router.get('/donated', auth, async (req, res) => {
+  try {
+    const reservations = await Reservation.findAll({
+      where: { user_id: req.userId },
+      include: [
+        { model: Item, as: 'item' },
+        { model: User, as: 'donor', attributes: ['id', 'name', 'avatar', 'verified', 'location'] }
+      ]
+    });
+
+    return res.json({ reservations });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Atualizar status pelo contrato esperado pelo frontend: /api/reservations/:id/status
+router.patch('/:id/status', auth, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const allowedStatuses = ['pendente', 'confirmada', 'concluida', 'cancelada'];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Status inválido' });
+    }
+
+    const reservation = await Reservation.findByPk(req.params.id);
+
+    if (!reservation) {
+      return res.status(404).json({ error: 'Reserva não encontrada' });
+    }
+
+    if (reservation.donor_id !== req.userId && reservation.user_id !== req.userId) {
+      return res.status(403).json({ error: 'Sem permissão' });
+    }
+
+    reservation.status = status;
+    if (status === 'concluida') {
+      reservation.completed_at = new Date();
+    }
+    await reservation.save();
+
+    const item = await Item.findByPk(reservation.item_id);
+    if (item) {
+      if (status === 'confirmada') item.status = 'reservado';
+      if (status === 'concluida') item.status = 'concluido';
+      if (status === 'cancelada' && item.status === 'reservado') item.status = 'disponivel';
+      await item.save();
+    }
+
+    return res.json({
+      message: 'Status da reserva atualizado com sucesso',
       reservation
     });
   } catch (error) {

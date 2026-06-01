@@ -27,6 +27,12 @@ app.use(express.json());
 // Definir associações
 Item.belongsTo(User, { as: 'donor', foreignKey: 'donor_id' });
 User.hasMany(Item, { foreignKey: 'donor_id' });
+Reservation.belongsTo(Item, { as: 'item', foreignKey: 'item_id' });
+Reservation.belongsTo(User, { as: 'receiver', foreignKey: 'user_id' });
+Reservation.belongsTo(User, { as: 'donor', foreignKey: 'donor_id' });
+Item.hasMany(Reservation, { foreignKey: 'item_id' });
+User.hasMany(Reservation, { as: 'receivedReservations', foreignKey: 'user_id' });
+User.hasMany(Reservation, { as: 'donationReservations', foreignKey: 'donor_id' });
 
 // Rotas
 app.use('/api/auth', authRoutes);

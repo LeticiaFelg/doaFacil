@@ -18,9 +18,24 @@ function initModal() {
   }
   doarBtn.dataset.modalAttached = 'true';
 
-  doarBtn.addEventListener('click', () => {
+  function isLoggedIn() {
+    return !!localStorage.getItem('doafacil_token');
+  }
+
+  function getLoginPath() {
+    return window.location.pathname.includes('/pages/') ? './login.html' : './pages/login.html';
+  }
+
+  function openDonationModal() {
+    if (!isLoggedIn()) {
+      window.location.href = getLoginPath();
+      return;
+    }
+
     doarModal.classList.add('active');
-  });
+  }
+
+  doarBtn.addEventListener('click', openDonationModal);
 
   modalClose.addEventListener('click', () => {
     doarModal.classList.remove('active');
@@ -56,6 +71,44 @@ function initModal() {
       bairro: document.getElementById('itemBairro').value,
       cidade: document.getElementById('itemCidade').value,
     };
+
+    const apiPayload = {
+      title: formData.nome,
+      description: formData.descricao,
+      category: formData.categoria,
+      condition: formData.condicao,
+      location: `${formData.bairro}, ${formData.cidade}`,
+      images: formData.imagens,
+      dimensions: formData.dimensoes,
+      material: formData.material,
+      color: formData.cor,
+      pickup: formData.retirada,
+      address: {
+        street: formData.rua,
+        number: formData.numero,
+        neighborhood: formData.bairro,
+        city: formData.cidade
+      }
+    };
+
+    if (window.DoaFacilAPI?.Items?.create) {
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        alert('Para cadastrar um item na API, entre na sua conta primeiro.');
+        return;
+      }
+
+      DoaFacilAPI.Items.create(apiPayload)
+        .done(() => {
+          formDoacao.reset();
+          doarModal.classList.remove('active');
+          alert('Item cadastrado com sucesso!');
+        })
+        .fail((jqXHR) => {
+          if (jqXHR.status === 401) return;
+          alert(jqXHR.responseJSON?.error || 'NÃ£o foi possÃ­vel cadastrar o item.');
+        });
+      return;
+    }
 
     console.log('Item cadastrado:', formData);
     formDoacao.reset();

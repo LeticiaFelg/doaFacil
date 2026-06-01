@@ -82,10 +82,10 @@
           <option value="disponivel">Disponível</option>
           <option value="cancelado">Cancelado</option>
         </select>
-        <select class="filter-select">
-          <option>Mais recentes</option>
-          <option>Mais antigos</option>
-          <option>A–Z</option>
+        <select class="filter-select" id="select-ordem">
+          <option value="recentes">Mais recentes</option>
+          <option value="antigos">Mais antigos</option>
+          <option value="az">A–Z</option>
         </select>
       </div>
     </div>
@@ -128,6 +128,10 @@
   <script src="../assets/js/modal.js"></script>
   <script>
   $(function () {
+    if (!DoaFacilAPI.Auth.isLoggedIn()) {
+      window.location.href = './login.html';
+      return;
+    }
   
     const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
     const STORAGE_RESERVATIONS_KEY = 'doafacil_reservations';
@@ -186,6 +190,122 @@
     };
   
     let currentTab = 'doado';
+    let doadoRows = mockDoado;
+    let recebidoRows = mockRecebido;
+
+    function getFallbackImage(item) {
+      const id = Number(item.item_id || item.id || 1);
+      const normalizedId = ((id - 1) % 12) + 1;
+      return item.image || `../assets/img/items/item${normalizedId}.jpg`;
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return value;
+
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+
+      return date.toLocaleDateString('pt-BR');
+    }
+
+    function normalizeStatus(status) {
+      const statuses = {
+        concluida: 'concluido',
+        concluido: 'concluido',
+        cancelada: 'cancelado',
+        cancelado: 'cancelado',
+        pendente: 'reservado',
+        confirmada: 'reservado',
+        reservado: 'reservado',
+        disponivel: 'disponivel'
+      };
+
+      return statuses[status] || 'disponivel';
+    }
+
+    function normalizeDoado(item) {
+      return {
+        id: item.id,
+        item_id: item.item_id || item.id,
+        image: getFallbackImage(item),
+        name: item.name || item.title || 'Item sem nome',
+        cat: item.cat || item.category || '',
+        receptor: item.receptor || 'Ainda sem receptor',
+        date: formatDate(item.date || item.createdAt),
+        status: normalizeStatus(item.status)
+      };
+    }
+
+    function normalizeRecebido(item) {
+      return {
+        id: item.id,
+        item_id: item.item_id || item.id,
+        image: getFallbackImage(item),
+        name: item.name || item.title || 'Item sem nome',
+        cat: item.cat || item.category || '',
+        doador: item.doador || item.donor?.name || 'Doador nao encontrado',
+        date: formatDate(item.date || item.createdAt),
+        status: normalizeStatus(item.status)
+      };
+    }
+
+    function updateUserContext(user, summary) {
+      if (user?.name) $('.ctx-name').text(user.name);
+      $('.ctx-badge').toggle(!!summary?.is_recurrent);
+    }
+
+    function updateMetrics(summary) {
+      const values = [
+        summary?.donated || 0,
+        summary?.received || 0,
+        summary?.completed || 0,
+        summary?.in_progress || 0
+      ];
+
+      $('.metric-num').each(function (index) {
+        $(this).text(values[index]);
+      });
+
+      $('.h-tab[data-tab="doado"] .tab-count').text(values[0]);
+      $('.h-tab[data-tab="recebido"] .tab-count').text(values[1]);
+    }
+
+    function sortRows(rows, order) {
+      const sorted = [...rows];
+
+      if (order === 'antigos') {
+        return sorted.reverse();
+      }
+
+      if (order === 'az') {
+        return sorted.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+      }
+
+      return sorted;
+    }
+
+    function applyFilters() {
+      const query = $('#input-busca').val().toLowerCase();
+      const status = $('#select-status').val();
+      const order = $('#select-ordem').val();
+      const source = currentTab === 'doado' ? doadoRows : recebidoRows;
+
+      let filtered = $.grep(source, function (item) {
+        const contact = currentTab === 'doado' ? item.receptor : item.doador;
+        const matchesQuery = item.name.toLowerCase().includes(query) || String(contact).toLowerCase().includes(query);
+        const matchesStatus = status === 'all' || item.status === status;
+        return matchesQuery && matchesStatus;
+      });
+
+      filtered = sortRows(filtered, order);
+
+      if (currentTab === 'doado') {
+        renderDoado(filtered);
+      } else {
+        renderRecebido(filtered);
+      }
+    }
   
     // ── Renderização ─────────────────────────────────────────
     // Substitui: document.getElementById + innerHTML + .map() nativo
@@ -243,6 +363,24 @@
       }).join(''));
     }
   
+    function loadHistory() {
+      DoaFacilAPI.History.getMine()
+        .done(function ({ user, summary, donated, received }) {
+          doadoRows = $.map(donated || [], normalizeDoado);
+          recebidoRows = $.map(received || [], normalizeRecebido);
+          updateUserContext(user, summary);
+          updateMetrics(summary);
+          applyFilters();
+        })
+        .fail(function (jqXHR) {
+          if (jqXHR.status === 401) return;
+          doadoRows = mockDoado;
+          recebidoRows = mockRecebido;
+          applyFilters();
+        });
+    }
+
+    loadHistory();
     const storedRecebido = getCurrentUser() ? loadStoredReservationsForUser(getCurrentUser().email) : [];
     const combinedRecebido = storedRecebido.concat(mockRecebido);
 
@@ -259,36 +397,23 @@
       // .toggle(bool) substitui style.display = 'block'/'none'
       $('#tab-doado').toggle(tab === 'doado');
       $('#tab-recebido').toggle(tab === 'recebido');
+      applyFilters();
     });
   
     // ── Busca por texto ──────────────────────────────────────
     // Substitui: oninput="filterHistory(this.value)" + .filter() nativo
     $(document).on('input', '#input-busca', function () {
-      const q = $(this).val().toLowerCase();
-      if (currentTab === 'doado') {
-        renderDoado($.grep(mockDoado, function (i) {
-          return i.name.toLowerCase().includes(q) || i.receptor.toLowerCase().includes(q);
-        }));
-      } else {
-        renderRecebido($.grep(combinedRecebido, function (i) {
-          return i.name.toLowerCase().includes(q) || i.doador.toLowerCase().includes(q);
-        }));
-      }
+      applyFilters();
     });
   
     // ── Filtro por status ────────────────────────────────────
     // Substitui: onchange="filterByStatus(this.value)" + .filter() nativo
     $(document).on('change', '#select-status', function () {
-      const val = $(this).val();
-      if (currentTab === 'doado') {
-        renderDoado(val === 'all' ? mockDoado : $.grep(mockDoado, function (i) {
-          return i.status === val;
-        }));
-      } else {
-        renderRecebido(val === 'all' ? combinedRecebido : $.grep(combinedRecebido, function (i) {
-          return i.status === val;
-        }));
-      }
+      applyFilters();
+    });
+
+    $(document).on('change', '#select-ordem', function () {
+      applyFilters();
     });
   
     // ── Botão de detalhe (gerado dinamicamente) ──────────────

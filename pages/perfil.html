@@ -221,6 +221,10 @@
   <script src="../assets/js/api.js"></script>
   <script>
     $(function () {
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        window.location.href = './login.html';
+        return;
+      }
     
       const STORAGE_USERS_KEY = 'doafacil_users';
       const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
@@ -279,7 +283,7 @@
     
       // Card "Nova doação"
       $(document).on('click', '#btn-nova-doacao', function () {
-        alert('Publicar novo item');
+        $('#doarModal').addClass('active');
       });
     
       // Botão "Solicitar perfil institucional"
