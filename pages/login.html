@@ -241,19 +241,44 @@
       return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
     }
 
-    function emailAlreadyRegistered(email) {
-      const registered = JSON.parse(localStorage.getItem('doafacil_registered_emails') || '[]');
-      return registered.includes(email.toLowerCase());
+    const STORAGE_USERS_KEY = 'doafacil_users';
+    const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
+
+    function getStoredUsers() {
+      return JSON.parse(localStorage.getItem(STORAGE_USERS_KEY) || '[]');
     }
 
-    function saveRegisteredEmail(email) {
-      const registered = JSON.parse(localStorage.getItem('doafacil_registered_emails') || '[]');
-      const normalized = email.toLowerCase();
-      if (!registered.includes(normalized)) {
-        registered.push(normalized);
-        localStorage.setItem('doafacil_registered_emails', JSON.stringify(registered));
+    function saveStoredUsers(users) {
+      localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+    }
+
+    function findUserByEmail(email) {
+      return getStoredUsers().find(user => user.email.toLowerCase() === email.toLowerCase());
+    }
+
+    function getCurrentUser() {
+      return JSON.parse(localStorage.getItem(STORAGE_CURRENT_USER_KEY) || 'null');
+    }
+
+    function setCurrentUser(user) {
+      localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(user));
+    }
+
+    function clearCurrentUser() {
+      localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
+    }
+
+    function emailAlreadyRegistered(email) {
+      return !!findUserByEmail(email);
+    }
+
+    function redirectIfLoggedIn() {
+      if (getCurrentUser()) {
+        window.location.href = '../pages/perfil.html';
       }
     }
+
+    redirectIfLoggedIn();
 
     document.getElementById('btn-criar-conta')?.addEventListener('click', function(e) {
       e.preventDefault();
@@ -288,7 +313,21 @@
         return showRegisterError('Este e-mail já possui conta associada.', 'reg-email');
       }
 
-      saveRegisteredEmail(email);
+      const user = {
+        name: nome,
+        email,
+        password,
+        phone,
+        bairro,
+        cpf,
+        createdAt: new Date().toISOString(),
+      };
+
+      const users = getStoredUsers();
+      users.push(user);
+      saveStoredUsers(users);
+      setCurrentUser(user);
+
       window.location.href = '../index.html';
     });
 
@@ -312,7 +351,15 @@
         return;
       }
 
-      alert('Login implementado (integrar com API)');
+      const user = findUserByEmail(email);
+      if (!user || user.password !== password) {
+        document.getElementById('login-erro').textContent = 'E-mail ou senha incorretos.';
+        document.getElementById('login-erro').style.display = 'block';
+        return;
+      }
+
+      setCurrentUser(user);
+      window.location.href = '../pages/perfil.html';
     });
   </script>
   </body>

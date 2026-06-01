@@ -14,16 +14,15 @@
 </head>
 <body>
 
-  <!-- TOP NAV -->
   <div id="navbar"></div>
 
   <div class="page-container">
 
     <!-- USER CONTEXT -->
     <div class="user-context-bar">
-      <div class="ctx-avatar">👩‍💼</div>
+      <div class="ctx-avatar" id="histCtxAvatar">👩‍💼</div>
       <div class="ctx-info">
-        <div class="ctx-name">Maria Clara Souza</div>
+        <div class="ctx-name" id="histCtxName">Maria Clara Souza</div>
         <div class="ctx-sub">Histórico pessoal de doações e recebimentos</div>
       </div>
       <div class="ctx-badge"><i class="bi bi-star-fill"></i> Doadora Recorrente</div>
@@ -130,6 +129,29 @@
   <script>
   $(function () {
   
+    const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
+    const STORAGE_RESERVATIONS_KEY = 'doafacil_reservations';
+
+    function getCurrentUser() {
+      return JSON.parse(localStorage.getItem(STORAGE_CURRENT_USER_KEY) || 'null');
+    }
+
+    function loadStoredReservationsForUser(email) {
+      const reservations = JSON.parse(localStorage.getItem(STORAGE_RESERVATIONS_KEY) || '[]');
+      return reservations.filter(res => res.receiverEmail && res.receiverEmail.toLowerCase() === email.toLowerCase());
+    }
+
+    function loadCurrentUserContext() {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      $('#histCtxName').text(user.name);
+      const initials = user.name.split(' ').slice(0, 2).map(part => part[0]).join('').toUpperCase();
+      $('#histCtxAvatar').text(initials || '👤');
+    }
+
+    loadCurrentUserContext();
+
     // ── Dados mockados ──────────────────────────────────────
     const mockDoado = [
       { id:1,  image:'../assets/img/items/item1.jpg', name:'Sofá de 3 lugares',        cat:'Móveis',     receptor:'Carlos M.',    date:'19/05/2026', status:'disponivel' },
@@ -221,8 +243,11 @@
       }).join(''));
     }
   
+    const storedRecebido = getCurrentUser() ? loadStoredReservationsForUser(getCurrentUser().email) : [];
+    const combinedRecebido = storedRecebido.concat(mockRecebido);
+
     renderDoado(mockDoado);
-    renderRecebido(mockRecebido);
+    renderRecebido(combinedRecebido);
   
     // ── Troca de abas ────────────────────────────────────────
     // Substitui: switchTab() com querySelectorAll + style.display
@@ -245,7 +270,7 @@
           return i.name.toLowerCase().includes(q) || i.receptor.toLowerCase().includes(q);
         }));
       } else {
-        renderRecebido($.grep(mockRecebido, function (i) {
+        renderRecebido($.grep(combinedRecebido, function (i) {
           return i.name.toLowerCase().includes(q) || i.doador.toLowerCase().includes(q);
         }));
       }
@@ -260,7 +285,7 @@
           return i.status === val;
         }));
       } else {
-        renderRecebido(val === 'all' ? mockRecebido : $.grep(mockRecebido, function (i) {
+        renderRecebido(val === 'all' ? combinedRecebido : $.grep(combinedRecebido, function (i) {
           return i.status === val;
         }));
       }
