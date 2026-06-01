@@ -28,8 +28,8 @@
         </div>
 
         <div class="hero-info">
-          <h1>Maria Clara Souza</h1>
-          <div class="location-line"><i class="bi bi-geo-alt"></i> Copacabana, Rio de Janeiro – RJ</div>
+          <h1 id="profileHeroName">Maria Clara Souza</h1>
+          <div class="location-line" id="profileHeroLocation"><i class="bi bi-geo-alt"></i> Copacabana, Rio de Janeiro – RJ</div>
 
           <!-- Multi-profile badges: click to switch view -->
           <div class="profile-badges" style="margin-top: 12px;">
@@ -37,7 +37,7 @@
             <button class="profile-type-badge type-receptor" data-profile="receptor">🏠 Receptora</button>
           </div>
 
-          <div class="join-date"><i class="bi bi-calendar3"></i> Membro desde março de 2024</div>
+          <div class="join-date" id="profileJoinDate"><i class="bi bi-calendar3"></i> Membro desde março de 2024</div>
         </div>
 
         <div class="hero-stats">
@@ -83,6 +83,9 @@
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
               <button class="btn-edit"><i class="bi bi-pencil"></i> Editar perfil</button>
+              <button id="btn-logout" class="btn-edit" style="background:#F8F9FA;color:#212529;border:1px solid #CED4DA;"><i class="bi bi-box-arrow-right"></i> Sair</button>
+              <button id="btn-delete-account" class="btn-edit" style="background:#F8D7DA;color:#842029;border:1px solid #F5C2C7;"><i class="bi bi-trash"></i> Apagar conta</button>
+
             </div>
           </div>
         </div>
@@ -130,7 +133,7 @@
           <div class="section-card">
             <h3><i class="bi bi-house-heart" style="color:var(--green-mid)"></i> Dados do receptor</h3>
             <div class="info-grid">
-              <div class="info-item"><label>Nome</label><div class="value">Maria Clara Souza</div></div>
+              <div class="info-item"><label>Nome</label><div class="value" id="profileReceptorNameValue">Maria Clara Souza</div></div>
               <div class="info-item"><label>Composição familiar</label><div class="value">4 pessoas</div></div>
               <div class="info-item"><label>Bairro</label><div class="value">Copacabana</div></div>
               <div class="info-item"><label>Status de cadastro</label><div class="value" style="color:var(--green-mid);">✅ Verificado</div></div>
@@ -219,6 +222,44 @@
   <script>
     $(function () {
     
+      const STORAGE_USERS_KEY = 'doafacil_users';
+      const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
+
+      function getCurrentUser() {
+        return JSON.parse(localStorage.getItem(STORAGE_CURRENT_USER_KEY) || 'null');
+      }
+
+      function saveCurrentUser(user) {
+        localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(user));
+      }
+
+      function updateStoredUser(user) {
+        const users = JSON.parse(localStorage.getItem(STORAGE_USERS_KEY) || '[]');
+        const updated = users.map(u => u.email.toLowerCase() === user.email.toLowerCase() ? user : u);
+        localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(updated));
+      }
+
+      function loadCurrentUserProfile() {
+        const user = getCurrentUser();
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        $('#profileHeroName').text(user.name);
+        $('#profileHeroLocation').html(`<i class="bi bi-geo-alt"></i> ${user.bairro ? `${user.bairro}, ` : ''}Rio de Janeiro – RJ`);
+        $('#profileNameValue').text(user.name);
+        $('#profileEmailValue').text(user.email);
+        $('#profilePhoneValue').text(user.phone || '-');
+        $('#profileNeighborhoodValue').text(user.bairro || '-');
+        $('#profileCpfValue').text(user.cpf || '-');
+        $('#profileReceptorNameValue').text(user.name);
+        const joinDate = user.createdAt ? new Date(user.createdAt).toLocaleString('pt-BR', { month: 'long', year: 'numeric' }) : 'março de 2024';
+        $('#profileJoinDate').html(`<i class="bi bi-calendar3"></i> Membro desde ${joinDate}`);
+      }
+
+      loadCurrentUserProfile();
+
       // Troca de visão Doador / Receptor
       // Substitui: switchProfile() com querySelectorAll + classList
       $(document).on('click', '.profile-type-badge', function () {
@@ -246,8 +287,32 @@
         alert('Solicitar perfil institucional');
       });
 
-      // Botão Editar Perfil Centralizado
+      $(document).on('click', '#btn-logout', function () {
+        localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
+        window.location.href = 'login.html';
+      });
 
+      $(document).on('click', '#btn-delete-account', function () {
+        const currentUser = getCurrentUser();
+        if (!currentUser) return;
+
+        const confirmed = confirm('Tem certeza de que deseja apagar sua conta? Esta ação não pode ser desfeita.');
+        if (!confirmed) return;
+
+        const users = JSON.parse(localStorage.getItem(STORAGE_USERS_KEY) || '[]');
+        const remainingUsers = users.filter(u => u.email.toLowerCase() !== currentUser.email.toLowerCase());
+        localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(remainingUsers));
+
+        const reservations = JSON.parse(localStorage.getItem('doafacil_reservations') || '[]');
+        const remainingReservations = reservations.filter(r => r.receiverEmail.toLowerCase() !== currentUser.email.toLowerCase());
+        localStorage.setItem('doafacil_reservations', JSON.stringify(remainingReservations));
+
+        localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
+        alert('Sua conta foi apagada com sucesso.');
+        window.location.href = 'login.html';
+      });
+
+      // Botão Editar Perfil Centralizado
 
       function fillProfileForm() {
         $('#profileName').val($('#profileNameValue').text().trim());
@@ -258,11 +323,17 @@
       }
 
       function syncProfileValues() {
-        $('#profileNameValue').text($('#profileName').val().trim());
+        const name = $('#profileName').val().trim();
+        const bairro = $('#profileNeighborhood').val().trim();
+
+        $('#profileNameValue').text(name);
         $('#profileEmailValue').text($('#profileEmail').val().trim());
         $('#profilePhoneValue').text($('#profilePhone').val().trim());
-        $('#profileNeighborhoodValue').text($('#profileNeighborhood').val().trim());
+        $('#profileNeighborhoodValue').text(bairro);
         $('#profileCpfValue').text($('#profileCpf').val().trim());
+        $('#profileHeroName').text(name);
+        $('#profileHeroLocation').html(`<i class="bi bi-geo-alt"></i> ${bairro ? `${bairro}, ` : ''}Rio de Janeiro – RJ`);
+        $('#profileReceptorNameValue').text(name);
       }
 
       const editProfileModal = document.getElementById('editProfileModal');
@@ -295,8 +366,26 @@
       $(document).on('submit', '#editProfileForm', function (e) {
         e.preventDefault();
         syncProfileValues();
+
+        const currentUser = getCurrentUser() || {};
+        const updatedUser = {
+          ...currentUser,
+          name: $('#profileName').val().trim(),
+          email: $('#profileEmail').val().trim(),
+          phone: $('#profilePhone').val().trim(),
+          bairro: $('#profileNeighborhood').val().trim(),
+          cpf: $('#profileCpf').val().trim(),
+        };
+
+        saveCurrentUser(updatedUser);
+        updateStoredUser(updatedUser);
+
         closeEditProfileModal();
         alert('Perfil atualizado com sucesso!');
+
+        closeEditProfileModal();
+        alert('Perfil atualizado com sucesso!');
+
       });
     
     });
