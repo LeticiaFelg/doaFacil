@@ -22,6 +22,21 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING(255),
     allowNull: false
   },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    defaultValue: ''
+  },
+  cpf: {
+    type: DataTypes.STRING(11),
+    allowNull: true,
+    unique: true
+  },
+  bairro: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    defaultValue: ''
+  },
   location: {
     type: DataTypes.STRING(255),
     allowNull: false
