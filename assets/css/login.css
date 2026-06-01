@@ -130,13 +130,11 @@
   /* Tab switcher */
   .tab-bar {
     display: flex;
-    background: var(--cream-dark);
     border-radius: 14px;
     padding: 4px;
-    margin-bottom: 36px;
+    margin-bottom: 10px;
   }
   .tab-btn {
-    flex: 1;
     padding: 10px;
     border: none;
     background: transparent;
@@ -214,6 +212,11 @@
   .input-wrap select:focus {
     border-color: var(--green-mid);
     box-shadow: 0 0 0 3px rgba(74,124,63,.12);
+  }
+  .input-wrap input.error,
+  .input-wrap select.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220,53,69,.12);
   }
 
   /* Profile type selector */
