@@ -144,7 +144,7 @@
             </div>
           </div>
 
-          <button class="btn-reserve" data-bs-toggle="modal" data-bs-target="#reserveModal">
+          <button id="btn-reserve-action" class="btn-reserve" data-bs-toggle="modal" data-bs-target="#reserveModal">
             <i class="bi bi-bookmark-check"></i> Reservar este item
           </button>
 
@@ -328,6 +328,16 @@
           .removeClass('status-available')
           .css({ background: '#FFF3CD', color: '#856404' })
           .html('<i class="bi bi-hourglass-split"></i> Reservado');
+
+        // Atualiza botão de reservar na action panel (texto, cor e torna não clicável)
+        $('#btn-reserve-action')
+          .html('<i class="bi bi-bookmark-check"></i> Item Reservado')
+          .css({ background: '#FFF3CD', color: '#856404', 'pointer-events': 'none' })
+          .attr('disabled', 'disabled')
+          .attr('aria-disabled', 'true')
+          .removeAttr('data-bs-toggle')
+          .removeAttr('data-bs-target')
+          .addClass('disabled');
       
         // Revela endereço exato após confirmação
         $('#item-location-name').text(item.fullAddress.split(',')[0]);
