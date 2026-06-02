@@ -38,6 +38,8 @@ const DoaFacilAPI = (() => {
       if (jqXHR.status === 401 && !isAuthAttempt) {
         localStorage.removeItem('doafacil_token');
         localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
         window.location.href = '/pages/login.html';
       }
     });
@@ -54,6 +56,7 @@ const DoaFacilAPI = (() => {
         localStorage.setItem('doafacil_token', token || access_token);
         localStorage.setItem('doafacil_user', JSON.stringify(user));
         localStorage.setItem('doafacil_current_user', JSON.stringify(user));
+        localStorage.removeItem('doafacil_fallback_session');
       });
     },
 
@@ -66,6 +69,7 @@ const DoaFacilAPI = (() => {
         localStorage.setItem('doafacil_token', token || access_token);
         localStorage.setItem('doafacil_user', JSON.stringify(user));
         localStorage.setItem('doafacil_current_user', JSON.stringify(user));
+        localStorage.removeItem('doafacil_fallback_session');
       });
     },
 
@@ -74,12 +78,21 @@ const DoaFacilAPI = (() => {
         localStorage.removeItem('doafacil_token');
         localStorage.removeItem('doafacil_user');
         localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
         window.location.href = '/pages/login.html';
       });
     },
 
     isLoggedIn() {
       return !!localStorage.getItem('doafacil_token');
+    },
+
+    isFallbackSession() {
+      return localStorage.getItem('doafacil_fallback_session') === 'true';
+    },
+
+    hasRealSession() {
+      return this.isLoggedIn() && !this.isFallbackSession();
     },
 
     getCurrentUser() {
@@ -92,6 +105,7 @@ const DoaFacilAPI = (() => {
         localStorage.removeItem('doafacil_token');
         localStorage.removeItem('doafacil_user');
         localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
       });
     },
   };
@@ -112,6 +126,7 @@ const DoaFacilAPI = (() => {
     },
     listMine()           { return _request('GET',    '/items/my');    },
     getById(id)          { return _request('GET',    `/items/${id}`); },
+    getByCategory(category) { return _request('GET', `/items/category/${category}`); },
     getWhatsAppContact(id) { return _request('POST', `/items/${id}/contact/whatsapp`); },
     create(data)         { return _request('POST',   '/items', data); },
     update(id, data)     { return _request('PUT',    `/items/${id}`, data); },
@@ -120,10 +135,14 @@ const DoaFacilAPI = (() => {
 
   // ── Reservas ─────────────────────────────────────────────
   const Reservations = {
-    create(itemId)         { return _request('POST',  '/reservations', { itemId }); },
+    create(itemId, message = '') {
+      return _request('POST', '/reservations', { itemId, message });
+    },
     getReceived()          { return _request('GET',   '/reservations/received'); },
     getDonated()           { return _request('GET',   '/reservations/donated'); },
     getById(id)            { return _request('GET',   `/reservations/${id}`); },
+    complete(id)           { return _request('PUT',   `/reservations/${id}/complete`); },
+    cancel(id)             { return _request('PUT',   `/reservations/${id}/cancel`); },
     updateStatus(id, status) {
       return _request('PATCH', `/reservations/${id}/status`, { status });
     },

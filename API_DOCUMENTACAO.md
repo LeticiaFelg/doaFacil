@@ -5,7 +5,7 @@ Este arquivo documenta as rotas HTTP ja criadas no backend do projeto DoaFacil. 
 Base local recomendada para testes:
 
 ```text
-http://localhost:3000/api
+http://localhost:5000/api
 ```
 
 Observacao: se o backend estiver rodando na porta padrao do `.env.example`, use `http://localhost:5000/api`.

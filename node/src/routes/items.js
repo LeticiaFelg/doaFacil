@@ -7,6 +7,7 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 
 const donorAttributes = ['id', 'name', 'avatar', 'verified', 'location'];
+const ITEM_DESCRIPTION_MAX_LENGTH = 1000;
 
 function onlyDigits(value) {
   return String(value || '').replace(/\D/g, '');
@@ -145,6 +146,30 @@ router.post('/:id/contact/whatsapp', auth, async (req, res) => {
   }
 });
 
+// Itens por categoria
+router.get('/category/:category', async (req, res) => {
+  try {
+    const items = await Item.findAll({
+      where: {
+        category: req.params.category,
+        status: 'disponivel'
+      },
+      include: [{
+        model: User,
+        as: 'donor',
+        attributes: donorAttributes
+      }]
+    });
+
+    return res.json({
+      category: req.params.category,
+      items
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // Obter item por ID
 router.get('/:id', async (req, res) => {
   try {
@@ -186,6 +211,10 @@ router.post('/', auth, async (req, res) => {
 
     if (!title || !description) {
       return res.status(400).json({ error: 'Titulo e descricao sao obrigatorios' });
+    }
+
+    if (description.length > ITEM_DESCRIPTION_MAX_LENGTH) {
+      return res.status(400).json({ error: `Descricao deve ter no maximo ${ITEM_DESCRIPTION_MAX_LENGTH} caracteres` });
     }
 
     const user = await User.findByPk(req.userId);
@@ -235,7 +264,12 @@ router.put('/:id', auth, async (req, res) => {
     const { title, description, condition, status, images, dimensions, material, color, pickup, address } = req.body;
 
     if (title) item.title = title;
-    if (description) item.description = description;
+    if (description) {
+      if (description.length > ITEM_DESCRIPTION_MAX_LENGTH) {
+        return res.status(400).json({ error: `Descricao deve ter no maximo ${ITEM_DESCRIPTION_MAX_LENGTH} caracteres` });
+      }
+      item.description = description;
+    }
     if (condition) item.condition = condition;
     if (status) item.status = status;
     if (images) item.images = images;
@@ -256,7 +290,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// Deletar item
+// Cancelar item (soft delete)
 router.delete('/:id', auth, async (req, res) => {
   try {
     const item = await Item.findByPk(req.params.id);
@@ -269,32 +303,12 @@ router.delete('/:id', auth, async (req, res) => {
       return res.status(403).json({ error: 'Sem permissao' });
     }
 
-    await item.destroy();
-
-    return res.json({ message: 'Item deletado com sucesso' });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
-
-// Itens por categoria
-router.get('/category/:category', async (req, res) => {
-  try {
-    const items = await Item.findAll({
-      where: {
-        category: req.params.category,
-        status: 'disponivel'
-      },
-      include: [{
-        model: User,
-        as: 'donor',
-        attributes: donorAttributes
-      }]
-    });
+    item.status = 'cancelado';
+    await item.save();
 
     return res.json({
-      category: req.params.category,
-      items
+      message: 'Item cancelado com sucesso',
+      item
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
