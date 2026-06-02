@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../assets/css/perfil.css">
   <link rel="stylesheet" href="../assets/css/components/navbar.css">
   <link rel="stylesheet" href="../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../assets/css/components/info-modals.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -291,7 +292,9 @@
 
       function normalizeImage(item) {
         if (item && Array.isArray(item.images) && item.images.length) {
+          const apiOrigin = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
           const image = item.images[0];
+          if (image.startsWith('/uploads')) return `${apiOrigin}${image}`;
           if (image.startsWith('../') || image.startsWith('./') || image.startsWith('http')) {
             return image.startsWith('./') ? `.${image}` : image;
           }

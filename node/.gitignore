@@ -1,4 +1,7 @@
 .env
 node_modules/
 doafacil.db
+uploads/items/*
+!uploads/.gitkeep
+!uploads/items/.gitkeep
 .DS_Store

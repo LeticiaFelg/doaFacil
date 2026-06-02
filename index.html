@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./assets/css/index.css">
   <link rel="stylesheet" href="./assets/css/components/footer.css">
   <link rel="stylesheet" href="./assets/css/components/navbar.css">
+  <link rel="stylesheet" href="./assets/css/components/info-modals.css">
   <link rel="stylesheet" href="./assets/css/components/heroCarousel.css">
   <link rel="stylesheet" href="./assets/css/components/featuredCarousel.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
@@ -327,8 +328,11 @@
       };
 
       function getFallbackImage(item) {
-        if (Array.isArray(item.images) && item.images.length) return item.images[0];
-        if (item.image) return item.image;
+        const apiOrigin = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+        if (Array.isArray(item.images) && item.images.length) {
+          return item.images[0].startsWith('/uploads') ? `${apiOrigin}${item.images[0]}` : item.images[0];
+        }
+        if (item.image) return item.image.startsWith('/uploads') ? `${apiOrigin}${item.image}` : item.image;
 
         const id = Number(item.id || 1);
         const normalizedId = ((id - 1) % 12) + 1;

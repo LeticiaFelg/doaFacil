@@ -1,5 +1,8 @@
 const express = require('express');
 const { Op } = require('sequelize');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const Item = require('../models/Item');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
@@ -8,6 +11,79 @@ const router = express.Router();
 
 const donorAttributes = ['id', 'name', 'avatar', 'verified', 'location'];
 const ITEM_DESCRIPTION_MAX_LENGTH = 1000;
+const MAX_ITEM_IMAGES = 3;
+const uploadDir = path.join(__dirname, '../../uploads/items');
+
+fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename(req, file, cb) {
+    const extension = path.extname(file.originalname).toLowerCase();
+    const safeBaseName = path.basename(file.originalname, extension)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 60) || 'item';
+
+    cb(null, `${Date.now()}-${safeBaseName}${extension}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    files: MAX_ITEM_IMAGES,
+    fileSize: 5 * 1024 * 1024
+  },
+  fileFilter(req, file, cb) {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Apenas imagens podem ser enviadas'));
+    }
+
+    return cb(null, true);
+  }
+});
+
+function getUploadedImageUrls(files) {
+  return (files || []).map((file) => `/uploads/items/${file.filename}`);
+}
+
+/*
+// Implementacao futura para S3 com presigned URL.
+// Requer instalar/configurar AWS SDK:
+// npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+//
+// const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+// const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+//
+// const s3 = new S3Client({
+//   region: process.env.AWS_REGION
+// });
+//
+// async function createItemImageUploadUrl({ userId, fileName, contentType }) {
+//   const extension = path.extname(fileName).toLowerCase();
+//   const safeBaseName = path.basename(fileName, extension)
+//     .toLowerCase()
+//     .replace(/[^a-z0-9]+/g, '-')
+//     .replace(/^-|-$/g, '')
+//     .slice(0, 60) || 'item';
+//   const key = `items/${userId}/${Date.now()}-${safeBaseName}${extension}`;
+//
+//   const command = new PutObjectCommand({
+//     Bucket: process.env.S3_BUCKET_NAME,
+//     Key: key,
+//     ContentType: contentType
+//   });
+//
+//   const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 60 * 5 });
+//   const publicUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+//
+//   return { key, uploadUrl, publicUrl };
+// }
+*/
 
 function onlyDigits(value) {
   return String(value || '').replace(/\D/g, '');
@@ -192,7 +268,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Criar item
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, upload.array('images', MAX_ITEM_IMAGES), async (req, res) => {
   try {
     const {
       title,
@@ -208,6 +284,15 @@ router.post('/', auth, async (req, res) => {
       pickup,
       address
     } = req.body;
+    const uploadedImages = getUploadedImageUrls(req.files);
+    const parsedImages = Array.isArray(images)
+      ? images
+      : typeof images === 'string' && images
+        ? [images]
+        : [];
+    const parsedAddress = typeof address === 'string'
+      ? JSON.parse(address || '{}')
+      : address;
 
     if (!title || !description) {
       return res.status(400).json({ error: 'Titulo e descricao sao obrigatorios' });
@@ -229,12 +314,12 @@ router.post('/', auth, async (req, res) => {
       emoji: emoji || '📦',
       condition: condition || 'bom',
       location: location || user.location,
-      images: images || [],
+      images: uploadedImages.length ? uploadedImages : parsedImages,
       dimensions: dimensions || '',
       material: material || '',
       color: color || '',
       pickup: pickup || '',
-      address: address || {},
+      address: parsedAddress || {},
       donor_id: req.userId,
       status: 'disponivel'
     });

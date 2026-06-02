@@ -119,9 +119,14 @@ function initModal() {
         return;
       }
 
-      DoaFacilAPI.Items.create(apiPayload)
+      const request = images.length && DoaFacilAPI.Items.createWithImages
+        ? DoaFacilAPI.Items.createWithImages(buildItemFormData(apiPayload, images))
+        : DoaFacilAPI.Items.create(apiPayload);
+
+      request
         .done(() => {
           formDoacao.reset();
+          if (descriptionField) updateCharCounter(descriptionField);
           doarModal.classList.remove('active');
           alert('Item cadastrado com sucesso!');
         })
@@ -137,6 +142,21 @@ function initModal() {
     doarModal.classList.remove('active');
     alert('Item cadastrado com sucesso!');
   });
+
+  function buildItemFormData(apiPayload, images) {
+    const formData = new FormData();
+
+    Object.entries(apiPayload).forEach(([key, value]) => {
+      if (key === 'images') return;
+      formData.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
+    });
+
+    images.forEach((image) => {
+      formData.append('images', image);
+    });
+
+    return formData;
+  }
 }
 
 if (document.readyState === 'loading') {

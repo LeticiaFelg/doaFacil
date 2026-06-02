@@ -43,4 +43,13 @@ authReady
 
     });
 
+    const infoModalsScriptPath = window.location.pathname.includes('/pages/')
+      ? '../assets/js/components/info-modals.js'
+      : './assets/js/components/info-modals.js';
+
+    if (!window.DoaFacilInfoModalsLoading) {
+      window.DoaFacilInfoModalsLoading = true;
+      $.getScript(infoModalsScriptPath);
+    }
+
   });
