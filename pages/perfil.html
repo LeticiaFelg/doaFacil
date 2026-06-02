@@ -61,7 +61,7 @@
     <div class="profile-view active" id="view-doador">
 
       <!-- Recurrent badge -->
-      <div class="recurrent-banner">
+      <div class="recurrent-banner" id="recurrentBanner">
         <div class="rb-icon">⭐</div>
         <div class="rb-text">
           <h4>Doadora Recorrente</h4>
@@ -94,7 +94,7 @@
           <!-- Active donations -->
           <div class="section-card">
             <h3><i class="bi bi-box-seam" style="color:var(--green-mid)"></i> Doações ativas</h3>
-            <div class="mini-grid">
+            <div class="mini-grid" id="activeDonationsGrid">
               <div class="mini-card" data-href="item.html?id=1">
                 <div class="mini-img"><img src="../assets/img/items/item1.jpg" alt="Sofá 3 lugares" loading="lazy"></div>
                 <div class="mini-body">
@@ -135,7 +135,7 @@
             <div class="info-grid">
               <div class="info-item"><label>Nome</label><div class="value" id="profileReceptorNameValue">Maria Clara Souza</div></div>
               <div class="info-item"><label>Composição familiar</label><div class="value">4 pessoas</div></div>
-              <div class="info-item"><label>Bairro</label><div class="value">Copacabana</div></div>
+              <div class="info-item"><label>Bairro</label><div class="value" id="profileReceptorNeighborhoodValue">Copacabana</div></div>
               <div class="info-item"><label>Status de cadastro</label><div class="value" style="color:var(--green-mid);">✅ Verificado</div></div>
             </div>
           </div>
@@ -144,7 +144,7 @@
         <div class="col-12">
           <div class="section-card">
             <h3><i class="bi bi-clock-history" style="color:var(--green-mid)"></i> Itens recebidos recentemente</h3>
-            <div class="mini-grid">
+            <div class="mini-grid" id="receivedItemsGrid">
               <div class="mini-card">
                 <div class="mini-img"><img src="../assets/img/items/item5.jpg" alt="Mesa escritório" loading="lazy"></div>
                 <div class="mini-body">
@@ -248,6 +248,127 @@
         }
       }
     
+      function applyProfile(user) {
+        if (!user) return;
+
+        const location = user.bairro || user.location || '';
+        const stats = user.stats || {};
+        const isRecurrent = Boolean(stats.is_recurrent);
+
+        $('.hero-info h1').text(user.name || 'Usuario DoaFacil');
+        $('.location-line').html(`<i class="bi bi-geo-alt"></i> ${location || 'Localizacao nao informada'}`);
+        $('#profileNameValue').text(user.name || '');
+        $('#profileEmailValue').text(user.email || '');
+        $('#profilePhoneValue').text(user.phone || '');
+        $('#profileNeighborhoodValue').text(location);
+        $('#profileCpfValue').text(user.cpf || '');
+        $('#profileReceptorNameValue').text(user.name || '');
+        $('#profileReceptorNeighborhoodValue').text(location || '-');
+
+        $('.hero-stat').eq(0).find('.s-num').text(stats.donated || 0);
+        $('.hero-stat').eq(1).find('.s-num').text(stats.received || 0);
+        $('.hero-stat').eq(2).find('.s-num').text(isRecurrent ? '⭐' : '-');
+
+        if (isRecurrent) {
+          $('#recurrentBanner').show();
+          $('#recurrentBanner .rb-text h4').text('Doador Recorrente');
+          $('#recurrentBanner .rb-text p').text(`${user.name || 'Este usuario'} ja doou varios itens. Obrigado por fazer a diferenca na comunidade!`);
+        } else {
+          $('#recurrentBanner').hide();
+        }
+      }
+
+      const statusLabels = {
+        disponivel: 'Disponivel',
+        reservado: 'Reservado',
+        concluido: 'Concluido',
+        cancelado: 'Cancelado',
+        pendente: 'Reservado',
+        confirmada: 'Reservado',
+        concluida: 'Recebido',
+        cancelada: 'Cancelado'
+      };
+
+      function normalizeImage(item) {
+        if (item && Array.isArray(item.images) && item.images.length) {
+          const image = item.images[0];
+          if (image.startsWith('../') || image.startsWith('./') || image.startsWith('http')) {
+            return image.startsWith('./') ? `.${image}` : image;
+          }
+          return `../${image}`;
+        }
+
+        const normalizedId = item && item.id ? ((Number(item.id) - 1) % 12) + 1 : 1;
+        return `../assets/img/items/item${normalizedId}.jpg`;
+      }
+
+      function emptyMiniCard(message) {
+        return `<div style="grid-column:1/-1;color:var(--text-muted);font-size:.9rem;padding:18px 4px;">${message}</div>`;
+      }
+
+      function renderDonationCard(item) {
+        const status = item.status || 'disponivel';
+        const statusClass = status === 'reservado' ? 's-reservado' : 's-disponivel';
+
+        return `
+          <div class="mini-card" data-href="item.html?id=${item.id}">
+            <div class="mini-img"><img src="${normalizeImage(item)}" alt="${item.title || 'Item'}" loading="lazy"></div>
+            <div class="mini-body">
+              <div class="mini-title">${item.title || 'Item sem titulo'}</div>
+              <span class="mini-status ${statusClass}">${statusLabels[status] || status}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderReceivedCard(reservation) {
+        const item = reservation.item || {};
+
+        return `
+          <div class="mini-card" data-href="item.html?id=${reservation.item_id || item.id}">
+            <div class="mini-img"><img src="${normalizeImage(item)}" alt="${item.title || 'Item'}" loading="lazy"></div>
+            <div class="mini-body">
+              <div class="mini-title">${item.title || 'Item recebido'}</div>
+              <span class="mini-status s-disponivel" style="background:#D4EDD0;color:#2D5A27">${statusLabels[reservation.status] || reservation.status || 'Recebido'}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderNewDonationCard() {
+        return `
+          <div class="mini-card" id="btn-nova-doacao" style="border:2px dashed var(--green-pale);display:flex;align-items:center;justify-content:center;flex-direction:column;height:120px;cursor:pointer;" >
+            <div style="font-size:1.6rem;color:var(--green-light)">＋</div>
+            <div style="font-size:.78rem;color:var(--text-muted);margin-top:4px">Nova doacao</div>
+          </div>
+        `;
+      }
+
+      function loadProfileLists() {
+        DoaFacilAPI.Items.listMine()
+          .done(function (response) {
+            const activeItems = (response.items || []).filter(function (item) {
+              return ['disponivel', 'reservado'].includes(item.status);
+            });
+            const cards = activeItems.map(renderDonationCard).join('');
+            $('#activeDonationsGrid').html((cards || emptyMiniCard('Nenhuma doacao ativa.')) + renderNewDonationCard());
+          })
+          .fail(function () {
+            $('#activeDonationsGrid').html(emptyMiniCard('Nao foi possivel carregar suas doacoes agora.') + renderNewDonationCard());
+          });
+
+        DoaFacilAPI.Reservations.getDonated()
+          .done(function (response) {
+            const received = (response.reservations || []).filter(function (reservation) {
+              return reservation.status === 'concluida';
+            });
+            $('#receivedItemsGrid').html(received.length ? received.map(renderReceivedCard).join('') : emptyMiniCard('Nenhum item recebido ainda.'));
+          })
+          .fail(function () {
+            $('#receivedItemsGrid').html(emptyMiniCard('Nao foi possivel carregar seus itens recebidos agora.'));
+          });
+      }
+
       const STORAGE_USERS_KEY = 'doafacil_users';
       const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
 
@@ -287,7 +408,10 @@
 
 
       DoaFacilAPI.Users.getMe()
-        .done(applyProfile)
+        .done(function (user) {
+          applyProfile(user);
+          loadProfileLists();
+        })
         .fail(function () {
           window.location.href = 'login.html';
         });
