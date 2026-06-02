@@ -221,9 +221,24 @@
   <script src="../assets/js/api.js"></script>
   <script>
     $(function () {
-      if (!DoaFacilAPI.Auth.isLoggedIn()) {
-        window.location.href = './login.html';
-        return;
+      const usingMockProfile = !DoaFacilAPI.Auth.isLoggedIn();
+
+      function applyProfile(user) {
+        if (!user) return;
+
+        const location = user.bairro || user.location || '';
+        $('.hero-info h1').text(user.name || 'Usuário DoaFácil');
+        $('.location-line').html(`<i class="bi bi-geo-alt"></i> ${location || 'Localização não informada'}`);
+        $('#profileNameValue').text(user.name || '');
+        $('#profileEmailValue').text(user.email || '');
+        $('#profilePhoneValue').text(user.phone || '');
+        $('#profileNeighborhoodValue').text(location);
+        $('#profileCpfValue').text(user.cpf || '');
+
+        if (user.stats) {
+          $('.hero-stat').eq(0).find('.s-num').text(user.stats.donated || 0);
+          $('.hero-stat').eq(1).find('.s-num').text(user.stats.received || 0);
+        }
       }
     
       const STORAGE_USERS_KEY = 'doafacil_users';
@@ -246,7 +261,6 @@
       function loadCurrentUserProfile() {
         const user = getCurrentUser();
         if (!user) {
-          window.location.href = 'login.html';
           return;
         }
 
@@ -263,6 +277,15 @@
       }
 
       loadCurrentUserProfile();
+
+
+      if (!usingMockProfile) {
+        DoaFacilAPI.Users.getMe()
+          .done(applyProfile)
+          .fail(function () {
+            // Mantem o HTML mockado visivel quando a API nao responder.
+          });
+      }
 
       // Troca de visão Doador / Receptor
       // Substitui: switchProfile() com querySelectorAll + classList

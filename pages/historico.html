@@ -98,7 +98,7 @@
         <span>Categoria</span>
         <span>Data</span>
         <span>Status</span>
-        <span></span>
+        <span>Cancelar</span>
       </div>
       <div id="doado-rows"></div>
     </div>
@@ -128,11 +128,6 @@
   <script src="../assets/js/modal.js"></script>
   <script>
   $(function () {
-    if (!DoaFacilAPI.Auth.isLoggedIn()) {
-      window.location.href = './login.html';
-      return;
-    }
-  
     const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
     const STORAGE_RESERVATIONS_KEY = 'doafacil_reservations';
 
@@ -271,6 +266,32 @@
       $('.h-tab[data-tab="recebido"] .tab-count').text(values[1]);
     }
 
+    function refreshMetricsFromRows() {
+      const allRows = [...doadoRows, ...recebidoRows];
+
+      updateMetrics({
+        donated: doadoRows.length,
+        received: recebidoRows.length,
+        completed: allRows.filter((item) => item.status === 'concluido').length,
+        in_progress: allRows.filter((item) => ['disponivel', 'reservado'].includes(item.status)).length,
+        is_recurrent: doadoRows.length >= 3
+      });
+    }
+
+    function loadFallbackHistory() {
+      doadoRows = $.map(mockDoado, normalizeDoado);
+      recebidoRows = $.map(mockRecebido, normalizeRecebido);
+      updateUserContext({ name: 'Maria Clara Souza' }, { is_recurrent: true });
+      updateMetrics({
+        donated: doadoRows.length,
+        received: recebidoRows.length,
+        completed: [...doadoRows, ...recebidoRows].filter((item) => item.status === 'concluido').length,
+        in_progress: [...doadoRows, ...recebidoRows].filter((item) => ['disponivel', 'reservado'].includes(item.status)).length,
+        is_recurrent: true
+      });
+      applyFilters();
+    }
+
     function sortRows(rows, order) {
       const sorted = [...rows];
 
@@ -317,6 +338,13 @@
         return;
       }
       $c.html($.map(data, function (item) {
+        const canCancel = ['reservado', 'disponivel'].includes(item.status);
+        const actionButton = canCancel
+          ? `<button class="btn-cancel-item" data-id="${item.id}" data-item-id="${item.item_id}" data-name="${item.name}" title="Cancelar item">
+              <i class="bi bi-x-circle"></i>
+            </button>`
+          : '';
+
         return `
           <div class="history-row cols-doado ${item.status === 'concluido' ? 'recurrent-row' : ''}">
             <div class="item-cell">
@@ -330,11 +358,7 @@
             <div style="font-size:.83rem;color:var(--text-muted);">${item.cat}</div>
             <div class="row-date">${item.date}</div>
             <div>${statusMap[item.status]}</div>
-            <div>
-              <button class="btn-mini" data-name="${item.name}">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
+            <div>${actionButton}</div>
           </div>`;
       }).join(''));
     }
@@ -364,6 +388,11 @@
     }
   
     function loadHistory() {
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        loadFallbackHistory();
+        return;
+      }
+
       DoaFacilAPI.History.getMine()
         .done(function ({ user, summary, donated, received }) {
           doadoRows = $.map(donated || [], normalizeDoado);
@@ -372,11 +401,8 @@
           updateMetrics(summary);
           applyFilters();
         })
-        .fail(function (jqXHR) {
-          if (jqXHR.status === 401) return;
-          doadoRows = mockDoado;
-          recebidoRows = mockRecebido;
-          applyFilters();
+        .fail(function () {
+          loadFallbackHistory();
         });
     }
 
@@ -421,6 +447,42 @@
     // Usa delegação porque o elemento é criado após o carregamento da página
     $(document).on('click', '.btn-mini', function () {
       alert('Detalhes: ' + $(this).data('name'));
+    });
+
+    $(document).on('click', '.btn-cancel-item', function () {
+      const $button = $(this);
+      const rowId = Number($button.data('id'));
+      const itemId = Number($button.data('item-id')) || rowId;
+      const itemName = $button.data('name');
+
+      if (!confirm(`Cancelar "${itemName}"? O item ficará marcado como cancelado.`)) {
+        return;
+      }
+
+      function markAsCancelled() {
+        doadoRows = $.map(doadoRows, function (item) {
+          if (Number(item.item_id || item.id) === itemId || Number(item.id) === rowId) {
+            return { ...item, status: 'cancelado' };
+          }
+          return item;
+        });
+        refreshMetricsFromRows();
+        applyFilters();
+      }
+
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        markAsCancelled();
+        return;
+      }
+
+      $button.prop('disabled', true);
+      DoaFacilAPI.Items.delete(itemId)
+        .done(markAsCancelled)
+        .fail(function (jqXHR) {
+          $button.prop('disabled', false);
+          if (jqXHR.status === 401) return;
+          alert(jqXHR.responseJSON?.error || 'Nao foi possivel cancelar o item.');
+        });
     });
   
   });

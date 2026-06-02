@@ -1,4 +1,5 @@
 function initModal() {
+  const ITEM_DESCRIPTION_MAX_LENGTH = 1000;
   const doarBtn = document.getElementById('doarBtn');
   const doarModal = document.getElementById('doarModal');
   const modalClose = doarModal ? doarModal.querySelector('.modal-close') : null;
@@ -35,6 +36,20 @@ function initModal() {
     doarModal.classList.add('active');
   }
 
+  function updateCharCounter(field) {
+    const counter = document.querySelector(`[data-counter-for="${field.id}"]`);
+    if (!counter) return;
+
+    counter.textContent = `${field.value.length}/${field.maxLength} caracteres`;
+  }
+
+  const descriptionField = document.getElementById('itemDescricao');
+  if (descriptionField) {
+    descriptionField.maxLength = ITEM_DESCRIPTION_MAX_LENGTH;
+    updateCharCounter(descriptionField);
+    descriptionField.addEventListener('input', () => updateCharCounter(descriptionField));
+  }
+
   doarBtn.addEventListener('click', openDonationModal);
 
   modalClose.addEventListener('click', () => {
@@ -56,11 +71,18 @@ function initModal() {
       return;
     }
 
+    const description = document.getElementById('itemDescricao').value.trim();
+
+    if (description.length > ITEM_DESCRIPTION_MAX_LENGTH) {
+      alert(`A descrição deve ter no máximo ${ITEM_DESCRIPTION_MAX_LENGTH} caracteres.`);
+      return;
+    }
+
     const formData = {
       nome: document.getElementById('itemNome').value,
       categoria: document.getElementById('itemCategoria').value,
       imagens: images.map(file => file.name),
-      descricao: document.getElementById('itemDescricao').value,
+      descricao: description,
       condicao: document.getElementById('itemCondicao').value,
       dimensoes: document.getElementById('itemDimensoes').value,
       material: document.getElementById('itemMaterial').value,

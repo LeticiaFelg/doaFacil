@@ -15,6 +15,7 @@ const itemRoutes = require('./routes/items');
 const userRoutes = require('./routes/users');
 const reservationRoutes = require('./routes/reservations');
 const historyRoutes = require('./routes/history');
+const { seedDemoData } = require('./seed/demoData');
 
 const app = express();
 
@@ -62,10 +63,13 @@ app.use((err, req, res, next) => {
 // Inicializar DB e servidor
 const PORT = process.env.PORT || 5000;
 
-sequelize.sync().then(() => {
+sequelize.sync().then(async () => {
+  const seedResult = await seedDemoData({ User, Item });
+
   app.listen(PORT, () => {
     console.log(`🌿 DoaFácil API rodando em http://localhost:${PORT}`);
     console.log(`📊 Banco de dados sincronizado`);
+    console.log(`Seed demo: ${seedResult.createdItems}/${seedResult.totalItems} itens criados para ${seedResult.user.name}`);
   });
 }).catch(err => {
   console.error('Erro ao conectar ao banco de dados:', err);

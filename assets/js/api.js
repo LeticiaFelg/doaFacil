@@ -112,6 +112,7 @@ const DoaFacilAPI = (() => {
     },
     listMine()           { return _request('GET',    '/items/my');    },
     getById(id)          { return _request('GET',    `/items/${id}`); },
+    getByCategory(category) { return _request('GET', `/items/category/${category}`); },
     getWhatsAppContact(id) { return _request('POST', `/items/${id}/contact/whatsapp`); },
     create(data)         { return _request('POST',   '/items', data); },
     update(id, data)     { return _request('PUT',    `/items/${id}`, data); },
@@ -120,7 +121,9 @@ const DoaFacilAPI = (() => {
 
   // ── Reservas ─────────────────────────────────────────────
   const Reservations = {
-    create(itemId)         { return _request('POST',  '/reservations', { itemId }); },
+    create(itemId, message = '') {
+      return _request('POST', '/reservations', { itemId, message });
+    },
     getReceived()          { return _request('GET',   '/reservations/received'); },
     getDonated()           { return _request('GET',   '/reservations/donated'); },
     getById(id)            { return _request('GET',   `/reservations/${id}`); },

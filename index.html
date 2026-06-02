@@ -266,6 +266,58 @@
 
       let currentFilter = 'all';
       let currentSearch = '';
+      let currentSort = 'recentes';
+      let loadedItems = mockItems;
+
+      const categoryLabels = {
+        moveis: 'Móveis',
+        eletro: 'Eletro',
+        roupas: 'Roupas',
+        calcados: 'Calçados',
+        utensilios: 'Utensílios',
+        escolar: 'Escolar',
+        brinquedos: 'Brinquedos',
+        outros: 'Outros'
+      };
+
+      function getFallbackImage(item) {
+        if (Array.isArray(item.images) && item.images.length) return item.images[0];
+        if (item.image) return item.image;
+
+        const id = Number(item.id || 1);
+        const normalizedId = ((id - 1) % 12) + 1;
+        return `./assets/img/items/item${normalizedId}.jpg`;
+      }
+
+      function normalizeItem(item) {
+        const category = item.category || 'outros';
+        const condition = item.condition || 'bom';
+        const conditionLabels = {
+          otimo: 'Ótimo',
+          bom: 'Bom estado',
+          usado: 'Usado'
+        };
+
+        return {
+          id: item.id,
+          title: item.title || 'Item sem título',
+          category,
+          categoryLabel: item.categoryLabel || categoryLabels[category] || category,
+          image: getFallbackImage(item),
+          condition,
+          condLabel: item.condLabel || conditionLabels[condition] || condition,
+          desc: item.desc || item.description || '',
+          location: item.location || item.donor?.location || '',
+          donor: item.donor || item.donor?.name || '',
+          donorRecurrent: Boolean(item.donorRecurrent || item.donor?.verified)
+        };
+      }
+
+      function fallbackItemsForCurrentFilters() {
+        return $.grep(mockItems, function (item) {
+          return currentFilter === 'all' || item.category === currentFilter;
+        });
+      }
 
       // ── Renderiza os cards no feed ──────────────────────────
       function renderFeed(items) {
@@ -353,7 +405,7 @@
         $('.filter-chip').removeClass('active');
         $(this).addClass('active');
         currentFilter = $(this).data('cat');
-        applyFilters();
+        loadItemsByCategory();
       });
 
       // ── Filtro de disponibilidade ───────────────────────────
@@ -369,23 +421,47 @@
 
       // ── Ordenação ───────────────────────────────────────────
       $(document).on('change', '.sort-select', function () {
-        applyFilters($(this).val());
+        currentSort = $(this).val();
+        applyFilters();
       });
 
       // ── Aplica todos os filtros e re-renderiza ──────────────
-      function applyFilters(sort) {
-        let items = $.grep(mockItems, function (item) {
-          const matchCat    = currentFilter === 'all' || item.category === currentFilter;
+      function applyFilters(sort, sourceItems) {
+        const selectedSort = sort || currentSort;
+        let items = $.grep(sourceItems || loadedItems, function (item) {
           const matchSearch = !currentSearch ||
             item.title.toLowerCase().includes(currentSearch) ||
             item.desc.toLowerCase().includes(currentSearch);
-          return matchCat && matchSearch;
+          return matchSearch;
         });
 
-        if (sort === 'az') {
+        if (selectedSort === 'az') {
           items.sort(function (a, b) { return a.title.localeCompare(b.title); });
         }
         renderFeed(items);
+      }
+
+      function loadItemsByCategory() {
+        if (!window.DoaFacilAPI?.Items) {
+          loadedItems = fallbackItemsForCurrentFilters();
+          applyFilters();
+          return;
+        }
+
+        const request = currentFilter === 'all'
+          ? DoaFacilAPI.Items.list()
+          : DoaFacilAPI.Items.getByCategory(currentFilter);
+
+        request
+          .done(function (response) {
+            const apiItems = $.map(response.items || [], normalizeItem);
+            loadedItems = apiItems;
+            applyFilters();
+          })
+          .fail(function () {
+            loadedItems = fallbackItemsForCurrentFilters();
+            applyFilters();
+          });
       }
 
       // ── Botão Reservar dentro do card ──────────────────────
@@ -441,7 +517,7 @@
       $(window).on('resize', renderFeatured);
 
       // Execuções iniciais
-      renderFeed(mockItems);
+      loadItemsByCategory();
       renderFeatured();
     });
   </script>

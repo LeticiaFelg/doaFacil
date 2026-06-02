@@ -189,7 +189,8 @@
           </p>
           <div style="margin-bottom:14px;">
             <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:6px;">Mensagem ao doador (opcional)</label>
-            <textarea class="form-control" rows="3" style="border-radius:12px;border:1.5px solid var(--cream-dark);font-family:'DM Sans',sans-serif;" placeholder="Ex: Posso buscar no sábado pela manhã..."></textarea>
+            <textarea id="reservation-message" class="form-control" rows="3" maxlength="500" style="border-radius:12px;border:1.5px solid var(--cream-dark);font-family:'DM Sans',sans-serif;" placeholder="Ex: Posso buscar no sábado pela manhã..."></textarea>
+            <small id="reservation-message-counter" style="display:block;margin-top:6px;color:var(--text-muted);font-size:.78rem;">0/500 caracteres</small>
           </div>
           <div style="background:var(--green-bg);border-radius:12px;padding:12px 16px;font-size:.83rem;color:var(--green-deep);">
             <i class="bi bi-info-circle"></i> A reserva expira em 48h se não houver confirmação.
@@ -214,6 +215,17 @@
   <script src="../assets/js/modal.js"></script>
   <script>
   $(function () {
+    const RESERVATION_MESSAGE_MAX_LENGTH = 500;
+
+    function updateReservationMessageCounter() {
+      const length = $('#reservation-message').val().length;
+      $('#reservation-message-counter').text(`${length}/${RESERVATION_MESSAGE_MAX_LENGTH} caracteres`);
+    }
+
+    $('#reservation-message')
+      .attr('maxlength', RESERVATION_MESSAGE_MAX_LENGTH)
+      .on('input', updateReservationMessageCounter);
+    updateReservationMessageCounter();
   
     // ── Dados mockados ──────────────────────────────────────
     const mockItems = [
@@ -331,6 +343,63 @@
     // ── Confirmar reserva no modal ───────────────────────────
     // Substitui: confirmReserve() com querySelector + getElementById + bootstrap.Modal.getInstance
     $(document).on('click', '#btn-confirmar-reserva', function () {
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        window.location.href = './login.html';
+        return;
+      }
+
+      const $button = $(this);
+      const itemId = currentItem?.id || Number(new URLSearchParams(window.location.search).get('id')) || 1;
+      const message = $('#reservation-message').val().trim();
+
+      if (message.length > RESERVATION_MESSAGE_MAX_LENGTH) {
+        alert(`A mensagem deve ter no máximo ${RESERVATION_MESSAGE_MAX_LENGTH} caracteres.`);
+        return;
+      }
+
+      $button.prop('disabled', true).text('Reservando...');
+
+      DoaFacilAPI.Reservations.create(itemId, message)
+        .done(function () {
+          const modal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
+          modal.hide();
+
+          setTimeout(function () {
+            const item = mockItems.find(i => i.id === itemId) || mockItems[0];
+
+            $('.status-pill')
+              .removeClass('status-available')
+              .css({ background: '#FFF3CD', color: '#856404' })
+              .html('<i class="bi bi-hourglass-split"></i> Reservado');
+
+            $('#btn-reserve-action')
+              .html('<i class="bi bi-bookmark-check"></i> Item Reservado')
+              .css({ background: '#FFF3CD', color: '#856404', 'pointer-events': 'none' })
+              .attr('disabled', 'disabled')
+              .attr('aria-disabled', 'true')
+              .removeAttr('data-bs-toggle')
+              .removeAttr('data-bs-target')
+              .addClass('disabled');
+
+            $('#item-location-name').text(item.fullAddress.split(',')[0]);
+            $('#item-location-sub').text(item.fullAddress);
+
+            $('#location-title').html('<i class="bi bi-map" style="color:var(--green-mid)"></i> LocalizaÃ§Ã£o exata');
+            $('#location-map').html(buildMapIframe(item.mapAddress, 'Mapa da localizaÃ§Ã£o exata'));
+
+            alert('âœ… Item reservado com sucesso!\nEntre em contato via WhatsApp para combinar a retirada.');
+          }, 300);
+        })
+        .fail(function (jqXHR) {
+          if (jqXHR.status === 401) return;
+          alert(jqXHR.responseJSON?.error || 'Nao foi possivel confirmar a reserva.');
+        })
+        .always(function () {
+          $button.prop('disabled', false).text('Confirmar reserva');
+        });
+
+      return;
+
       const modal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
       modal.hide();
     

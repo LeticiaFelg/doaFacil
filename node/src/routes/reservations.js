@@ -7,6 +7,7 @@ const auth = require('../middleware/auth');
 const { Op } = require('sequelize');
 
 const router = express.Router();
+const RESERVATION_MESSAGE_MAX_LENGTH = 500;
 
 // Criar reserva
 router.post('/', auth, async (req, res) => {
@@ -18,13 +19,26 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ error: 'Item ID é obrigatório' });
     }
 
+    if (message && message.length > RESERVATION_MESSAGE_MAX_LENGTH) {
+      return res.status(400).json({ error: `Mensagem deve ter no maximo ${RESERVATION_MESSAGE_MAX_LENGTH} caracteres` });
+    }
+
     const item = await Item.findByPk(item_id);
     if (!item) {
       return res.status(404).json({ error: 'Item não encontrado' });
     }
 
+    if (item.status !== 'disponivel') {
+      return res.status(409).json({ error: 'Item nao esta disponivel para reserva' });
+    }
+
     const existing = await Reservation.findOne({
-      where: { item_id, status: 'confirmada' }
+      where: {
+        item_id,
+        status: {
+          [Op.in]: ['pendente', 'confirmada']
+        }
+      }
     });
     if (existing) {
       return res.status(409).json({ error: 'Item já foi reservado' });
@@ -45,9 +59,13 @@ router.post('/', auth, async (req, res) => {
       status: 'pendente'
     });
 
+    item.status = 'reservado';
+    await item.save();
+
     return res.status(201).json({
       message: 'Reserva criada com sucesso',
-      reservation
+      reservation,
+      item
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
