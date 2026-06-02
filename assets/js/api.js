@@ -127,6 +127,8 @@ const DoaFacilAPI = (() => {
     getReceived()          { return _request('GET',   '/reservations/received'); },
     getDonated()           { return _request('GET',   '/reservations/donated'); },
     getById(id)            { return _request('GET',   `/reservations/${id}`); },
+    complete(id)           { return _request('PUT',   `/reservations/${id}/complete`); },
+    cancel(id)             { return _request('PUT',   `/reservations/${id}/cancel`); },
     updateStatus(id, status) {
       return _request('PATCH', `/reservations/${id}/status`, { status });
     },

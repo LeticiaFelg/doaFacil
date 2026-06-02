@@ -64,12 +64,12 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 sequelize.sync().then(async () => {
-  const seedResult = await seedDemoData({ User, Item });
+  const seedResult = await seedDemoData({ User, Item, Reservation, History });
 
   app.listen(PORT, () => {
     console.log(`🌿 DoaFácil API rodando em http://localhost:${PORT}`);
     console.log(`📊 Banco de dados sincronizado`);
-    console.log(`Seed demo: ${seedResult.createdItems}/${seedResult.totalItems} itens criados para ${seedResult.user.name}`);
+    console.log(`Seed demo: ${seedResult.createdItems}/${seedResult.totalItems} itens, ${seedResult.createdReservations} reservas e ${seedResult.createdHistory} historicos criados para ${seedResult.user.name}`);
   });
 }).catch(err => {
   console.error('Erro ao conectar ao banco de dados:', err);

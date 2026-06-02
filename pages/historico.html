@@ -98,7 +98,7 @@
         <span>Categoria</span>
         <span>Data</span>
         <span>Status</span>
-        <span>Cancelar</span>
+        <span>Confirmar / Cancelar</span>
       </div>
       <div id="doado-rows"></div>
     </div>
@@ -223,6 +223,7 @@
       return {
         id: item.id,
         item_id: item.item_id || item.id,
+        reservation_id: item.reservation_id || null,
         image: getFallbackImage(item),
         name: item.name || item.title || 'Item sem nome',
         cat: item.cat || item.category || '',
@@ -338,11 +339,20 @@
         return;
       }
       $c.html($.map(data, function (item) {
+        const canConfirm = item.status === 'reservado';
         const canCancel = ['reservado', 'disponivel'].includes(item.status);
-        const actionButton = canCancel
-          ? `<button class="btn-cancel-item" data-id="${item.id}" data-item-id="${item.item_id}" data-name="${item.name}" title="Cancelar item">
+        const confirmButton = canConfirm
+          ? `<button class="btn-confirm-delivery" data-id="${item.id}" data-item-id="${item.item_id}" data-reservation-id="${item.reservation_id || ''}" data-name="${item.name}" title="Confirmar entrega">
+              <i class="bi bi-check-circle"></i>
+            </button>`
+          : '';
+        const cancelButton = canCancel
+          ? `<button class="btn-cancel-item" data-id="${item.id}" data-item-id="${item.item_id}" data-reservation-id="${item.reservation_id || ''}" data-name="${item.name}" data-status="${item.status}" title="Cancelar item">
               <i class="bi bi-x-circle"></i>
             </button>`
+          : '';
+        const actionButton = confirmButton || cancelButton
+          ? `<div class="row-actions">${confirmButton}${cancelButton}</div>`
           : '';
 
         return `
@@ -407,11 +417,6 @@
     }
 
     loadHistory();
-    const storedRecebido = getCurrentUser() ? loadStoredReservationsForUser(getCurrentUser().email) : [];
-    const combinedRecebido = storedRecebido.concat(mockRecebido);
-
-    renderDoado(mockDoado);
-    renderRecebido(combinedRecebido);
   
     // ── Troca de abas ────────────────────────────────────────
     // Substitui: switchTab() com querySelectorAll + style.display
@@ -453,16 +458,25 @@
       const $button = $(this);
       const rowId = Number($button.data('id'));
       const itemId = Number($button.data('item-id')) || rowId;
+      const reservationId = Number($button.data('reservation-id'));
+      const status = $button.data('status');
       const itemName = $button.data('name');
+      const confirmationMessage = status === 'reservado'
+        ? `Cancelar a reserva de "${itemName}"? O item voltara a ficar disponivel.`
+        : `Cancelar "${itemName}"? O item ficara marcado como cancelado.`;
 
-      if (!confirm(`Cancelar "${itemName}"? O item ficará marcado como cancelado.`)) {
+      if (!confirm(confirmationMessage)) {
         return;
       }
 
       function markAsCancelled() {
         doadoRows = $.map(doadoRows, function (item) {
           if (Number(item.item_id || item.id) === itemId || Number(item.id) === rowId) {
-            return { ...item, status: 'cancelado' };
+            return {
+              ...item,
+              status: status === 'reservado' ? 'disponivel' : 'cancelado',
+              receptor: status === 'reservado' ? 'Ainda sem receptor' : item.receptor
+            };
           }
           return item;
         });
@@ -476,7 +490,11 @@
       }
 
       $button.prop('disabled', true);
-      DoaFacilAPI.Items.delete(itemId)
+      const request = status === 'reservado' && reservationId
+        ? DoaFacilAPI.Reservations.cancel(reservationId)
+        : DoaFacilAPI.Items.delete(itemId);
+
+      request
         .done(markAsCancelled)
         .fail(function (jqXHR) {
           $button.prop('disabled', false);
@@ -484,9 +502,46 @@
           alert(jqXHR.responseJSON?.error || 'Nao foi possivel cancelar o item.');
         });
     });
-  
+
+    $(document).on('click', '.btn-confirm-delivery', function () {
+      const $button = $(this);
+      const rowId = Number($button.data('id'));
+      const itemId = Number($button.data('item-id')) || rowId;
+      const reservationId = Number($button.data('reservation-id'));
+      const itemName = $button.data('name');
+
+      if (!confirm(`Confirmar entrega de "${itemName}"? O item ficara marcado como concluido.`)) {
+        return;
+      }
+
+      function markAsCompleted() {
+        doadoRows = $.map(doadoRows, function (item) {
+          if (Number(item.item_id || item.id) === itemId || Number(item.id) === rowId) {
+            return { ...item, status: 'concluido' };
+          }
+          return item;
+        });
+        refreshMetricsFromRows();
+        applyFilters();
+      }
+
+      if (!DoaFacilAPI.Auth.isLoggedIn() || !reservationId) {
+        markAsCompleted();
+        return;
+      }
+
+      $button.prop('disabled', true);
+      DoaFacilAPI.Reservations.complete(reservationId)
+        .done(markAsCompleted)
+        .fail(function (jqXHR) {
+          $button.prop('disabled', false);
+          if (jqXHR.status === 401) return;
+          alert(jqXHR.responseJSON?.error || 'Nao foi possivel confirmar a entrega.');
+        });
+    });
   });
   </script>
 </body>
 </html>
+
 

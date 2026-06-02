@@ -65,6 +65,7 @@ router.get('/my', auth, async (req, res) => {
       return {
         id: item.id,
         item_id: item.id,
+        reservation_id: reservation?.id || null,
         image: getFirstImage(item),
         name: item.title,
         cat: item.category,

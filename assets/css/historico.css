@@ -172,7 +172,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     letter-spacing: .5px;
     color: var(--text-muted);
 }
-.cols-doado    { grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 80px; }
+.cols-doado    { grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 120px; }
 .cols-recebido { grid-template-columns: 2fr 1.2fr 1fr 1fr 80px; }
 
 /* TABLE ROW */
@@ -234,6 +234,28 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     transition: all .15s;
 }
 .btn-mini:hover { border-color: var(--green-light); color: var(--green-mid); background: var(--green-bg); }
+.row-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-confirm-delivery {
+    border: 1.5px solid #86EFAC;
+    background: #F0FDF4;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .78rem;
+    font-weight: 600;
+    color: #166534;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-confirm-delivery:hover {
+    border-color: #16A34A;
+    background: #DCFCE7;
+    color: #14532D;
+}
 .btn-cancel-item {
     border: 1.5px solid #FCA5A5;
     background: #FEF2F2;
