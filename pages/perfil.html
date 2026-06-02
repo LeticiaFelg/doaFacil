@@ -221,7 +221,14 @@
   <script src="../assets/js/api.js"></script>
   <script>
     $(function () {
-      const usingMockProfile = !DoaFacilAPI.Auth.isLoggedIn();
+      if (!DoaFacilAPI.Auth.hasRealSession()) {
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
+        window.location.href = 'login.html';
+        return;
+      }
 
       function applyProfile(user) {
         if (!user) return;
@@ -279,13 +286,11 @@
       loadCurrentUserProfile();
 
 
-      if (!usingMockProfile) {
-        DoaFacilAPI.Users.getMe()
-          .done(applyProfile)
-          .fail(function () {
-            // Mantem o HTML mockado visivel quando a API nao responder.
-          });
-      }
+      DoaFacilAPI.Users.getMe()
+        .done(applyProfile)
+        .fail(function () {
+          window.location.href = 'login.html';
+        });
 
       // Troca de visão Doador / Receptor
       // Substitui: switchProfile() com querySelectorAll + classList
@@ -316,6 +321,9 @@
 
       $(document).on('click', '#btn-logout', function () {
         localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_fallback_session');
         window.location.href = 'login.html';
       });
 
@@ -335,6 +343,9 @@
         localStorage.setItem('doafacil_reservations', JSON.stringify(remainingReservations));
 
         localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_fallback_session');
         alert('Sua conta foi apagada com sucesso.');
         window.location.href = 'login.html';
       });

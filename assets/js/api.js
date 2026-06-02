@@ -38,6 +38,8 @@ const DoaFacilAPI = (() => {
       if (jqXHR.status === 401 && !isAuthAttempt) {
         localStorage.removeItem('doafacil_token');
         localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
         window.location.href = '/pages/login.html';
       }
     });
@@ -54,6 +56,7 @@ const DoaFacilAPI = (() => {
         localStorage.setItem('doafacil_token', token || access_token);
         localStorage.setItem('doafacil_user', JSON.stringify(user));
         localStorage.setItem('doafacil_current_user', JSON.stringify(user));
+        localStorage.removeItem('doafacil_fallback_session');
       });
     },
 
@@ -66,6 +69,7 @@ const DoaFacilAPI = (() => {
         localStorage.setItem('doafacil_token', token || access_token);
         localStorage.setItem('doafacil_user', JSON.stringify(user));
         localStorage.setItem('doafacil_current_user', JSON.stringify(user));
+        localStorage.removeItem('doafacil_fallback_session');
       });
     },
 
@@ -74,12 +78,21 @@ const DoaFacilAPI = (() => {
         localStorage.removeItem('doafacil_token');
         localStorage.removeItem('doafacil_user');
         localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
         window.location.href = '/pages/login.html';
       });
     },
 
     isLoggedIn() {
       return !!localStorage.getItem('doafacil_token');
+    },
+
+    isFallbackSession() {
+      return localStorage.getItem('doafacil_fallback_session') === 'true';
+    },
+
+    hasRealSession() {
+      return this.isLoggedIn() && !this.isFallbackSession();
     },
 
     getCurrentUser() {
@@ -92,6 +105,7 @@ const DoaFacilAPI = (() => {
         localStorage.removeItem('doafacil_token');
         localStorage.removeItem('doafacil_user');
         localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
       });
     },
   };

@@ -258,7 +258,20 @@
         localStorage.removeItem('doafacil_fallback_session');
       }
 
+      function clearFallbackSession() {
+        if (localStorage.getItem('doafacil_fallback_session') === 'true') {
+          clearStoredSession();
+        }
+      }
+
+      function hasRealSession() {
+        return localStorage.getItem('doafacil_token') &&
+          localStorage.getItem('doafacil_fallback_session') !== 'true';
+      }
+
       function enableFallbackSession() {
+        if (hasRealSession()) return;
+
         localStorage.setItem('doafacil_current_user', JSON.stringify(fallbackMaria));
         localStorage.setItem('doafacil_user', JSON.stringify(fallbackMaria));
         localStorage.setItem('doafacil_token', 'mock-maria-clara');
@@ -268,7 +281,7 @@
       return fetch(`${apiBase}/health`, { cache: 'no-store' })
         .then(function (response) {
           if (!response.ok) throw new Error('API indisponivel');
-          clearStoredSession();
+          clearFallbackSession();
         })
         .catch(enableFallbackSession);
     })();
