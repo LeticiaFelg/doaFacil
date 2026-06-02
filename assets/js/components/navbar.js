@@ -1,10 +1,10 @@
 const navbarPath = window.location.pathname.includes('/pages/') ? '../assets/components/navbar.html' : './assets/components/navbar.html';
+const authReady = window.DoaFacilHomeAuthReady || Promise.resolve();
 
-fetch(navbarPath)
-  .then(response => response.text())
+authReady
+  .then(() => $.get(navbarPath))
   .then(data => {
-
-    document.getElementById('navbar').innerHTML = data;
+    $('#navbar').html(data);
 
     function getCurrentUser() {
       return JSON.parse(localStorage.getItem('doafacil_current_user') || 'null');

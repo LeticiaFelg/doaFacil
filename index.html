@@ -239,12 +239,45 @@
         </div>
       </div>
     </div>
+  <script src="./assets/js/config.js"></script>
+  <script>
+    window.DoaFacilHomeAuthReady = (function () {
+      const apiBase = window.API_BASE_URL || 'http://localhost:5000/api';
+      const fallbackMaria = {
+        id: 1,
+        name: 'Maria Clara Souza',
+        email: 'maria.clara@example.com',
+        avatar: 'MC',
+        roles: ['doador', 'receptor']
+      };
+
+      function clearStoredSession() {
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
+      }
+
+      function enableFallbackSession() {
+        localStorage.setItem('doafacil_current_user', JSON.stringify(fallbackMaria));
+        localStorage.setItem('doafacil_user', JSON.stringify(fallbackMaria));
+        localStorage.setItem('doafacil_token', 'mock-maria-clara');
+        localStorage.setItem('doafacil_fallback_session', 'true');
+      }
+
+      return fetch(`${apiBase}/health`, { cache: 'no-store' })
+        .then(function (response) {
+          if (!response.ok) throw new Error('API indisponivel');
+          clearStoredSession();
+        })
+        .catch(enableFallbackSession);
+    })();
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="./assets/js/components/footer.js"></script>
   <script src="./assets/js/components/navbar.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <script src="./assets/js/modal.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="./assets/js/config.js"></script>
   <script src="./assets/js/api.js"></script>
   <script>
     $(function () {
