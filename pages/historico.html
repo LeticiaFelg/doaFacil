@@ -191,7 +191,10 @@
     function getFallbackImage(item) {
       const id = Number(item.item_id || item.id || 1);
       const normalizedId = ((id - 1) % 12) + 1;
-      return item.image || `../assets/img/items/item${normalizedId}.jpg`;
+      const apiOrigin = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+      const image = item.image || `../assets/img/items/item${normalizedId}.jpg`;
+
+      return image.startsWith('/uploads') ? `${apiOrigin}${image}` : image;
     }
 
     function formatDate(value) {

@@ -129,6 +129,20 @@ const DoaFacilAPI = (() => {
     getByCategory(category) { return _request('GET', `/items/category/${category}`); },
     getWhatsAppContact(id) { return _request('POST', `/items/${id}/contact/whatsapp`); },
     create(data)         { return _request('POST',   '/items', data); },
+    createWithImages(formData) {
+      const headers = {};
+      const token = localStorage.getItem('doafacil_token');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      return $.ajax({
+        url: `${BASE_URL}/items`,
+        method: 'POST',
+        headers,
+        data: formData,
+        processData: false,
+        contentType: false
+      });
+    },
     update(id, data)     { return _request('PUT',    `/items/${id}`, data); },
     delete(id)           { return _request('DELETE', `/items/${id}`); },
   };

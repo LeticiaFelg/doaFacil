@@ -291,7 +291,9 @@
 
       function normalizeImage(item) {
         if (item && Array.isArray(item.images) && item.images.length) {
+          const apiOrigin = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
           const image = item.images[0];
+          if (image.startsWith('/uploads')) return `${apiOrigin}${image}`;
           if (image.startsWith('../') || image.startsWith('./') || image.startsWith('http')) {
             return image.startsWith('./') ? `.${image}` : image;
           }

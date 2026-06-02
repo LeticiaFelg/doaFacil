@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const sequelize = require('./config/database');
 
 // Modelos
@@ -24,6 +25,7 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:8000'
 }));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Definir associacoes
 Item.belongsTo(User, { as: 'donor', foreignKey: 'donor_id' });
