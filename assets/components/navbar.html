@@ -56,13 +56,13 @@
       <div style="padding: 0 12px; color: var(--text-muted); font-size: .82rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px;">
         Informações
       </div>
-      <a class="offcanvas-nav-link" href="#" data-bs-dismiss="offcanvas">
+      <a class="offcanvas-nav-link" href="#" data-info-modal="sobre">
         <i class="bi bi-info-circle"></i> Sobre
       </a>
-      <a class="offcanvas-nav-link" href="#" data-bs-dismiss="offcanvas">
+      <a class="offcanvas-nav-link" href="#" data-info-modal="faq">
         <i class="bi bi-question-circle"></i> FAQ
       </a>
-      <a class="offcanvas-nav-link" href="#" data-bs-dismiss="offcanvas">
+      <a class="offcanvas-nav-link" href="#" data-info-modal="contato">
         <i class="bi bi-envelope"></i> Contato
       </a>
     </div>
@@ -94,6 +94,7 @@
           <option value="escolar">Escolar</option>
           <option value="utensilios">Utensílios</option>
           <option value="brinquedos">Brinquedos</option>
+          <option value="outros">Outros</option>
         </select>
       </div>
       <div class="form-group">
@@ -103,7 +104,8 @@
       </div>
       <div class="form-group">
         <label for="itemDescricao">Descrição</label>
-        <textarea id="itemDescricao" name="descricao" rows="4" placeholder="Descreva o estado, características e detalhes do item..."></textarea>
+        <textarea id="itemDescricao" name="descricao" rows="4" maxlength="1000" placeholder="Descreva o estado, características e detalhes do item..."></textarea>
+        <small class="char-counter" data-counter-for="itemDescricao">0/1000 caracteres</small>
       </div>
       <div class="form-group">
         <label for="itemCondicao">Condição *</label>

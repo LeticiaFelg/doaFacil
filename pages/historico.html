@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../assets/css/historico.css">
   <link rel="stylesheet" href="../assets/css/components/navbar.css">
   <link rel="stylesheet" href="../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../assets/css/components/info-modals.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -82,10 +83,10 @@
           <option value="disponivel">Disponível</option>
           <option value="cancelado">Cancelado</option>
         </select>
-        <select class="filter-select">
-          <option>Mais recentes</option>
-          <option>Mais antigos</option>
-          <option>A–Z</option>
+        <select class="filter-select" id="select-ordem">
+          <option value="recentes">Mais recentes</option>
+          <option value="antigos">Mais antigos</option>
+          <option value="az">A–Z</option>
         </select>
       </div>
     </div>
@@ -98,7 +99,7 @@
         <span>Categoria</span>
         <span>Data</span>
         <span>Status</span>
-        <span></span>
+        <span>Confirmar / Cancelar</span>
       </div>
       <div id="doado-rows"></div>
     </div>
@@ -128,7 +129,6 @@
   <script src="../assets/js/modal.js"></script>
   <script>
   $(function () {
-  
     const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
     const STORAGE_RESERVATIONS_KEY = 'doafacil_reservations';
 
@@ -153,7 +153,8 @@
     loadCurrentUserContext();
 
     // ── Dados mockados ──────────────────────────────────────
-    const mockDoado = [
+    /* LEGACY MOCK migrado para node/src/seed/demoData.js. Mantido somente para consulta.
+const mockDoado = [
       { id:1,  image:'../assets/img/items/item1.jpg', name:'Sofá de 3 lugares',        cat:'Móveis',     receptor:'Carlos M.',    date:'19/05/2026', status:'disponivel' },
       { id:2,  image:'../assets/img/items/item3.jpg', name:'Micro-ondas 30L',           cat:'Eletro',     receptor:'Ana Lima',     date:'12/05/2026', status:'reservado'  },
       { id:3,  image:'../assets/img/items/item4.jpg', name:'Kit roupas infantis',       cat:'Roupas',     receptor:'ONG Recomeço', date:'08/05/2026', status:'concluido'  },
@@ -167,8 +168,11 @@
       { id:11, image:'../assets/img/items/item12.jpg', name:'Mochila escolar',           cat:'Escolar',    receptor:'Inst. Educar', date:'20/03/2026', status:'concluido'  },
       { id:12, image:'../assets/img/items/item11.jpg', name:'Geladeira 280L',            cat:'Eletro',     receptor:'Maria F.',     date:'14/03/2026', status:'concluido'  },
     ];
+*/
+const mockDoado = [];
   
-    const mockRecebido = [
+    /* LEGACY MOCK migrado para node/src/seed/demoData.js. Mantido somente para consulta.
+const mockRecebido = [
       { id:1, image:'../assets/img/items/item5.jpg', name:'Mesa escritório',         cat:'Móveis',     doador:'Lara C.',    date:'25/04/2026', status:'concluido' },
       { id:2, image:'../assets/img/items/item8.jpg', name:'Livros didáticos',        cat:'Escolar',    doador:'Roberto S.', date:'18/04/2026', status:'concluido' },
       { id:3, image:'../assets/img/items/item4.jpg', name:'Roupas tamanho M (lote)', cat:'Roupas',     doador:'Ana P.',     date:'10/04/2026', status:'concluido' },
@@ -177,6 +181,8 @@
       { id:6, image:'../assets/img/items/item10.jpg', name:'Kit brinquedos',          cat:'Brinquedos', doador:'Inst.Vida',  date:'15/03/2026', status:'concluido' },
       { id:7, image:'../assets/img/items/item1.jpg', name:'Poltrona de leitura',    cat:'Móveis',     doador:'Hugo B.',    date:'05/03/2026', status:'reservado' },
     ];
+*/
+const mockRecebido = [];
   
     const statusMap = {
       concluido:  '<span class="pill pill-concluido">✅ Concluído</span>',
@@ -186,6 +192,152 @@
     };
   
     let currentTab = 'doado';
+    let doadoRows = mockDoado;
+    let recebidoRows = mockRecebido;
+
+    function getFallbackImage(item) {
+      const id = Number(item.item_id || item.id || 1);
+      const normalizedId = ((id - 1) % 12) + 1;
+      const apiOrigin = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+      const image = item.image || `../assets/img/items/item${normalizedId}.jpg`;
+
+      return image.startsWith('/uploads') ? `${apiOrigin}${image}` : image;
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return value;
+
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+
+      return date.toLocaleDateString('pt-BR');
+    }
+
+    function normalizeStatus(status) {
+      const statuses = {
+        concluida: 'concluido',
+        concluido: 'concluido',
+        cancelada: 'cancelado',
+        cancelado: 'cancelado',
+        pendente: 'reservado',
+        confirmada: 'reservado',
+        reservado: 'reservado',
+        disponivel: 'disponivel'
+      };
+
+      return statuses[status] || 'disponivel';
+    }
+
+    function normalizeDoado(item) {
+      return {
+        id: item.id,
+        item_id: item.item_id || item.id,
+        reservation_id: item.reservation_id || null,
+        image: getFallbackImage(item),
+        name: item.name || item.title || 'Item sem nome',
+        cat: item.cat || item.category || '',
+        receptor: item.receptor || 'Ainda sem receptor',
+        date: formatDate(item.date || item.createdAt),
+        status: normalizeStatus(item.status)
+      };
+    }
+
+    function normalizeRecebido(item) {
+      return {
+        id: item.id,
+        item_id: item.item_id || item.id,
+        image: getFallbackImage(item),
+        name: item.name || item.title || 'Item sem nome',
+        cat: item.cat || item.category || '',
+        doador: item.doador || item.donor?.name || 'Doador nao encontrado',
+        date: formatDate(item.date || item.createdAt),
+        status: normalizeStatus(item.status)
+      };
+    }
+
+    function updateUserContext(user, summary) {
+      if (user?.name) $('.ctx-name').text(user.name);
+      $('.ctx-badge').toggle(!!summary?.is_recurrent);
+    }
+
+    function updateMetrics(summary) {
+      const values = [
+        summary?.donated || 0,
+        summary?.received || 0,
+        summary?.completed || 0,
+        summary?.in_progress || 0
+      ];
+
+      $('.metric-num').each(function (index) {
+        $(this).text(values[index]);
+      });
+
+      $('.h-tab[data-tab="doado"] .tab-count').text(values[0]);
+      $('.h-tab[data-tab="recebido"] .tab-count').text(values[1]);
+    }
+
+    function refreshMetricsFromRows() {
+      const allRows = [...doadoRows, ...recebidoRows];
+
+      updateMetrics({
+        donated: doadoRows.length,
+        received: recebidoRows.length,
+        completed: allRows.filter((item) => item.status === 'concluido').length,
+        in_progress: allRows.filter((item) => ['disponivel', 'reservado'].includes(item.status)).length,
+        is_recurrent: doadoRows.length >= 3
+      });
+    }
+
+    function loadFallbackHistory() {
+      doadoRows = $.map(mockDoado, normalizeDoado);
+      recebidoRows = $.map(mockRecebido, normalizeRecebido);
+      updateUserContext({ name: 'Maria Clara Souza' }, { is_recurrent: true });
+      updateMetrics({
+        donated: doadoRows.length,
+        received: recebidoRows.length,
+        completed: [...doadoRows, ...recebidoRows].filter((item) => item.status === 'concluido').length,
+        in_progress: [...doadoRows, ...recebidoRows].filter((item) => ['disponivel', 'reservado'].includes(item.status)).length,
+        is_recurrent: true
+      });
+      applyFilters();
+    }
+
+    function sortRows(rows, order) {
+      const sorted = [...rows];
+
+      if (order === 'antigos') {
+        return sorted.reverse();
+      }
+
+      if (order === 'az') {
+        return sorted.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+      }
+
+      return sorted;
+    }
+
+    function applyFilters() {
+      const query = $('#input-busca').val().toLowerCase();
+      const status = $('#select-status').val();
+      const order = $('#select-ordem').val();
+      const source = currentTab === 'doado' ? doadoRows : recebidoRows;
+
+      let filtered = $.grep(source, function (item) {
+        const contact = currentTab === 'doado' ? item.receptor : item.doador;
+        const matchesQuery = item.name.toLowerCase().includes(query) || String(contact).toLowerCase().includes(query);
+        const matchesStatus = status === 'all' || item.status === status;
+        return matchesQuery && matchesStatus;
+      });
+
+      filtered = sortRows(filtered, order);
+
+      if (currentTab === 'doado') {
+        renderDoado(filtered);
+      } else {
+        renderRecebido(filtered);
+      }
+    }
   
     // ── Renderização ─────────────────────────────────────────
     // Substitui: document.getElementById + innerHTML + .map() nativo
@@ -197,6 +349,22 @@
         return;
       }
       $c.html($.map(data, function (item) {
+        const canConfirm = item.status === 'reservado';
+        const canCancel = ['reservado', 'disponivel'].includes(item.status);
+        const confirmButton = canConfirm
+          ? `<button class="btn-confirm-delivery" data-id="${item.id}" data-item-id="${item.item_id}" data-reservation-id="${item.reservation_id || ''}" data-name="${item.name}" title="Confirmar entrega">
+              <i class="bi bi-check-circle"></i>
+            </button>`
+          : '';
+        const cancelButton = canCancel
+          ? `<button class="btn-cancel-item" data-id="${item.id}" data-item-id="${item.item_id}" data-reservation-id="${item.reservation_id || ''}" data-name="${item.name}" data-status="${item.status}" title="Cancelar item">
+              <i class="bi bi-x-circle"></i>
+            </button>`
+          : '';
+        const actionButton = confirmButton || cancelButton
+          ? `<div class="row-actions">${confirmButton}${cancelButton}</div>`
+          : '';
+
         return `
           <div class="history-row cols-doado ${item.status === 'concluido' ? 'recurrent-row' : ''}">
             <div class="item-cell">
@@ -210,11 +378,7 @@
             <div style="font-size:.83rem;color:var(--text-muted);">${item.cat}</div>
             <div class="row-date">${item.date}</div>
             <div>${statusMap[item.status]}</div>
-            <div>
-              <button class="btn-mini" data-name="${item.name}">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
+            <div>${actionButton}</div>
           </div>`;
       }).join(''));
     }
@@ -243,11 +407,26 @@
       }).join(''));
     }
   
-    const storedRecebido = getCurrentUser() ? loadStoredReservationsForUser(getCurrentUser().email) : [];
-    const combinedRecebido = storedRecebido.concat(mockRecebido);
+    function loadHistory() {
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        loadFallbackHistory();
+        return;
+      }
 
-    renderDoado(mockDoado);
-    renderRecebido(combinedRecebido);
+      DoaFacilAPI.History.getMine()
+        .done(function ({ user, summary, donated, received }) {
+          doadoRows = $.map(donated || [], normalizeDoado);
+          recebidoRows = $.map(received || [], normalizeRecebido);
+          updateUserContext(user, summary);
+          updateMetrics(summary);
+          applyFilters();
+        })
+        .fail(function () {
+          loadFallbackHistory();
+        });
+    }
+
+    loadHistory();
   
     // ── Troca de abas ────────────────────────────────────────
     // Substitui: switchTab() com querySelectorAll + style.display
@@ -259,36 +438,23 @@
       // .toggle(bool) substitui style.display = 'block'/'none'
       $('#tab-doado').toggle(tab === 'doado');
       $('#tab-recebido').toggle(tab === 'recebido');
+      applyFilters();
     });
   
     // ── Busca por texto ──────────────────────────────────────
     // Substitui: oninput="filterHistory(this.value)" + .filter() nativo
     $(document).on('input', '#input-busca', function () {
-      const q = $(this).val().toLowerCase();
-      if (currentTab === 'doado') {
-        renderDoado($.grep(mockDoado, function (i) {
-          return i.name.toLowerCase().includes(q) || i.receptor.toLowerCase().includes(q);
-        }));
-      } else {
-        renderRecebido($.grep(combinedRecebido, function (i) {
-          return i.name.toLowerCase().includes(q) || i.doador.toLowerCase().includes(q);
-        }));
-      }
+      applyFilters();
     });
   
     // ── Filtro por status ────────────────────────────────────
     // Substitui: onchange="filterByStatus(this.value)" + .filter() nativo
     $(document).on('change', '#select-status', function () {
-      const val = $(this).val();
-      if (currentTab === 'doado') {
-        renderDoado(val === 'all' ? mockDoado : $.grep(mockDoado, function (i) {
-          return i.status === val;
-        }));
-      } else {
-        renderRecebido(val === 'all' ? combinedRecebido : $.grep(combinedRecebido, function (i) {
-          return i.status === val;
-        }));
-      }
+      applyFilters();
+    });
+
+    $(document).on('change', '#select-ordem', function () {
+      applyFilters();
     });
   
     // ── Botão de detalhe (gerado dinamicamente) ──────────────
@@ -297,9 +463,95 @@
     $(document).on('click', '.btn-mini', function () {
       alert('Detalhes: ' + $(this).data('name'));
     });
-  
+
+    $(document).on('click', '.btn-cancel-item', function () {
+      const $button = $(this);
+      const rowId = Number($button.data('id'));
+      const itemId = Number($button.data('item-id')) || rowId;
+      const reservationId = Number($button.data('reservation-id'));
+      const status = $button.data('status');
+      const itemName = $button.data('name');
+      const confirmationMessage = status === 'reservado'
+        ? `Cancelar a reserva de "${itemName}"? O item voltara a ficar disponivel.`
+        : `Cancelar "${itemName}"? O item ficara marcado como cancelado.`;
+
+      if (!confirm(confirmationMessage)) {
+        return;
+      }
+
+      function markAsCancelled() {
+        doadoRows = $.map(doadoRows, function (item) {
+          if (Number(item.item_id || item.id) === itemId || Number(item.id) === rowId) {
+            return {
+              ...item,
+              status: status === 'reservado' ? 'disponivel' : 'cancelado',
+              receptor: status === 'reservado' ? 'Ainda sem receptor' : item.receptor
+            };
+          }
+          return item;
+        });
+        refreshMetricsFromRows();
+        applyFilters();
+      }
+
+      if (!DoaFacilAPI.Auth.isLoggedIn()) {
+        markAsCancelled();
+        return;
+      }
+
+      $button.prop('disabled', true);
+      const request = status === 'reservado' && reservationId
+        ? DoaFacilAPI.Reservations.cancel(reservationId)
+        : DoaFacilAPI.Items.delete(itemId);
+
+      request
+        .done(markAsCancelled)
+        .fail(function (jqXHR) {
+          $button.prop('disabled', false);
+          if (jqXHR.status === 401) return;
+          alert(jqXHR.responseJSON?.error || 'Nao foi possivel cancelar o item.');
+        });
+    });
+
+    $(document).on('click', '.btn-confirm-delivery', function () {
+      const $button = $(this);
+      const rowId = Number($button.data('id'));
+      const itemId = Number($button.data('item-id')) || rowId;
+      const reservationId = Number($button.data('reservation-id'));
+      const itemName = $button.data('name');
+
+      if (!confirm(`Confirmar entrega de "${itemName}"? O item ficara marcado como concluido.`)) {
+        return;
+      }
+
+      function markAsCompleted() {
+        doadoRows = $.map(doadoRows, function (item) {
+          if (Number(item.item_id || item.id) === itemId || Number(item.id) === rowId) {
+            return { ...item, status: 'concluido' };
+          }
+          return item;
+        });
+        refreshMetricsFromRows();
+        applyFilters();
+      }
+
+      if (!DoaFacilAPI.Auth.isLoggedIn() || !reservationId) {
+        markAsCompleted();
+        return;
+      }
+
+      $button.prop('disabled', true);
+      DoaFacilAPI.Reservations.complete(reservationId)
+        .done(markAsCompleted)
+        .fail(function (jqXHR) {
+          $button.prop('disabled', false);
+          if (jqXHR.status === 401) return;
+          alert(jqXHR.responseJSON?.error || 'Nao foi possivel confirmar a entrega.');
+        });
+    });
   });
   </script>
 </body>
 </html>
+
 

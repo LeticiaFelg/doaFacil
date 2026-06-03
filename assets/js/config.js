@@ -15,5 +15,5 @@
 // ↑ Troque pelo seu subdomínio Cloudflare após configurar o tunnel.
 //   Exemplo real: 'https://doafacil-api.meugrupo.workers.dev/api'
 //
-// Para testes locais (sem o tunnel), troque por:
-window.API_BASE_URL = 'http://localhost:3000/api';
+// Para testes locais (sem o tunnel), usando o backend Node em node/.env:
+window.API_BASE_URL = 'http://localhost:5000/api';

@@ -43,6 +43,26 @@ const Item = sequelize.define('Item', {
     type: DataTypes.JSON,
     defaultValue: []
   },
+  dimensions: {
+    type: DataTypes.STRING(100),
+    defaultValue: ''
+  },
+  material: {
+    type: DataTypes.STRING(100),
+    defaultValue: ''
+  },
+  color: {
+    type: DataTypes.STRING(50),
+    defaultValue: ''
+  },
+  pickup: {
+    type: DataTypes.STRING(255),
+    defaultValue: ''
+  },
+  address: {
+    type: DataTypes.JSON,
+    defaultValue: {}
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
