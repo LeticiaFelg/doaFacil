@@ -27,7 +27,6 @@ db.exec(`
     neighborhood TEXT,
     city        TEXT,
     state       TEXT,
-    profileType TEXT NOT NULL DEFAULT 'both',
     createdAt   TEXT NOT NULL,
     updatedAt   TEXT NOT NULL
   );
