@@ -145,7 +145,14 @@
             </div>
           </div>
 
-          <button id="btn-reserve-action" class="btn-reserve" data-bs-toggle="modal" data-bs-target="#reserveModal">
+          <div class="form-check" style="margin:8px 0 12px 0;">
+            <input class="form-check-input" type="checkbox" value="" id="checkbox-habilitar-reserva">
+            <label class="form-check-label" for="checkbox-habilitar-reserva" style="font-size:.88rem;color:var(--text-muted);">
+              Confirmo que li as informações do item
+            </label>
+          </div>
+
+          <button class="btn-reserve" id="btn-reservar-item" data-bs-toggle="modal" data-bs-target="#reserveModal" disabled>
             <i class="bi bi-bookmark-check"></i> Reservar este item
           </button>
 
@@ -534,6 +541,11 @@ const mockItems = [];
       if ($emoji.length) {
         $emoji.text($(this).data('emoji'));
       }
+    });
+  
+    $('#btn-reservar-item').prop('disabled', !$('#checkbox-habilitar-reserva').is(':checked'));
+    $(document).on('change', '#checkbox-habilitar-reserva', function () {
+      $('#btn-reservar-item').prop('disabled', !$(this).is(':checked'));
     });
   
     // ── Botão WhatsApp ───────────────────────────────────────

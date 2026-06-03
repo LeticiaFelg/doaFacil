@@ -96,8 +96,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     transition: all .2s;
     display: flex; align-items: center; gap: 5px;
 }
-.type-doador   { border-color: var(--green-pale); color: var(--green-pale); }
-.type-receptor { border-color: #FDE68A; color: #FDE68A; }
+.type-doador   { border-color: var(--green-pale); color: var(--green-deep); }
+.type-receptor { border-color: #FDE68A; color: #78350F; }
 .type-inst     { border-color: #A5D8FF; color: #A5D8FF; }
 .type-doador.active   { background: var(--green-pale); color: var(--green-deep); }
 .type-receptor.active { background: #FDE68A; color: #78350F; }
