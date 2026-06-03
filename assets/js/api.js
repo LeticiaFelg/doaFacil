@@ -10,7 +10,7 @@
 // ─── Configuração base ─────────────────────────────────────
 const DoaFacilAPI = (() => {
   // Troque pela URL do API Gateway após o deploy
-  const BASE_URL = window.API_BASE_URL || 'http://localhost:3000/api';
+  const BASE_URL = window.API_BASE_URL || 'http://localhost:5000/';
 
   /**
    * Retorna os headers padrão. Inclui Authorization se houver token salvo.
@@ -34,9 +34,12 @@ const DoaFacilAPI = (() => {
       data: data ? JSON.stringify(data) : null,
     }).fail((jqXHR) => {
       // Token expirado: redireciona para login
-      if (jqXHR.status === 401) {
+      const isAuthAttempt = endpoint === '/users/login' || endpoint === '/users/register';
+      if (jqXHR.status === 401 && !isAuthAttempt) {
         localStorage.removeItem('doafacil_token');
         localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
         window.location.href = '/pages/login.html';
       }
     });
@@ -49,9 +52,11 @@ const DoaFacilAPI = (() => {
      * @param {{ name, email, password, phone, address, profileType }} data
      */
     register(data) {
-      return _request('POST', '/users/register', data).done(({ user, token }) => {
-        localStorage.setItem('doafacil_token', token);
+      return _request('POST', '/users/register', data).done(({ user, token, access_token }) => {
+        localStorage.setItem('doafacil_token', token || access_token);
         localStorage.setItem('doafacil_user', JSON.stringify(user));
+        localStorage.setItem('doafacil_current_user', JSON.stringify(user));
+        localStorage.removeItem('doafacil_fallback_session');
       });
     },
 
@@ -60,25 +65,48 @@ const DoaFacilAPI = (() => {
      * @param {{ email, password }} credentials
      */
     login(credentials) {
-      return _request('POST', '/users/login', credentials).done(({ user, token }) => {
-        localStorage.setItem('doafacil_token', token);
+      return _request('POST', '/users/login', credentials).done(({ user, token, access_token }) => {
+        localStorage.setItem('doafacil_token', token || access_token);
         localStorage.setItem('doafacil_user', JSON.stringify(user));
+        localStorage.setItem('doafacil_current_user', JSON.stringify(user));
+        localStorage.removeItem('doafacil_fallback_session');
       });
     },
 
     logout() {
-      localStorage.removeItem('doafacil_token');
-      localStorage.removeItem('doafacil_user');
-      window.location.href = '/pages/login.html';
+      return _request('POST', '/users/logout').always(() => {
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
+        window.location.href = '/pages/login.html';
+      });
     },
 
     isLoggedIn() {
       return !!localStorage.getItem('doafacil_token');
     },
 
+    isFallbackSession() {
+      return localStorage.getItem('doafacil_fallback_session') === 'true';
+    },
+
+    hasRealSession() {
+      return this.isLoggedIn() && !this.isFallbackSession();
+    },
+
     getCurrentUser() {
       const raw = localStorage.getItem('doafacil_user');
       return raw ? JSON.parse(raw) : null;
+    },
+
+    deleteAccount() {
+      return _request('DELETE', '/users/me').always(() => {
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
+      });
     },
   };
 
@@ -98,24 +126,51 @@ const DoaFacilAPI = (() => {
     },
     listMine()           { return _request('GET',    '/items/my');    },
     getById(id)          { return _request('GET',    `/items/${id}`); },
+    getByCategory(category) { return _request('GET', `/items/category/${category}`); },
+    getWhatsAppContact(id) { return _request('POST', `/items/${id}/contact/whatsapp`); },
     create(data)         { return _request('POST',   '/items', data); },
+    createWithImages(formData) {
+      const headers = {};
+      const token = localStorage.getItem('doafacil_token');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      return $.ajax({
+        url: `${BASE_URL}/items`,
+        method: 'POST',
+        headers,
+        data: formData,
+        processData: false,
+        contentType: false
+      });
+    },
     update(id, data)     { return _request('PUT',    `/items/${id}`, data); },
     delete(id)           { return _request('DELETE', `/items/${id}`); },
   };
 
   // ── Reservas ─────────────────────────────────────────────
   const Reservations = {
-    create(itemId)         { return _request('POST',  '/reservations', { itemId }); },
+    create(itemId, message = '') {
+      return _request('POST', '/reservations', { itemId, message });
+    },
     getReceived()          { return _request('GET',   '/reservations/received'); },
     getDonated()           { return _request('GET',   '/reservations/donated'); },
     getById(id)            { return _request('GET',   `/reservations/${id}`); },
+    complete(id)           { return _request('PUT',   `/reservations/${id}/complete`); },
+    cancel(id)             { return _request('PUT',   `/reservations/${id}/cancel`); },
     updateStatus(id, status) {
       return _request('PATCH', `/reservations/${id}/status`, { status });
     },
   };
 
-  return { Auth, Users, Items, Reservations };
+  // â”€â”€ HistÃ³rico â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const History = {
+    getMine() { return _request('GET', '/history/my'); },
+  };
+
+  return { Auth, Users, Items, Reservations, History };
 })();
+
+window.DoaFacilAPI = DoaFacilAPI;
 
 // ─── Exemplos de uso (jQuery) nos HTMLs ────────────────────
 //

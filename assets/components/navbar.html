@@ -1,46 +1,75 @@
 <nav class="top-nav">
 
   <a class="brand" href="../index.html">
-    <div class="brand-icon">🌿</div>
+    <img src="../assets/img/Logo.jpeg" alt="Logo DoaFácil" class="brand-logo">
     <span class="brand-name">DoaFácil</span>
   </a>
 
-  <div class="nav-links">
-
+  <!-- Desktop nav links (hidden on tablet/mobile) -->
+  <div class="nav-links-desktop">
     <a class="nav-link-btn" href="../index.html">
       <i class="bi bi-grid"></i> Home
     </a>
-
     <a class="nav-link-btn" href="../pages/perfil.html">
       <i class="bi bi-person"></i> Perfil
     </a>
-
     <a class="nav-link-btn" href="../pages/historico.html">
       <i class="bi bi-clock-history"></i> Histórico
     </a>
+  </div>
 
+  <div class="nav-actions">
     <button id="doarBtn" class="impact-toggle-btn">
       <i class="bi bi-gift"></i> Doar
     </button>
 
-    <!-- Mobile impact toggle 
-    <button
-      class="impact-toggle-btn impact-toggle-btn-mobile"
-      data-bs-toggle="offcanvas"
-      data-bs-target="#impactOffcanvas"
-    >
-      <i class="bi bi-graph-up"></i> Impacto
-    </button>-->
+    <!-- Menu hamburger (visible on tablet/mobile) -->
+    <button class="nav-menu-btn" data-bs-toggle="offcanvas" data-bs-target="#navOffcanvas" aria-controls="navOffcanvas">
+      <i class="bi bi-list"></i>
+    </button>
 
     <a href="../pages/perfil.html" style="text-decoration:none">
       <div class="nav-avatar">👤</div>
     </a>
-
   </div>
 
 </nav>
 
-<div id="doarModal" class="modal" aria-hidden="true">
+<!-- Offcanvas Menu (Mobile/Tablet) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="navOffcanvas" aria-labelledby="navOffcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="navOffcanvasLabel">Menu</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="offcanvas-nav">
+      <a class="offcanvas-nav-link" href="../index.html" data-bs-dismiss="offcanvas">
+        <i class="bi bi-grid"></i> Home
+      </a>
+      <a class="offcanvas-nav-link" href="../pages/perfil.html" data-bs-dismiss="offcanvas">
+        <i class="bi bi-person"></i> Perfil
+      </a>
+      <a class="offcanvas-nav-link" href="../pages/historico.html" data-bs-dismiss="offcanvas">
+        <i class="bi bi-clock-history"></i> Histórico
+      </a>
+      <hr style="margin: 16px 0; border: none; border-top: 1px solid var(--cream-dark);">
+      <div style="padding: 0 12px; color: var(--text-muted); font-size: .82rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px;">
+        Informações
+      </div>
+      <a class="offcanvas-nav-link" href="#" data-info-modal="sobre">
+        <i class="bi bi-info-circle"></i> Sobre
+      </a>
+      <a class="offcanvas-nav-link" href="#" data-info-modal="faq">
+        <i class="bi bi-question-circle"></i> FAQ
+      </a>
+      <a class="offcanvas-nav-link" href="#" data-info-modal="contato">
+        <i class="bi bi-envelope"></i> Contato
+      </a>
+    </div>
+  </div>
+</div>
+
+<div id="doarModal" class="modal custom-modal" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
       <h2>Cadastrar Item para Doação</h2>
@@ -65,11 +94,18 @@
           <option value="escolar">Escolar</option>
           <option value="utensilios">Utensílios</option>
           <option value="brinquedos">Brinquedos</option>
+          <option value="outros">Outros</option>
         </select>
       </div>
       <div class="form-group">
+        <label for="itemImages">Fotos do item</label>
+        <input type="file" id="itemImages" name="images" accept="image/*" multiple>
+        <small style="display:block;margin-top:.35rem;color:var(--text-muted);font-size:.82rem;">Máximo 3 imagens.</small>
+      </div>
+      <div class="form-group">
         <label for="itemDescricao">Descrição</label>
-        <textarea id="itemDescricao" name="descricao" rows="4" placeholder="Descreva o estado, características e detalhes do item..."></textarea>
+        <textarea id="itemDescricao" name="descricao" rows="4" maxlength="1000" placeholder="Descreva o estado, características e detalhes do item..."></textarea>
+        <small class="char-counter" data-counter-for="itemDescricao">0/1000 caracteres</small>
       </div>
       <div class="form-group">
         <label for="itemCondicao">Condição *</label>
@@ -81,8 +117,36 @@
         </select>
       </div>
       <div class="form-group">
-        <label for="itemLocalizacao">Localização *</label>
-        <input type="text" id="itemLocalizacao" name="localizacao" placeholder="Bairro e Cidade" required>
+        <label for="itemDimensoes">Dimensões</label>
+        <input type="text" id="itemDimensoes" name="dimensoes" placeholder="Ex: 220 x 85 x 90 cm">
+      </div>
+      <div class="form-group">
+        <label for="itemMaterial">Material</label>
+        <input type="text" id="itemMaterial" name="material" placeholder="Ex: Madeira / Tecido">
+      </div>
+      <div class="form-group">
+        <label for="itemCor">Cor</label>
+        <input type="text" id="itemCor" name="cor" placeholder="Ex: Cinza claro">
+      </div>
+      <div class="form-group">
+        <label for="itemRetirada">Retirada</label>
+        <input type="text" id="itemRetirada" name="retirada" placeholder="Ex: A combinar, Retirar no local">
+      </div>
+      <div class="form-group">
+        <label for="itemRua">Rua *</label>
+        <input type="text" id="itemRua" name="rua" placeholder="Nome da rua" required>
+      </div>
+      <div class="form-group">
+        <label for="itemNumero">Número *</label>
+        <input type="text" id="itemNumero" name="numero" placeholder="Número" required>
+      </div>
+      <div class="form-group">
+        <label for="itemBairro">Bairro *</label>
+        <input type="text" id="itemBairro" name="bairro" placeholder="Bairro" required>
+      </div>
+      <div class="form-group">
+        <label for="itemCidade">Cidade *</label>
+        <input type="text" id="itemCidade" name="cidade" placeholder="Cidade" required>
       </div>
       <button type="submit" class="btn-submit">Cadastrar Item</button>
     </form>
