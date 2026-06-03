@@ -67,15 +67,15 @@
             </div>
             <div class="spec-item">
               <div class="s-label">Material</div>
-              <div class="s-value">Tecido / Madeira</div>
+              <div class="s-value" id="spec-material">Tecido / Madeira</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Cor</div>
-              <div class="s-value">Cinza claro</div>
+              <div class="s-value" id="spec-color">Cinza claro</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Retirada</div>
-              <div class="s-value">A combinar</div>
+              <div class="s-value" id="spec-pickup">A combinar</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Publicado em</div>
@@ -229,7 +229,8 @@
     updateReservationMessageCounter();
   
     // ── Dados mockados ──────────────────────────────────────
-    const mockItems = [
+    /* LEGACY MOCK migrado para node/src/seed/demoData.js. Mantido somente para consulta.
+const mockItems = [
       { id: 1, title: 'Sofá de 3 lugares',      category: 'moveis',     categoryLabel: 'Móveis',     image: '../assets/img/items/item1.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: 'Sofá em tecido cinza, leve desgaste nos braços, estrutura firme.',          location: 'Ipanema, RJ', generalMapsQuery: 'Ipanema,+Rio+de+Janeiro', fullAddress: 'Rua Nascimento Silva 107, Ipanema, Rio de Janeiro', mapAddress: 'Rua+Nascimento+Silva+107,+Ipanema,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22421-000', donor: 'Maria Clara Souza',    donorRecurrent: true  },
       { id: 2, title: 'Guarda-roupa 4 portas',  category: 'moveis',     categoryLabel: 'Móveis',     image: '../assets/img/items/item2.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: 'Madeira clara, espelho interno, sem trincas.',                              location: 'Urca, RJ',   generalMapsQuery: 'Urca,+Rio+de+Janeiro', fullAddress: 'Av. Pasteur 520, Urca, Rio de Janeiro', mapAddress: 'Av.+Pasteur+520,+Urca,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22290-240', donor: 'João P.',     donorRecurrent: false },
       { id: 3, title: 'Micro-ondas 30L',        category: 'eletro',     categoryLabel: 'Eletro',     image: '../assets/img/items/item3.jpg', condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Funcionando perfeitamente, acompanha prato giratório.',                     location: 'Tijuca, RJ',     generalMapsQuery: 'Tijuca,+Rio+de+Janeiro', fullAddress: 'Rua Barão de Mesquita 1200, Tijuca, Rio de Janeiro', mapAddress: 'Rua+Barão+de+Mesquita+1200,+Tijuca,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+20540-003', donor: 'Maria Clara Souza',      donorRecurrent: true  },
@@ -243,8 +244,32 @@
       { id:11, title: 'Geladeira 280L',         category: 'eletro',     categoryLabel: 'Eletro',     image: '../assets/img/items/item11.jpg', condition: 'usado',  condLabel: 'Usado',        desc: 'Funciona bem, pequenas marcas externas.',                                   location: 'Flamengo, RJ',   generalMapsQuery: 'Flamengo,+Rio+de+Janeiro', fullAddress: 'Rua Fernando Osório 68, Flamengo, Rio de Janeiro', mapAddress: 'Rua+Fernando+Osorio+68,+Flamengo,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22210-030', donor: 'Hugo S.',     donorRecurrent: true  },
       { id:12, title: 'Mochila escolar',        category: 'escolar',    categoryLabel: 'Escolar',    image: '../assets/img/items/item12.jpg', condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Nova, nunca usada, tamanho médio.',                                         location: 'Santa Cruz, RJ', generalMapsQuery: 'Santa+Cruz,+Rio+de+Janeiro', fullAddress: 'Av. Santa Cruz 1500, Santa Cruz, Rio de Janeiro', mapAddress: 'Av.+Santa+Cruz+1500,+Santa+Cruz,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+23565-250', donor: 'Olivia C.',   donorRecurrent: false },
     ];
+*/
+const mockItems = [];
 
     let currentItem = null;
+    const categoryLabels = {
+      moveis: 'Moveis',
+      eletro: 'Eletro',
+      roupas: 'Roupas',
+      calcados: 'Calcados',
+      utensilios: 'Utensilios',
+      escolar: 'Escolar',
+      brinquedos: 'Brinquedos',
+      outros: 'Outros'
+    };
+    const conditionLabels = {
+      otimo: 'Otimo',
+      bom: 'Bom estado',
+      usado: 'Usado'
+    };
+    const statusLabels = {
+      disponivel: 'Disponivel',
+      reservado: 'Reservado',
+      concluido: 'Concluido',
+      cancelado: 'Cancelado',
+      indisponivel: 'Indisponivel'
+    };
 
     // ── Helper: monta iframe do Google Maps ─────────────────
     function buildMapIframe(address, title) {
@@ -260,7 +285,183 @@
   
     // ── Carrega os dados do item conforme ?id= na URL ────────
     // Substitui: loadItem() com document.getElementById x10 + document.querySelector
-    function loadItem() {
+    function getApiOrigin() {
+      return (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+    }
+
+    function resolveImage(image) {
+      if (!image) return '';
+      if (image.startsWith('./assets/')) return `.${image}`;
+      if (image.startsWith('/uploads')) return `${getApiOrigin()}${image}`;
+      return image;
+    }
+
+    function getItemImage(item) {
+      if (Array.isArray(item.images) && item.images.length) {
+        return resolveImage(item.images[0]);
+      }
+
+      return resolveImage(item.image || '');
+    }
+
+    function normalizeApiItem(item) {
+      const category = item.category || 'outros';
+      const condition = item.condition || 'bom';
+      const address = item.address || {};
+      const location = item.location || item.donor?.location || '';
+      const exactAddress = [
+        address.street,
+        address.number,
+        address.neighborhood,
+        address.city
+      ].filter(Boolean).join(', ') || location;
+
+      return {
+        id: item.id,
+        title: item.title || 'Item sem titulo',
+        category,
+        categoryLabel: categoryLabels[category] || category,
+        image: getItemImage(item),
+        images: item.images || [],
+        condition,
+        condLabel: conditionLabels[condition] || condition,
+        desc: item.description || item.desc || '',
+        location,
+        generalMapsQuery: location,
+        fullAddress: exactAddress,
+        mapAddress: exactAddress,
+        dimensions: item.dimensions || '',
+        material: item.material || '',
+        color: item.color || '',
+        pickup: item.pickup || '',
+        donor: item.donor?.name || item.donor || 'Doador',
+        donorRecurrent: Boolean(item.donorRecurrent || item.donor?.verified),
+        status: item.status || 'disponivel',
+        emoji: item.emoji || '📦'
+      };
+    }
+
+    function getCachedSelectedItem(itemId) {
+      try {
+        const cachedItem = JSON.parse(sessionStorage.getItem('doafacil_selected_item') || 'null');
+        if (cachedItem && Number(cachedItem.id) === Number(itemId)) {
+          return normalizeApiItem(cachedItem);
+        }
+      } catch (error) {
+        sessionStorage.removeItem('doafacil_selected_item');
+      }
+
+      return null;
+    }
+
+    function buildMissingItem(itemId) {
+      return {
+        id: itemId,
+        title: 'Item nao encontrado',
+        category: 'outros',
+        categoryLabel: 'Item',
+        image: '',
+        images: [],
+        condition: 'bom',
+        condLabel: 'Indisponivel',
+        desc: 'Nao foi possivel carregar os dados deste item. Verifique se a API esta rodando e tente atualizar a pagina.',
+        location: '',
+        generalMapsQuery: '',
+        fullAddress: '',
+        mapAddress: '',
+        dimensions: '',
+        material: '',
+        color: '',
+        pickup: '',
+        donor: 'Doador',
+        donorRecurrent: false,
+        status: 'indisponivel',
+        emoji: '📦'
+      };
+    }
+
+    function setReservationState(item) {
+      const status = item.status || 'disponivel';
+
+      if (status === 'disponivel') {
+        $('.status-pill')
+          .addClass('status-available')
+          .removeAttr('style')
+          .html('<i class="bi bi-check-circle-fill"></i> Disponivel');
+
+        $('#btn-reserve-action')
+          .html('<i class="bi bi-bookmark-check"></i> Reservar este item')
+          .removeAttr('disabled')
+          .removeAttr('aria-disabled')
+          .attr('data-bs-toggle', 'modal')
+          .attr('data-bs-target', '#reserveModal')
+          .removeClass('disabled')
+          .css({ background: '', color: '', 'pointer-events': '' });
+        return;
+      }
+
+      const styles = {
+        reservado: { background: '#FFF3CD', color: '#856404' },
+        concluido: { background: '#D4EDD0', color: '#2D5A27' },
+        cancelado: { background: '#F8D7DA', color: '#842029' },
+        indisponivel: { background: '#F8D7DA', color: '#842029' }
+      };
+      const style = styles[status] || styles.reservado;
+
+      $('.status-pill')
+        .removeClass('status-available')
+        .css(style)
+        .html(`<i class="bi bi-hourglass-split"></i> ${statusLabels[status] || status}`);
+
+      $('#btn-reserve-action')
+        .html(`<i class="bi bi-bookmark-check"></i> Item ${statusLabels[status] || status}`)
+        .css({ ...style, 'pointer-events': 'none' })
+        .attr('disabled', 'disabled')
+        .attr('aria-disabled', 'true')
+        .removeAttr('data-bs-toggle')
+        .removeAttr('data-bs-target')
+        .addClass('disabled');
+    }
+
+    function renderItem(item) {
+      currentItem = item;
+
+      $('#breadcrumb-category').text(item.categoryLabel);
+      $('#breadcrumb-title').text(item.title);
+
+      if (item.image) {
+        $('#gallery-visual').html(`<img id="gallery-img" src="${item.image}" alt="${item.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`);
+      } else {
+        $('#gallery-visual').html(`<span id="gallery-emoji" style="font-size:4rem;">${item.emoji}</span>`);
+      }
+
+      $('#item-desc-main').text(item.desc);
+      $('#item-desc-extra').text(`${item.title} disponivel para retirada ${item.pickup || 'a combinar'}.`);
+
+      $('#spec-category').text(item.categoryLabel);
+      $('#spec-condition').text(item.condLabel);
+      $('.spec-item').eq(2).find('.s-value').text(item.dimensions || '-');
+      $('#spec-material').text(item.material || '-');
+      $('#spec-color').text(item.color || '-');
+      $('#spec-pickup').text(item.pickup || 'A combinar');
+
+      $('#item-location-name').text((item.location || '').split(',')[0] || 'Localizacao');
+      $('#item-location-sub').text(item.location || 'Localizacao nao informada');
+      $('#location-map').html(buildMapIframe(item.generalMapsQuery || item.location || '', 'Mapa da localizacao aproximada'));
+
+      $('#item-category-badge').text(item.categoryLabel);
+      $('#item-title-main').text(item.title);
+      $('#item-condition-text').text(item.condLabel);
+      $('#donor-name').text(item.donor);
+
+      $('#modal-item-emoji').text(item.emoji);
+      $('#modal-item-title').text(item.title);
+      $('#modal-item-sub').text(`${item.location || ''} · ${item.condLabel}`);
+
+      setReservationState(item);
+    }
+
+    function loadMockItem() {
       const params = new URLSearchParams(window.location.search);
       const itemId = Number(params.get('id')) || 1;
       const item   = mockItems.find(i => i.id === itemId) || mockItems[0];
@@ -301,8 +502,27 @@
       $('#modal-item-sub').text(`${item.location} · ${item.condLabel}`);
     }
   
+    function loadItemFromApi() {
+      const params = new URLSearchParams(window.location.search);
+      const itemId = Number(params.get('id')) || 1;
+      const fallbackItem = getCachedSelectedItem(itemId) || mockItems.find(i => i.id === itemId) || buildMissingItem(itemId);
+
+      if (!window.DoaFacilAPI?.Items?.getById) {
+        renderItem(fallbackItem);
+        return;
+      }
+
+      DoaFacilAPI.Items.getById(itemId)
+        .done(function (item) {
+          renderItem(normalizeApiItem(item));
+        })
+        .fail(function () {
+          renderItem(fallbackItem);
+        });
+    }
+
     // Substitui: window.addEventListener('load', loadItem)
-    $(window).on('load', loadItem);
+    $(window).on('load', loadItemFromApi);
   
     // ── Navegação da galeria por dots ────────────────────────
     // Substitui: switchImg() com querySelectorAll + classList + getElementById
