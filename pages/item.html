@@ -22,9 +22,9 @@
   <div class="breadcrumb-bar">
     <a href="../index.html">Feed</a>
     <i class="bi bi-chevron-right"></i>
-    <a href="#" id="breadcrumb-category">Móveis</a>
+    <a href="#" id="breadcrumb-category">-</a>
     <i class="bi bi-chevron-right"></i>
-    <span style="color:var(--text-dark)" id="breadcrumb-title">Sofá de 3 lugares</span>
+    <span style="color:var(--text-dark)" id="breadcrumb-title">-</span>
   </div>
 
   <div class="page-container">
@@ -42,10 +42,10 @@
         <div class="detail-card">
           <h3><i class="bi bi-card-text" style="color:var(--green-mid)"></i> Descrição</h3>
           <p id="item-desc-main" style="color:var(--text-muted);line-height:1.75;font-size:.92rem;">
-            Sofá de 3 lugares em tecido cinza, estrutura de madeira maçiça com pés em metal. Apresenta leve desgaste nos braços pelo uso diário, mas a estrutura e o assento estão em ótimas condições.
+            Carregando descrição...
           </p>
           <p id="item-desc-extra" style="color:var(--text-muted);line-height:1.75;font-size:.92rem;margin-top:10px;">
-            Perfeito para quem precisa de um sofá funcional para sala ou escritório. Disponível para retirada a combinar. Levo até o térreo do prédio.
+            Carregando detalhes...
           </p>
         </div>
 
@@ -55,35 +55,35 @@
           <div class="specs-grid">
             <div class="spec-item">
               <div class="s-label">Categoria</div>
-              <div class="s-value" id="spec-category">🪑 Móveis</div>
+              <div class="s-value" id="spec-category">-</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Estado</div>
-              <div class="s-value" id="spec-condition">Bom estado</div>
+              <div class="s-value" id="spec-condition">-</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Dimensões</div>
-              <div class="s-value">220 × 85 × 90 cm</div>
+              <div class="s-value">-</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Material</div>
-              <div class="s-value" id="spec-material">Tecido / Madeira</div>
+              <div class="s-value" id="spec-material">-</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Cor</div>
-              <div class="s-value" id="spec-color">Cinza claro</div>
+              <div class="s-value" id="spec-color">-</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Retirada</div>
-              <div class="s-value" id="spec-pickup">A combinar</div>
+              <div class="s-value" id="spec-pickup">-</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Publicado em</div>
-              <div class="s-value">19 mai. 2026</div>
+              <div class="s-value" id="spec-published">-</div>
             </div>
             <div class="spec-item">
               <div class="s-label">Visualizações</div>
-              <div class="s-value">48 visitas</div>
+              <div class="s-value" id="spec-views">-</div>
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@
           <h3 id="location-title"><i class="bi bi-map" style="color:var(--green-mid)"></i> Localização aproximada</h3>
           <div id="location-map" style="background:var(--cream-dark);border-radius:14px;height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-muted);overflow:hidden;">
             <i class="bi bi-geo-alt" style="font-size:2.5rem;color:var(--green-light)"></i>
-            <div style="font-weight:600;font-size:.95rem;">Copacabana, Rio de Janeiro – RJ</div>
+            <div style="font-weight:600;font-size:.95rem;" id="item-location-name">Carregando localização...</div>
             <div style="font-size:.8rem;">Endereço exato informado após reserva</div>
           </div>
         </div>
@@ -101,23 +101,8 @@
         <!-- Related -->
         <div class="detail-card">
           <h3><i class="bi bi-grid" style="color:var(--green-mid)"></i> Itens relacionados</h3>
-          <div class="related-scroll">
-            <a class="related-card" href="#">
-              <div class="rel-img">🪑</div>
-              <div class="rel-body"><div class="rel-title">Mesa escritório</div><div class="rel-location">Centro, RJ</div></div>
-            </a>
-            <a class="related-card" href="#">
-              <div class="rel-img">🛏️</div>
-              <div class="rel-body"><div class="rel-title">Cama solteiro</div><div class="rel-location">Bonsucesso</div></div>
-            </a>
-            <a class="related-card" href="#">
-              <div class="rel-img">🪟</div>
-              <div class="rel-body"><div class="rel-title">Guarda-roupa</div><div class="rel-location">Botafogo</div></div>
-            </a>
-            <a class="related-card" href="#">
-              <div class="rel-img">🪴</div>
-              <div class="rel-body"><div class="rel-title">Prateleiras</div><div class="rel-location">Tijuca</div></div>
-            </a>
+          <div class="related-scroll" id="related-items-container">
+            <div style="color:var(--text-muted);text-align:center;padding:20px;">Carregando itens relacionados...</div>
           </div>
         </div>
       </div>
@@ -127,21 +112,21 @@
 
         <!-- Main action card -->
         <div class="action-card">
-          <div class="item-category-badge" id="item-category-badge">🪑 Móveis</div>
-          <h1 class="item-title-main" id="item-title-main">Sofá de 3 lugares</h1>
+          <div class="item-category-badge" id="item-category-badge">-</div>
+          <h1 class="item-title-main" id="item-title-main">Carregando item...</h1>
 
           <div class="condition-bar">
             <div class="cond-pip" style="background:#4A7C3F"></div>
-            <span class="cond-text" id="item-condition-text" style="color:var(--green-mid);">Bom estado</span>
+            <span class="cond-text" id="item-condition-text" style="color:var(--green-mid);">-</span>
           </div>
 
-          <span class="status-pill status-available"><i class="bi bi-check-circle-fill"></i> Disponível</span>
+          <span class="status-pill status-available" id="status-pill"><i class="bi bi-check-circle-fill"></i> Disponível</span>
 
           <div class="location-block">
             <div class="loc-icon">📍</div>
             <div>
-              <div class="loc-name" id="item-location-name">Copacabana</div>
-              <div class="loc-sub" id="item-location-sub">Rio de Janeiro – RJ · aprox. 2.3 km</div>
+              <div class="loc-name" id="item-location-name">-</div>
+              <div class="loc-sub" id="item-location-sub">-</div>
             </div>
           </div>
 
@@ -152,7 +137,7 @@
             </label>
           </div>
 
-          <button class="btn-reserve" id="btn-reservar-item" data-bs-toggle="modal" data-bs-target="#reserveModal" disabled>
+          <button class="btn-reserve" id="btn-reserve-action" data-bs-toggle="modal" data-bs-target="#reserveModal" disabled>
             <i class="bi bi-bookmark-check"></i> Reservar este item
           </button>
 
@@ -164,11 +149,11 @@
 
         <!-- Donor card -->
         <div class="donor-card">
-          <div class="donor-avatar" id="donor-avatar">👩‍💼</div>
+          <div class="donor-avatar" id="donor-avatar">👤</div>
           <div class="donor-info">
-            <div class="d-name" id="donor-name">Maria Clara Souza</div>
-            <div class="d-sub" id="donor-donations">23 doações realizadas</div>
-            <div class="donor-recurrent" id="donor-recurrent">⭐ Doadora Recorrente</div>
+            <div class="d-name" id="donor-name">-</div>
+            <div class="d-sub" id="donor-donations">-</div>
+            <div class="donor-recurrent" id="donor-recurrent">-</div>
           </div>
         </div>
 
@@ -186,10 +171,10 @@
         </div>
         <div class="modal-body">
           <div style="display:flex;align-items:center;gap:14px;background:var(--cream);border-radius:14px;padding:14px;margin-bottom:20px;">
-            <span id="modal-item-emoji" style="font-size:2.5rem">🛋️</span>
+            <span id="modal-item-emoji" style="font-size:2.5rem">📦</span>
             <div>
-              <div id="modal-item-title" style="font-weight:700">Sofá de 3 lugares</div>
-              <div id="modal-item-sub" style="font-size:.82rem;color:var(--text-muted)">Copacabana, RJ · Bom estado</div>
+              <div id="modal-item-title" style="font-weight:700">Carregando...</div>
+              <div id="modal-item-sub" style="font-size:.82rem;color:var(--text-muted)">-</div>
             </div>
           </div>
           <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:16px;">
