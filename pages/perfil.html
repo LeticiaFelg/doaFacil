@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Perfil</title>
+  <link rel="icon" type="image/png" href="../public/faveicon4.png">
   <link rel="stylesheet" href="../assets/css/perfil.css">
   <link rel="stylesheet" href="../assets/css/components/navbar.css">
   <link rel="stylesheet" href="../assets/css/components/footer.css">
+  <link rel="stylesheet" href="../assets/css/components/info-modals.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -27,8 +29,8 @@
         </div>
 
         <div class="hero-info">
-          <h1>Maria Clara Souza</h1>
-          <div class="location-line"><i class="bi bi-geo-alt"></i> Copacabana, Rio de Janeiro – RJ</div>
+          <h1 id="profileHeroName">Maria Clara Souza</h1>
+          <div class="location-line" id="profileHeroLocation"><i class="bi bi-geo-alt"></i> Copacabana, Rio de Janeiro – RJ</div>
 
           <!-- Multi-profile badges: click to switch view -->
           <div class="profile-badges" style="margin-top: 12px;">
@@ -36,7 +38,7 @@
             <button class="profile-type-badge type-receptor" data-profile="receptor">🏠 Receptora</button>
           </div>
 
-          <div class="join-date"><i class="bi bi-calendar3"></i> Membro desde março de 2024</div>
+          <div class="join-date" id="profileJoinDate"><i class="bi bi-calendar3"></i> Membro desde março de 2024</div>
         </div>
 
         <div class="hero-stats">
@@ -60,7 +62,7 @@
     <div class="profile-view active" id="view-doador">
 
       <!-- Recurrent badge -->
-      <div class="recurrent-banner">
+      <div class="recurrent-banner" id="recurrentBanner">
         <div class="rb-icon">⭐</div>
         <div class="rb-text">
           <h4>Doadora Recorrente</h4>
@@ -74,16 +76,17 @@
           <div class="section-card">
             <h3><i class="bi bi-person-lines-fill" style="color:var(--green-mid)"></i> Dados do doador</h3>
             <div class="info-grid">
-              <div class="info-item"><label>Nome</label><div class="value">Maria Clara Souza</div></div>
-              <div class="info-item"><label>E-mail</label><div class="value">maria@email.com</div></div>
-              <div class="info-item"><label>Bairro</label><div class="value">Copacabana</div></div>
-              <div class="info-item"><label>WhatsApp</label><div class="value">(21) 99812-3456</div></div>
-              <div class="info-item"><label>Tipo</label><div class="value">Pessoa Física</div></div>
-              <div class="info-item"><label>Status</label><div class="value" style="color:var(--green-mid);">✅ Verificado</div></div>
+              <div class="info-item"><label>Nome</label><div class="value" id="profileNameValue">Maria Clara Souza</div></div>
+              <div class="info-item"><label>E-mail</label><div class="value" id="profileEmailValue">maria@email.com</div></div>
+              <div class="info-item"><label>Telefone</label><div class="value" id="profilePhoneValue">(21) 99812-3456</div></div>
+              <div class="info-item"><label>Bairro</label><div class="value" id="profileNeighborhoodValue">Copacabana</div></div>
+              <div class="info-item"><label>CPF</label><div class="value" id="profileCpfValue">940.340.740-94</div></div>
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
               <button class="btn-edit"><i class="bi bi-pencil"></i> Editar perfil</button>
-              <button class="btn-whatsapp"><i class="bi bi-whatsapp"></i> Contato</button>
+              <button id="btn-logout" class="btn-edit" style="background:#F8F9FA;color:#212529;border:1px solid #CED4DA;"><i class="bi bi-box-arrow-right"></i> Sair</button>
+              <button id="btn-delete-account" class="btn-edit" style="background:#F8D7DA;color:#842029;border:1px solid #F5C2C7;"><i class="bi bi-trash"></i> Apagar conta</button>
+
             </div>
           </div>
         </div>
@@ -92,7 +95,7 @@
           <!-- Active donations -->
           <div class="section-card">
             <h3><i class="bi bi-box-seam" style="color:var(--green-mid)"></i> Doações ativas</h3>
-            <div class="mini-grid">
+            <div class="mini-grid" id="activeDonationsGrid">
               <div class="mini-card" data-href="item.html?id=1">
                 <div class="mini-img"><img src="../assets/img/items/item1.jpg" alt="Sofá 3 lugares" loading="lazy"></div>
                 <div class="mini-body">
@@ -131,9 +134,9 @@
           <div class="section-card">
             <h3><i class="bi bi-house-heart" style="color:var(--green-mid)"></i> Dados do receptor</h3>
             <div class="info-grid">
-              <div class="info-item"><label>Nome</label><div class="value">Maria Clara Souza</div></div>
+              <div class="info-item"><label>Nome</label><div class="value" id="profileReceptorNameValue">Maria Clara Souza</div></div>
               <div class="info-item"><label>Composição familiar</label><div class="value">4 pessoas</div></div>
-              <div class="info-item"><label>Bairro</label><div class="value">Copacabana</div></div>
+              <div class="info-item"><label>Bairro</label><div class="value" id="profileReceptorNeighborhoodValue">Copacabana</div></div>
               <div class="info-item"><label>Status de cadastro</label><div class="value" style="color:var(--green-mid);">✅ Verificado</div></div>
             </div>
           </div>
@@ -142,7 +145,7 @@
         <div class="col-12">
           <div class="section-card">
             <h3><i class="bi bi-clock-history" style="color:var(--green-mid)"></i> Itens recebidos recentemente</h3>
-            <div class="mini-grid">
+            <div class="mini-grid" id="receivedItemsGrid">
               <div class="mini-card">
                 <div class="mini-img"><img src="../assets/img/items/item5.jpg" alt="Mesa escritório" loading="lazy"></div>
                 <div class="mini-body">
@@ -174,6 +177,42 @@
     </div>
   </div><!-- end page-container -->
   <div id="footer"></div>
+
+  <div id="editProfileModal" class="modal custom-modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar perfil</h2>
+        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-description">
+        Atualize seus dados de contato e informações pessoais para manter seu perfil sempre correto.
+      </div>
+      <form id="editProfileForm" class="modal-form">
+        <div class="form-group">
+          <label for="profileName">Nome</label>
+          <input type="text" id="profileName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="profileEmail">E-mail</label>
+          <input type="email" id="profileEmail" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="profilePhone">Telefone</label>
+          <input type="text" id="profilePhone" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="profileNeighborhood">Bairro</label>
+          <input type="text" id="profileNeighborhood" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="profileCpf">CPF</label>
+          <input type="text" id="profileCpf" class="form-control" required>
+        </div>
+        <button type="submit" class="btn-submit">Salvar alterações</button>
+      </form>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/components/footer.js"></script>
@@ -183,7 +222,203 @@
   <script src="../assets/js/api.js"></script>
   <script>
     $(function () {
+      if (!DoaFacilAPI.Auth.hasRealSession()) {
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      function applyProfile(user) {
+        if (!user) return;
+
+        const location = user.bairro || user.location || '';
+        $('.hero-info h1').text(user.name || 'Usuário DoaFácil');
+        $('.location-line').html(`<i class="bi bi-geo-alt"></i> ${location || 'Localização não informada'}`);
+        $('#profileNameValue').text(user.name || '');
+        $('#profileEmailValue').text(user.email || '');
+        $('#profilePhoneValue').text(user.phone || '');
+        $('#profileNeighborhoodValue').text(location);
+        $('#profileCpfValue').text(user.cpf || '');
+
+        if (user.stats) {
+          $('.hero-stat').eq(0).find('.s-num').text(user.stats.donated || 0);
+          $('.hero-stat').eq(1).find('.s-num').text(user.stats.received || 0);
+        }
+      }
     
+      function applyProfile(user) {
+        if (!user) return;
+
+        const location = user.bairro || user.location || '';
+        const stats = user.stats || {};
+        const isRecurrent = Boolean(stats.is_recurrent);
+
+        $('.hero-info h1').text(user.name || 'Usuario DoaFacil');
+        $('.location-line').html(`<i class="bi bi-geo-alt"></i> ${location || 'Localizacao nao informada'}`);
+        $('#profileNameValue').text(user.name || '');
+        $('#profileEmailValue').text(user.email || '');
+        $('#profilePhoneValue').text(user.phone || '');
+        $('#profileNeighborhoodValue').text(location);
+        $('#profileCpfValue').text(user.cpf || '');
+        $('#profileReceptorNameValue').text(user.name || '');
+        $('#profileReceptorNeighborhoodValue').text(location || '-');
+
+        $('.hero-stat').eq(0).find('.s-num').text(stats.donated || 0);
+        $('.hero-stat').eq(1).find('.s-num').text(stats.received || 0);
+        $('.hero-stat').eq(2).find('.s-num').text(isRecurrent ? '⭐' : '-');
+
+        if (isRecurrent) {
+          $('#recurrentBanner').show();
+          $('#recurrentBanner .rb-text h4').text('Doador Recorrente');
+          $('#recurrentBanner .rb-text p').text(`${user.name || 'Este usuario'} ja doou varios itens. Obrigado por fazer a diferenca na comunidade!`);
+        } else {
+          $('#recurrentBanner').hide();
+        }
+      }
+
+      const statusLabels = {
+        disponivel: 'Disponivel',
+        reservado: 'Reservado',
+        concluido: 'Concluido',
+        cancelado: 'Cancelado',
+        pendente: 'Reservado',
+        confirmada: 'Reservado',
+        concluida: 'Recebido',
+        cancelada: 'Cancelado'
+      };
+
+      function normalizeImage(item) {
+        if (item && Array.isArray(item.images) && item.images.length) {
+          const apiOrigin = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+          const image = item.images[0];
+          if (image.startsWith('/uploads')) return `${apiOrigin}${image}`;
+          if (image.startsWith('../') || image.startsWith('./') || image.startsWith('http')) {
+            return image.startsWith('./') ? `.${image}` : image;
+          }
+          return `../${image}`;
+        }
+
+        const normalizedId = item && item.id ? ((Number(item.id) - 1) % 12) + 1 : 1;
+        return `../assets/img/items/item${normalizedId}.jpg`;
+      }
+
+      function emptyMiniCard(message) {
+        return `<div style="grid-column:1/-1;color:var(--text-muted);font-size:.9rem;padding:18px 4px;">${message}</div>`;
+      }
+
+      function renderDonationCard(item) {
+        const status = item.status || 'disponivel';
+        const statusClass = status === 'reservado' ? 's-reservado' : 's-disponivel';
+
+        return `
+          <div class="mini-card" data-href="item.html?id=${item.id}">
+            <div class="mini-img"><img src="${normalizeImage(item)}" alt="${item.title || 'Item'}" loading="lazy"></div>
+            <div class="mini-body">
+              <div class="mini-title">${item.title || 'Item sem titulo'}</div>
+              <span class="mini-status ${statusClass}">${statusLabels[status] || status}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderReceivedCard(reservation) {
+        const item = reservation.item || {};
+
+        return `
+          <div class="mini-card" data-href="item.html?id=${reservation.item_id || item.id}">
+            <div class="mini-img"><img src="${normalizeImage(item)}" alt="${item.title || 'Item'}" loading="lazy"></div>
+            <div class="mini-body">
+              <div class="mini-title">${item.title || 'Item recebido'}</div>
+              <span class="mini-status s-disponivel" style="background:#D4EDD0;color:#2D5A27">${statusLabels[reservation.status] || reservation.status || 'Recebido'}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderNewDonationCard() {
+        return `
+          <div class="mini-card" id="btn-nova-doacao" style="border:2px dashed var(--green-pale);display:flex;align-items:center;justify-content:center;flex-direction:column;height:120px;cursor:pointer;" >
+            <div style="font-size:1.6rem;color:var(--green-light)">＋</div>
+            <div style="font-size:.78rem;color:var(--text-muted);margin-top:4px">Nova doacao</div>
+          </div>
+        `;
+      }
+
+      function loadProfileLists() {
+        DoaFacilAPI.Items.listMine()
+          .done(function (response) {
+            const activeItems = (response.items || []).filter(function (item) {
+              return ['disponivel', 'reservado'].includes(item.status);
+            });
+            const cards = activeItems.map(renderDonationCard).join('');
+            $('#activeDonationsGrid').html((cards || emptyMiniCard('Nenhuma doacao ativa.')) + renderNewDonationCard());
+          })
+          .fail(function () {
+            $('#activeDonationsGrid').html(emptyMiniCard('Nao foi possivel carregar suas doacoes agora.') + renderNewDonationCard());
+          });
+
+        DoaFacilAPI.Reservations.getDonated()
+          .done(function (response) {
+            const received = (response.reservations || []).filter(function (reservation) {
+              return reservation.status === 'concluida';
+            });
+            $('#receivedItemsGrid').html(received.length ? received.map(renderReceivedCard).join('') : emptyMiniCard('Nenhum item recebido ainda.'));
+          })
+          .fail(function () {
+            $('#receivedItemsGrid').html(emptyMiniCard('Nao foi possivel carregar seus itens recebidos agora.'));
+          });
+      }
+
+      const STORAGE_USERS_KEY = 'doafacil_users';
+      const STORAGE_CURRENT_USER_KEY = 'doafacil_current_user';
+
+      function getCurrentUser() {
+        return JSON.parse(localStorage.getItem(STORAGE_CURRENT_USER_KEY) || 'null');
+      }
+
+      function saveCurrentUser(user) {
+        localStorage.setItem(STORAGE_CURRENT_USER_KEY, JSON.stringify(user));
+      }
+
+      function updateStoredUser(user) {
+        const users = JSON.parse(localStorage.getItem(STORAGE_USERS_KEY) || '[]');
+        const updated = users.map(u => u.email.toLowerCase() === user.email.toLowerCase() ? user : u);
+        localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(updated));
+      }
+
+      function loadCurrentUserProfile() {
+        const user = getCurrentUser();
+        if (!user) {
+          return;
+        }
+
+        $('#profileHeroName').text(user.name);
+        $('#profileHeroLocation').html(`<i class="bi bi-geo-alt"></i> ${user.bairro ? `${user.bairro}, ` : ''}Rio de Janeiro – RJ`);
+        $('#profileNameValue').text(user.name);
+        $('#profileEmailValue').text(user.email);
+        $('#profilePhoneValue').text(user.phone || '-');
+        $('#profileNeighborhoodValue').text(user.bairro || '-');
+        $('#profileCpfValue').text(user.cpf || '-');
+        $('#profileReceptorNameValue').text(user.name);
+        const joinDate = user.createdAt ? new Date(user.createdAt).toLocaleString('pt-BR', { month: 'long', year: 'numeric' }) : 'março de 2024';
+        $('#profileJoinDate').html(`<i class="bi bi-calendar3"></i> Membro desde ${joinDate}`);
+      }
+
+      loadCurrentUserProfile();
+
+
+      DoaFacilAPI.Users.getMe()
+        .done(function (user) {
+          applyProfile(user);
+          loadProfileLists();
+        })
+        .fail(function () {
+          window.location.href = 'login.html';
+        });
+
       // Troca de visão Doador / Receptor
       // Substitui: switchProfile() com querySelectorAll + classList
       $(document).on('click', '.profile-type-badge', function () {
@@ -203,7 +438,7 @@
     
       // Card "Nova doação"
       $(document).on('click', '#btn-nova-doacao', function () {
-        alert('Publicar novo item');
+        $('#doarModal').addClass('active');
       });
     
       // Botão "Solicitar perfil institucional"
@@ -211,15 +446,114 @@
         alert('Solicitar perfil institucional');
       });
 
+      $(document).on('click', '#btn-logout', function () {
+        localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_fallback_session');
+        window.location.href = 'login.html';
+      });
+
+      $(document).on('click', '#btn-delete-account', function () {
+        const currentUser = getCurrentUser();
+        if (!currentUser) return;
+
+        const confirmed = confirm('Tem certeza de que deseja apagar sua conta? Esta ação não pode ser desfeita.');
+        if (!confirmed) return;
+
+        const users = JSON.parse(localStorage.getItem(STORAGE_USERS_KEY) || '[]');
+        const remainingUsers = users.filter(u => u.email.toLowerCase() !== currentUser.email.toLowerCase());
+        localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(remainingUsers));
+
+        const reservations = JSON.parse(localStorage.getItem('doafacil_reservations') || '[]');
+        const remainingReservations = reservations.filter(r => r.receiverEmail.toLowerCase() !== currentUser.email.toLowerCase());
+        localStorage.setItem('doafacil_reservations', JSON.stringify(remainingReservations));
+
+        localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_fallback_session');
+        alert('Sua conta foi apagada com sucesso.');
+        window.location.href = 'login.html';
+      });
+
       // Botão Editar Perfil Centralizado
+
+      function fillProfileForm() {
+        $('#profileName').val($('#profileNameValue').text().trim());
+        $('#profileEmail').val($('#profileEmailValue').text().trim());
+        $('#profilePhone').val($('#profilePhoneValue').text().trim());
+        $('#profileNeighborhood').val($('#profileNeighborhoodValue').text().trim());
+        $('#profileCpf').val($('#profileCpfValue').text().trim());
+      }
+
+      function syncProfileValues() {
+        const name = $('#profileName').val().trim();
+        const bairro = $('#profileNeighborhood').val().trim();
+
+        $('#profileNameValue').text(name);
+        $('#profileEmailValue').text($('#profileEmail').val().trim());
+        $('#profilePhoneValue').text($('#profilePhone').val().trim());
+        $('#profileNeighborhoodValue').text(bairro);
+        $('#profileCpfValue').text($('#profileCpf').val().trim());
+        $('#profileHeroName').text(name);
+        $('#profileHeroLocation').html(`<i class="bi bi-geo-alt"></i> ${bairro ? `${bairro}, ` : ''}Rio de Janeiro – RJ`);
+        $('#profileReceptorNameValue').text(name);
+      }
+
+      const editProfileModal = document.getElementById('editProfileModal');
+      const editProfileClose = editProfileModal.querySelector('.modal-close');
+      const editProfileForm = document.getElementById('editProfileForm');
+
+      function openEditProfileModal() {
+        fillProfileForm();
+        editProfileModal.classList.add('active');
+        editProfileModal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeEditProfileModal() {
+        editProfileModal.classList.remove('active');
+        editProfileModal.setAttribute('aria-hidden', 'true');
+      }
+
       $(document).on('click', '.btn-edit', function (e) {
         e.preventDefault();
-        // Sem Ajax
-        alert('Falta função Ajax para envio do HTTP PUT.');
+        openEditProfileModal();
+      });
+
+      editProfileClose.addEventListener('click', closeEditProfileModal);
+      editProfileModal.addEventListener('click', function (e) {
+        if (e.target === editProfileModal) {
+          closeEditProfileModal();
+        }
+      });
+
+      $(document).on('submit', '#editProfileForm', function (e) {
+        e.preventDefault();
+        syncProfileValues();
+
+        const currentUser = getCurrentUser() || {};
+        const updatedUser = {
+          ...currentUser,
+          name: $('#profileName').val().trim(),
+          email: $('#profileEmail').val().trim(),
+          phone: $('#profilePhone').val().trim(),
+          bairro: $('#profileNeighborhood').val().trim(),
+          cpf: $('#profileCpf').val().trim(),
+        };
+
+        saveCurrentUser(updatedUser);
+        updateStoredUser(updatedUser);
+
+        closeEditProfileModal();
+        alert('Perfil atualizado com sucesso!');
+
+        closeEditProfileModal();
+        alert('Perfil atualizado com sucesso!');
+
       });
     
     });
 </script>
 </body>
 </html>
-

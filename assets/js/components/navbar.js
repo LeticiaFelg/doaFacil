@@ -1,10 +1,24 @@
 const navbarPath = window.location.pathname.includes('/pages/') ? '../assets/components/navbar.html' : './assets/components/navbar.html';
+const authReady = window.DoaFacilHomeAuthReady || Promise.resolve();
 
-fetch(navbarPath)
-  .then(response => response.text())
+authReady
+  .then(() => $.get(navbarPath))
   .then(data => {
+    $('#navbar').html(data);
 
-    document.getElementById('navbar').innerHTML = data;
+    function getCurrentUser() {
+      return JSON.parse(localStorage.getItem('doafacil_current_user') || 'null');
+    }
+
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      const avatar = document.querySelector('.nav-avatar');
+      if (avatar) {
+        const initials = currentUser.name.split(' ').slice(0, 2).map(part => part[0]).join('').toUpperCase();
+        avatar.textContent = initials || '👤';
+        avatar.title = currentUser.name;
+      }
+    }
 
     // Detecta página atual
     const currentPage = window.location.pathname.split("/").pop();
@@ -28,5 +42,14 @@ fetch(navbarPath)
       }
 
     });
+
+    const infoModalsScriptPath = window.location.pathname.includes('/pages/')
+      ? '../assets/js/components/info-modals.js'
+      : './assets/js/components/info-modals.js';
+
+    if (!window.DoaFacilInfoModalsLoading) {
+      window.DoaFacilInfoModalsLoading = true;
+      $.getScript(infoModalsScriptPath);
+    }
 
   });

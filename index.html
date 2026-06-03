@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DoaFácil – Feed</title>
+  <link rel="icon" type="image/png" href="./public/faveicon4.png">
   <link rel="stylesheet" href="./assets/css/index.css">
   <link rel="stylesheet" href="./assets/css/components/footer.css">
   <link rel="stylesheet" href="./assets/css/components/navbar.css">
+  <link rel="stylesheet" href="./assets/css/components/info-modals.css">
   <link rel="stylesheet" href="./assets/css/components/heroCarousel.css">
   <link rel="stylesheet" href="./assets/css/components/featuredCarousel.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
@@ -15,13 +17,10 @@
 </head>
 <body>
 
-  <!-- TOP NAV -->
   <div id="navbar"></div>
 
-  <!-- HERO CAROUSEL -->
   <section id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
-      <!-- Adicionando suporte a arraste via JS -->
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -35,7 +34,7 @@
       <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
     </div>
     <div class="carousel-inner">
-      <div class="carousel-item active hero-overlay">
+      <div class="carousel-item hero-carousel-item active hero-overlay">
         <img src="./assets/img/image-1.webp" alt="Doação de alimentos">
         <div class="container h-100 d-flex align-items-center hero-content">
           <div class="text-white">
@@ -44,7 +43,7 @@
           </div>
         </div>
       </div>
-      <div class="carousel-item hero-overlay">
+      <div class="carousel-item hero-carousel-item hero-overlay">
         <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=1600" alt="Crianças sorrindo">
         <div class="container h-100 d-flex align-items-center hero-content">
           <div class="text-white">
@@ -53,7 +52,7 @@
           </div>
         </div>
       </div>
-      <div class="carousel-item hero-overlay">
+      <div class="carousel-item hero-carousel-item hero-overlay">
         <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=1600" alt="Mãos dadas">
         <div class="container h-100 d-flex align-items-center hero-content">
           <div class="text-white">
@@ -68,7 +67,7 @@
   <main class="main-layout">
 
     <!-- Impact Panel -->
-    <section class="impact-section">
+    <section id="impact-section" class="impact-section">
       <div class="impact-panel impact-horizontal">
         <h3><i class="bi bi-bar-chart-fill"></i> Impacto Social</h3>
 
@@ -156,7 +155,7 @@
     </aside>
 
     <!-- FEED -->
-    <div class="feed-area">
+    <div class="feed-area" id="feed-area">
       <div class="feed-header">
         <h2>Itens disponíveis</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -241,33 +240,149 @@
         </div>
       </div>
     </div>
+  <script src="./assets/js/config.js"></script>
+  <script>
+    window.DoaFacilHomeAuthReady = (function () {
+      const apiBase = window.API_BASE_URL || 'http://localhost:5000/api';
+      const fallbackMaria = {
+        id: 1,
+        name: 'Maria Clara Souza',
+        email: 'maria.clara@example.com',
+        avatar: 'MC',
+        roles: ['doador', 'receptor']
+      };
+
+      function clearStoredSession() {
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
+      }
+
+      function clearFallbackSession() {
+        if (localStorage.getItem('doafacil_fallback_session') === 'true') {
+          clearStoredSession();
+        }
+      }
+
+      function hasRealSession() {
+        return localStorage.getItem('doafacil_token') &&
+          localStorage.getItem('doafacil_fallback_session') !== 'true';
+      }
+
+      function enableFallbackSession() {
+        if (hasRealSession()) return;
+
+        localStorage.setItem('doafacil_current_user', JSON.stringify(fallbackMaria));
+        localStorage.setItem('doafacil_user', JSON.stringify(fallbackMaria));
+        localStorage.setItem('doafacil_token', 'mock-maria-clara');
+        localStorage.setItem('doafacil_fallback_session', 'true');
+      }
+
+      return fetch(`${apiBase}/health`, { cache: 'no-store' })
+        .then(function (response) {
+          if (!response.ok) throw new Error('API indisponivel');
+          clearFallbackSession();
+        })
+        .catch(enableFallbackSession);
+    })();
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="./assets/js/components/footer.js"></script>
   <script src="./assets/js/components/navbar.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <script src="./assets/js/modal.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="./assets/js/config.js"></script>
   <script src="./assets/js/api.js"></script>
   <script>
     $(function () {
       // ── Dados mockados (remover quando a API estiver conectada) ──
-      const mockItems = [
-        { id: 1, title: 'Sofá de 3 lugares', category: 'moveis', categoryLabel: 'Móveis', emoji: '🛋️', condition: 'bom', condLabel: 'Bom estado', desc: 'Sofá em tecido cinza, leve desgaste nos braços.', location: 'Copacabana, RJ', donor: 'Maria S.', donorRecurrent: true },
-        { id: 2, title: 'Guarda-roupa 4 portas', category: 'moveis', categoryLabel: 'Móveis', emoji: '🪟', condition: 'bom', condLabel: 'Bom estado', desc: 'Madeira clara, espelho interno, sem trincas.', location: 'Botafogo, RJ', donor: 'João P.', donorRecurrent: false },
-        { id: 3, title: 'Micro-ondas 30L', category: 'eletro', categoryLabel: 'Eletro', emoji: '📱', condition: 'otimo', condLabel: 'Ótimo', desc: 'Funcionando perfeitamente, acompanha prato giratório.', location: 'Tijuca, RJ', donor: 'Ana C.', donorRecurrent: true },
-        { id: 4, title: 'Kit roupas infantis', category: 'roupas', categoryLabel: 'Roupas', emoji: '👕', condition: 'otimo', condLabel: 'Ótimo', desc: 'Tamanhos 4 a 8 anos, várias peças, bem conservadas.', location: 'Méier, RJ', donor: 'Carlos M.', donorRecurrent: true },
-        { id: 5, title: 'Mesa de escritório', category: 'moveis', categoryLabel: 'Móveis', emoji: '🪑', condition: 'usado', condLabel: 'Usado', desc: 'Mesa retangular 120x60cm, arranhões superficiais.', location: 'Centro, RJ', donor: 'Lia F.', donorRecurrent: false },
-        { id: 6, title: 'Conjunto de panelas', category: 'utensilios', categoryLabel: 'Utensílios', emoji: '🍳', condition: 'bom', condLabel: 'Bom estado', desc: '5 peças, antiaderente, sem lascas.', location: 'Realengo, RJ', donor: 'Paulo T.', donorRecurrent: false },
-        { id: 7, title: 'Tênis esportivo 42', category: 'calcados', categoryLabel: 'Calçados', emoji: '👟', condition: 'bom', condLabel: 'Bom estado', desc: 'Pouco uso, solado em bom estado.', location: 'Jacarepaguá', donor: 'Marcos L.', donorRecurrent: true },
-        { id: 8, title: 'Livros didáticos', category: 'escolar', categoryLabel: 'Escolar', emoji: '📚', condition: 'otimo', condLabel: 'Ótimo', desc: 'Ensino médio, completos, sem anotações.', location: 'Vila Isabel', donor: 'Beatriz N.', donorRecurrent: false },
-        { id: 9, title: 'Cama solteiro', category: 'moveis', categoryLabel: 'Móveis', emoji: '🛏️', condition: 'bom', condLabel: 'Bom estado', desc: 'Cama de madeira com colchão incluso, sem mofos.', location: 'Bonsucesso', donor: 'Fernanda R.', donorRecurrent: true },
-        { id: 10, title: 'Brinquedos variados', category: 'brinquedos', categoryLabel: 'Brinquedos', emoji: '🧸', condition: 'bom', condLabel: 'Bom estado', desc: 'Quebra-cabeças, carrinhos e bonecas.', location: 'Sulacap', donor: 'Renata M.', donorRecurrent: false },
-        { id: 11, title: 'Geladeira 280L', category: 'eletro', categoryLabel: 'Eletro', emoji: '🧊', condition: 'usado', condLabel: 'Usado', desc: 'Funciona bem, pequenas marcas externas.', location: 'Bangu', donor: 'Hugo S.', donorRecurrent: true },
-        { id: 12, title: 'Mochila escolar', category: 'escolar', categoryLabel: 'Escolar', emoji: '🎒', condition: 'otimo', condLabel: 'Ótimo', desc: 'Nova, nunca usada, tamanho médio.', location: 'Santa Cruz', donor: 'Olivia C.', donorRecurrent: false }
+      /* LEGACY MOCK migrado para node/src/seed/demoData.js. Mantido somente para consulta.
+const mockItems = [
+        { id: 1, title: 'Sofá de 3 lugares', category: 'moveis', categoryLabel: 'Móveis', image: './assets/img/items/item1.jpg', condition: 'bom', condLabel: 'Bom estado', desc: 'Sofá em tecido cinza, leve desgaste nos braços.', location: 'Copacabana, RJ', donor: 'Maria S.', donorRecurrent: true },
+        { id: 2, title: 'Guarda-roupa 4 portas', category: 'moveis', categoryLabel: 'Móveis', image: './assets/img/items/item2.jpg', condition: 'bom', condLabel: 'Bom estado', desc: 'Madeira clara, espelho interno, sem trincas.', location: 'Botafogo, RJ', donor: 'João P.', donorRecurrent: false },
+        { id: 3, title: 'Micro-ondas 30L', category: 'eletro', categoryLabel: 'Eletro', image: './assets/img/items/item3.jpg', condition: 'otimo', condLabel: 'Ótimo', desc: 'Funcionando perfeitamente, acompanha prato giratório.', location: 'Tijuca, RJ', donor: 'Ana C.', donorRecurrent: true },
+        { id: 4, title: 'Kit roupas infantis', category: 'roupas', categoryLabel: 'Roupas', image: './assets/img/items/item4.jpg', condition: 'otimo', condLabel: 'Ótimo', desc: 'Tamanhos 4 a 8 anos, várias peças, bem conservadas.', location: 'Méier, RJ', donor: 'Carlos M.', donorRecurrent: true },
+        { id: 5, title: 'Mesa de escritório', category: 'moveis', categoryLabel: 'Móveis', image: './assets/img/items/item5.jpg', condition: 'usado', condLabel: 'Usado', desc: 'Mesa retangular 120x60cm, arranhões superficiais.', location: 'Centro, RJ', donor: 'Lia F.', donorRecurrent: false },
+        { id: 6, title: 'Conjunto de panelas', category: 'utensilios', categoryLabel: 'Utensílios', image: './assets/img/items/item6.jpg', condition: 'bom', condLabel: 'Bom estado', desc: '5 peças, antiaderente, sem lascas.', location: 'Realengo, RJ', donor: 'Paulo T.', donorRecurrent: false },
+        { id: 7, title: 'Tênis esportivo 42', category: 'calcados', categoryLabel: 'Calçados', image: './assets/img/items/item7.jpg', condition: 'bom', condLabel: 'Bom estado', desc: 'Pouco uso, solado em bom estado.', location: 'Jacarepaguá', donor: 'Marcos L.', donorRecurrent: true },
+        { id: 8, title: 'Livros didáticos', category: 'escolar', categoryLabel: 'Escolar', image: './assets/img/items/item8.jpg', condition: 'otimo', condLabel: 'Ótimo', desc: 'Ensino médio, completos, sem anotações.', location: 'Vila Isabel', donor: 'Beatriz N.', donorRecurrent: false },
+        { id: 9, title: 'Cama solteiro', category: 'moveis', categoryLabel: 'Móveis', image: './assets/img/items/item9.jpg', condition: 'bom', condLabel: 'Bom estado', desc: 'Cama de madeira com colchão incluso, sem mofos.', location: 'Bonsucesso', donor: 'Fernanda R.', donorRecurrent: true },
+        { id: 10, title: 'Brinquedos variados', category: 'brinquedos', categoryLabel: 'Brinquedos', image: './assets/img/items/item10.jpg', condition: 'bom', condLabel: 'Bom estado', desc: 'Quebra-cabeças, carrinhos e bonecas.', location: 'Sulacap', donor: 'Renata M.', donorRecurrent: false },
+        { id: 11, title: 'Geladeira 280L', category: 'eletro', categoryLabel: 'Eletro', image: './assets/img/items/item11.jpg', condition: 'usado', condLabel: 'Usado', desc: 'Funciona bem, pequenas marcas externas.', location: 'Bangu', donor: 'Hugo S.', donorRecurrent: true },
+        { id: 12, title: 'Mochila escolar', category: 'escolar', categoryLabel: 'Escolar', image: './assets/img/items/item12.jpg', condition: 'otimo', condLabel: 'Ótimo', desc: 'Nova, nunca usada, tamanho médio.', location: 'Santa Cruz', donor: 'Olivia C.', donorRecurrent: false }
       ];
+*/
+const mockItems = [];
 
       let currentFilter = 'all';
       let currentSearch = '';
+      let currentSort = 'recentes';
+      let loadedItems = mockItems;
+      let loadedFeaturedItems = [];
+
+      const categoryLabels = {
+        moveis: 'Móveis',
+        eletro: 'Eletro',
+        roupas: 'Roupas',
+        calcados: 'Calçados',
+        utensilios: 'Utensílios',
+        escolar: 'Escolar',
+        brinquedos: 'Brinquedos',
+        outros: 'Outros'
+      };
+
+      function getFallbackImage(item) {
+        const apiOrigin = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+        if (Array.isArray(item.images) && item.images.length) {
+          return item.images[0].startsWith('/uploads') ? `${apiOrigin}${item.images[0]}` : item.images[0];
+        }
+        if (item.image) return item.image.startsWith('/uploads') ? `${apiOrigin}${item.image}` : item.image;
+
+        const id = Number(item.id || 1);
+        const normalizedId = ((id - 1) % 12) + 1;
+        return `./assets/img/items/item${normalizedId}.jpg`;
+      }
+
+      function normalizeItem(item) {
+        const category = item.category || 'outros';
+        const condition = item.condition || 'bom';
+        const conditionLabels = {
+          otimo: 'Ótimo',
+          bom: 'Bom estado',
+          usado: 'Usado'
+        };
+
+        return {
+          id: item.id,
+          title: item.title || 'Item sem título',
+          category,
+          categoryLabel: item.categoryLabel || categoryLabels[category] || category,
+          image: getFallbackImage(item),
+          condition,
+          condLabel: item.condLabel || conditionLabels[condition] || condition,
+          desc: item.desc || item.description || '',
+          location: item.location || item.donor?.location || '',
+          donor: item.donor?.name || item.donor || '',
+          donorRecurrent: Boolean(item.donorRecurrent || item.donor?.verified)
+        };
+      }
+
+      function rememberSelectedItem(itemId) {
+        const id = Number(itemId);
+        const item = $.grep(loadedItems.concat(mockItems), function (candidate) {
+          return Number(candidate.id) === id;
+        })[0];
+
+        if (item) {
+          sessionStorage.setItem('doafacil_selected_item', JSON.stringify(item));
+        }
+      }
+
+      function fallbackItemsForCurrentFilters() {
+        return $.grep(mockItems, function (item) {
+          return currentFilter === 'all' || item.category === currentFilter;
+        });
+      }
 
       // ── Renderiza os cards no feed ──────────────────────────
       function renderFeed(items) {
@@ -286,9 +401,9 @@
 
         const html = $.map(items, function (item) {
           return `
-            <a class="item-card" href="pages/item.html?id=${item.id}" style="text-decoration:none;color:inherit;">
+            <a class="item-card js-item-link" data-id="${item.id}" href="pages/item.html?id=${item.id}" style="text-decoration:none;color:inherit;">
               <div class="item-img">
-                <span>${item.emoji}</span>
+                <img src="${item.image}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;">
                 <span class="badge-cond badge-${item.condition}">${item.condLabel}</span>
               </div>
               <div class="item-body">
@@ -314,20 +429,28 @@
 
         const isMobile = $(window).width() < 768;
         const itemsPerPage = isMobile ? 2 : 5;
-        const featuredItems = [...mockItems].reverse().slice(0, 10);
+        const featuredItems = [...loadedFeaturedItems].reverse().slice(0, 10);
+
+        if (!featuredItems.length) {
+          $content.html('');
+          $('#featuredCarousel .carousel-indicators').html('');
+          return;
+        }
 
         let html = '';
         for (let i = 0; i < featuredItems.length; i += itemsPerPage) {
           const chunk = featuredItems.slice(i, i + itemsPerPage);
           html += `
-            <div class="carousel-item ${i === 0 ? 'active' : ''}">
+            <div class="carousel-item featured-carousel-item ${i === 0 ? 'active' : ''}">
               <div class="row g-3 row-cols-2 row-cols-md-5">
                 ${$.map(chunk, function(item) {
                   return `
                     <div class="col">
-                      <a href="pages/item.html?id=${item.id}" class="card h-100 text-decoration-none border-0 shadow-sm" style="background: #f0f7ee;">
+                      <a href="pages/item.html?id=${item.id}" data-id="${item.id}" class="card h-100 text-decoration-none border-0 shadow-sm js-item-link" style="background: transparent; display:block;">
+                        <div style="height:150px; overflow: hidden; border-radius: 0.25rem;max-height:100px;">
+                          <img src="${item.image}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;border-radius: 0.25rem;display:block;">
+                        </div>
                         <div class="card-body text-center p-3">
-                          <div style="font-size: 2.5rem; margin-bottom: 10px;">${item.emoji}</div>
                           <h6 class="card-title text-dark mb-1 text-truncate">${item.title}</h6>
                           <small class="text-muted">${item.location}</small>
                         </div>
@@ -353,7 +476,7 @@
         $('.filter-chip').removeClass('active');
         $(this).addClass('active');
         currentFilter = $(this).data('cat');
-        applyFilters();
+        loadItemsByCategory();
       });
 
       // ── Filtro de disponibilidade ───────────────────────────
@@ -369,26 +492,68 @@
 
       // ── Ordenação ───────────────────────────────────────────
       $(document).on('change', '.sort-select', function () {
-        applyFilters($(this).val());
+        currentSort = $(this).val();
+        applyFilters();
       });
 
       // ── Aplica todos os filtros e re-renderiza ──────────────
-      function applyFilters(sort) {
-        let items = $.grep(mockItems, function (item) {
-          const matchCat    = currentFilter === 'all' || item.category === currentFilter;
+      function applyFilters(sort, sourceItems) {
+        const selectedSort = sort || currentSort;
+        let items = $.grep(sourceItems || loadedItems, function (item) {
           const matchSearch = !currentSearch ||
             item.title.toLowerCase().includes(currentSearch) ||
             item.desc.toLowerCase().includes(currentSearch);
-          return matchCat && matchSearch;
+          return matchSearch;
         });
 
-        if (sort === 'az') {
+        if (selectedSort === 'az') {
           items.sort(function (a, b) { return a.title.localeCompare(b.title); });
         }
         renderFeed(items);
       }
 
+      function loadItemsByCategory() {
+        if (!window.DoaFacilAPI?.Items) {
+          loadedItems = fallbackItemsForCurrentFilters();
+          applyFilters();
+          return;
+        }
+
+        const request = currentFilter === 'all'
+          ? DoaFacilAPI.Items.list()
+          : DoaFacilAPI.Items.getByCategory(currentFilter);
+
+        request
+          .done(function (response) {
+            const apiItems = $.map(response.items || [], normalizeItem);
+            loadedItems = apiItems;
+            applyFilters();
+          })
+          .fail(function () {
+            loadedItems = fallbackItemsForCurrentFilters();
+            applyFilters();
+          });
+      }
+
       // ── Botão Reservar dentro do card ──────────────────────
+      function loadFeaturedItems() {
+        if (!window.DoaFacilAPI?.Items) {
+          loadedFeaturedItems = [];
+          renderFeatured();
+          return;
+        }
+
+        DoaFacilAPI.Items.list({ status: 'all', per_page: 20 })
+          .done(function (response) {
+            loadedFeaturedItems = $.map(response.items || [], normalizeItem);
+            renderFeatured();
+          })
+          .fail(function () {
+            loadedFeaturedItems = [];
+            renderFeatured();
+          });
+      }
+
       $(document).on('click', '.btn-reservar-card', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -397,6 +562,10 @@
       });
 
       // ── Contador animado ────────────────────────────────────
+      $(document).on('click', '.js-item-link', function () {
+        rememberSelectedItem($(this).data('id'));
+      });
+
       function animateCounter($el, target) {
         let current = 0;
         const step  = Math.ceil(target / 60);
@@ -441,8 +610,8 @@
       $(window).on('resize', renderFeatured);
 
       // Execuções iniciais
-      renderFeed(mockItems);
-      renderFeatured();
+      loadItemsByCategory();
+      loadFeaturedItems();
     });
   </script>
 </body>

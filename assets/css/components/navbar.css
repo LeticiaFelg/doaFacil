@@ -9,12 +9,14 @@
     position: sticky; 
     top: 0; 
     z-index: 100;
+    position: fixed;
+    width: 100%;
 }
 
 .brand {
     display: flex; 
     align-items: center; 
-    gap: 10px;
+    gap: 0;
     text-decoration: none;
     flex-shrink: 0;
 }
@@ -45,7 +47,13 @@
     flex: 1;
     justify-content: center;
 }
-
+.brand-logo {
+    width: 50px;
+    height: 26px;
+    border-radius: 10px;
+    max-width: 50px;
+    max-height: 26px
+}
 .nav-link-btn {
     padding: 7px 16px;
     border: none;
@@ -227,7 +235,7 @@
     }
 }
 
-#doarModal {
+.custom-modal {
     position: fixed !important;
     inset: 0;
     display: flex !important;
@@ -241,12 +249,12 @@
     z-index: 9999;
 }
 
-#doarModal.active {
+.custom-modal.active {
     opacity: 1;
     visibility: visible;
 }
 
-#doarModal .modal-content {
+.custom-modal .modal-content {
     width: min(100%, 520px);
     max-height: min(100%, 92vh);
     background: #fff;
@@ -256,7 +264,7 @@
     overflow-y: auto;
 }
 
-#doarModal .modal-header {
+.custom-modal .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -264,12 +272,12 @@
     margin-bottom: 1rem;
 }
 
-#doarModal .modal-header h2 {
+.custom-modal .modal-header h2 {
     font-size: 1.25rem;
     margin: 0;
 }
 
-#doarModal .modal-close {
+.custom-modal .modal-close {
     border: none;
     background: transparent;
     font-size: 1.5rem;
@@ -278,26 +286,26 @@
     color: var(--text-muted);
 }
 
-#doarModal .modal-description {
+.custom-modal .modal-description {
     margin-bottom: 1rem;
     color: var(--text-muted);
     font-size: .95rem;
     line-height: 1.6;
 }
 
-#doarModal .modal-form .form-group {
+.custom-modal .modal-form .form-group {
     margin-bottom: 1rem;
 }
 
-#doarModal .modal-form label {
+.custom-modal .modal-form label {
     display: block;
     margin-bottom: .5rem;
     font-weight: 600;
 }
 
-#doarModal .modal-form input,
-#doarModal .modal-form select,
-#doarModal .modal-form textarea {
+.custom-modal .modal-form input,
+.custom-modal .modal-form select,
+.custom-modal .modal-form textarea {
     width: 100%;
     border: 1px solid var(--cream-dark);
     border-radius: 14px;
@@ -308,11 +316,18 @@
     background: #fff;
 }
 
-#doarModal .modal-form textarea {
+.custom-modal .modal-form textarea {
     resize: vertical;
 }
 
-#doarModal .btn-submit {
+.custom-modal .modal-form .char-counter {
+    display: block;
+    margin-top: .35rem;
+    color: var(--text-muted);
+    font-size: .78rem;
+}
+
+.custom-modal .btn-submit {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -327,7 +342,8 @@
     transition: transform .15s ease, filter .15s ease;
 }
 
-#doarModal .btn-submit:hover {
+.custom-modal .btn-submit:hover {
     filter: brightness(1.05);
     transform: translateY(-1px);
 }
+
