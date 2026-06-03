@@ -21,8 +21,22 @@ const { seedDemoData } = require('./seed/demoData');
 const app = express();
 
 // Middleware
+const allowedFrontendOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:8000',
+  'http://127.0.0.1:8000',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500'
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8000'
+  origin(origin, callback) {
+    if (!origin || allowedFrontendOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Origem nao permitida pelo CORS'));
+  }
 }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

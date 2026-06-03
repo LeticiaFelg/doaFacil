@@ -296,7 +296,8 @@
   <script>
     $(function () {
       // ── Dados mockados (remover quando a API estiver conectada) ──
-      const mockItems = [
+      /* LEGACY MOCK migrado para node/src/seed/demoData.js. Mantido somente para consulta.
+const mockItems = [
         { id: 1, title: 'Sofá de 3 lugares', category: 'moveis', categoryLabel: 'Móveis', image: './assets/img/items/item1.jpg', condition: 'bom', condLabel: 'Bom estado', desc: 'Sofá em tecido cinza, leve desgaste nos braços.', location: 'Copacabana, RJ', donor: 'Maria S.', donorRecurrent: true },
         { id: 2, title: 'Guarda-roupa 4 portas', category: 'moveis', categoryLabel: 'Móveis', image: './assets/img/items/item2.jpg', condition: 'bom', condLabel: 'Bom estado', desc: 'Madeira clara, espelho interno, sem trincas.', location: 'Botafogo, RJ', donor: 'João P.', donorRecurrent: false },
         { id: 3, title: 'Micro-ondas 30L', category: 'eletro', categoryLabel: 'Eletro', image: './assets/img/items/item3.jpg', condition: 'otimo', condLabel: 'Ótimo', desc: 'Funcionando perfeitamente, acompanha prato giratório.', location: 'Tijuca, RJ', donor: 'Ana C.', donorRecurrent: true },
@@ -310,11 +311,14 @@
         { id: 11, title: 'Geladeira 280L', category: 'eletro', categoryLabel: 'Eletro', image: './assets/img/items/item11.jpg', condition: 'usado', condLabel: 'Usado', desc: 'Funciona bem, pequenas marcas externas.', location: 'Bangu', donor: 'Hugo S.', donorRecurrent: true },
         { id: 12, title: 'Mochila escolar', category: 'escolar', categoryLabel: 'Escolar', image: './assets/img/items/item12.jpg', condition: 'otimo', condLabel: 'Ótimo', desc: 'Nova, nunca usada, tamanho médio.', location: 'Santa Cruz', donor: 'Olivia C.', donorRecurrent: false }
       ];
+*/
+const mockItems = [];
 
       let currentFilter = 'all';
       let currentSearch = '';
       let currentSort = 'recentes';
       let loadedItems = mockItems;
+      let loadedFeaturedItems = [];
 
       const categoryLabels = {
         moveis: 'Móveis',
@@ -358,9 +362,20 @@
           condLabel: item.condLabel || conditionLabels[condition] || condition,
           desc: item.desc || item.description || '',
           location: item.location || item.donor?.location || '',
-          donor: item.donor || item.donor?.name || '',
+          donor: item.donor?.name || item.donor || '',
           donorRecurrent: Boolean(item.donorRecurrent || item.donor?.verified)
         };
+      }
+
+      function rememberSelectedItem(itemId) {
+        const id = Number(itemId);
+        const item = $.grep(loadedItems.concat(mockItems), function (candidate) {
+          return Number(candidate.id) === id;
+        })[0];
+
+        if (item) {
+          sessionStorage.setItem('doafacil_selected_item', JSON.stringify(item));
+        }
       }
 
       function fallbackItemsForCurrentFilters() {
@@ -386,7 +401,7 @@
 
         const html = $.map(items, function (item) {
           return `
-            <a class="item-card" href="pages/item.html?id=${item.id}" style="text-decoration:none;color:inherit;">
+            <a class="item-card js-item-link" data-id="${item.id}" href="pages/item.html?id=${item.id}" style="text-decoration:none;color:inherit;">
               <div class="item-img">
                 <img src="${item.image}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;">
                 <span class="badge-cond badge-${item.condition}">${item.condLabel}</span>
@@ -414,7 +429,13 @@
 
         const isMobile = $(window).width() < 768;
         const itemsPerPage = isMobile ? 2 : 5;
-        const featuredItems = [...mockItems].reverse().slice(0, 10);
+        const featuredItems = [...loadedFeaturedItems].reverse().slice(0, 10);
+
+        if (!featuredItems.length) {
+          $content.html('');
+          $('#featuredCarousel .carousel-indicators').html('');
+          return;
+        }
 
         let html = '';
         for (let i = 0; i < featuredItems.length; i += itemsPerPage) {
@@ -425,7 +446,7 @@
                 ${$.map(chunk, function(item) {
                   return `
                     <div class="col">
-                      <a href="pages/item.html?id=${item.id}" class="card h-100 text-decoration-none border-0 shadow-sm" style="background: transparent; display:block;">
+                      <a href="pages/item.html?id=${item.id}" data-id="${item.id}" class="card h-100 text-decoration-none border-0 shadow-sm js-item-link" style="background: transparent; display:block;">
                         <div style="height:150px; overflow: hidden; border-radius: 0.25rem;max-height:100px;">
                           <img src="${item.image}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;border-radius: 0.25rem;display:block;">
                         </div>
@@ -515,6 +536,24 @@
       }
 
       // ── Botão Reservar dentro do card ──────────────────────
+      function loadFeaturedItems() {
+        if (!window.DoaFacilAPI?.Items) {
+          loadedFeaturedItems = [];
+          renderFeatured();
+          return;
+        }
+
+        DoaFacilAPI.Items.list({ status: 'all', per_page: 20 })
+          .done(function (response) {
+            loadedFeaturedItems = $.map(response.items || [], normalizeItem);
+            renderFeatured();
+          })
+          .fail(function () {
+            loadedFeaturedItems = [];
+            renderFeatured();
+          });
+      }
+
       $(document).on('click', '.btn-reservar-card', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -523,6 +562,10 @@
       });
 
       // ── Contador animado ────────────────────────────────────
+      $(document).on('click', '.js-item-link', function () {
+        rememberSelectedItem($(this).data('id'));
+      });
+
       function animateCounter($el, target) {
         let current = 0;
         const step  = Math.ceil(target / 60);
@@ -568,7 +611,7 @@
 
       // Execuções iniciais
       loadItemsByCategory();
-      renderFeatured();
+      loadFeaturedItems();
     });
   </script>
 </body>

@@ -128,7 +128,7 @@ router.get('/', async (req, res) => {
       where.category = category;
     }
 
-    if (status) {
+    if (status && status !== 'all') {
       where.status = status;
     }
 
