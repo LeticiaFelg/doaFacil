@@ -178,7 +178,8 @@
     border-left: 3px solid transparent;
 }
 
-.offcanvas-nav-link:hover {
+.offcanvas-nav-link:hover,
+.offcanvas-nav-link.active {
     background: var(--green-bg);
     color: var(--green-deep);
     border-left-color: var(--green-mid);
