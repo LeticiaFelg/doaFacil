@@ -84,25 +84,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     display: flex; align-items: center; gap: 6px;
 }
 
-/* Profile type badges */
-.profile-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.profile-type-badge {
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-size: .78rem;
-    font-weight: 600;
-    border: 1.5px solid;
-    cursor: pointer;
-    transition: all .2s;
-    display: flex; align-items: center; gap: 5px;
-}
-.type-doador   { border-color: var(--green-pale); color: var(--green-deep); }
-.type-receptor { border-color: #FDE68A; color: #78350F; }
-.type-inst     { border-color: #A5D8FF; color: #A5D8FF; }
-.type-doador.active   { background: var(--green-pale); color: var(--green-deep); }
-.type-receptor.active { background: #FDE68A; color: #78350F; }
-.type-inst.active     { background: #A5D8FF; color: #1E3A5F; }
-
 .hero-info .join-date { color: rgba(255,255,255,.45); font-size: .8rem; }
 
 .hero-stats { display: flex; gap: 0; margin-left: auto; }
@@ -125,9 +106,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     letter-spacing: .4px;
 }
 
-/* PROFILE VIEWS (switched by active type) */
-.profile-view { display: none; }
-.profile-view.active { display: block; animation: fadeUp .3s ease; }
+/* PROFILE SECTIONS */
+.profile-view { display: block; animation: fadeUp .3s ease; }
+.profile-view + .profile-view { margin-top: 28px; }
+#view-inst { display: none; }
 @keyframes fadeUp { from { opacity:0;transform:translateY(8px); } to { opacity:1;transform:translateY(0); } }
 
 /* SECTION CARDS */
@@ -257,7 +239,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     .hero-inner { flex-direction: column; gap: 20px; }
     .hero-stat { padding: 0 16px; }
     .hero-info h1 { font-size: 1.8rem; }
-    .profile-badges { justify-content: center; }
 }
 
 @media (max-width: 576px) {

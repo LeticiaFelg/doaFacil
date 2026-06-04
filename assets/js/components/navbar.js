@@ -20,27 +20,27 @@ authReady
       }
     }
 
-    // Detecta página atual
-    const currentPage = window.location.pathname.split("/").pop();
+    const isPagesPath = window.location.pathname.includes('/pages/');
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const navRoutes = {
+      home: isPagesPath ? '../index.html' : 'index.html',
+      perfil: isPagesPath ? 'perfil.html' : 'pages/perfil.html',
+      historico: isPagesPath ? 'historico.html' : 'pages/historico.html'
+    };
 
-    // Todos os links da navbar
-    const links = document.querySelectorAll('.nav-link-btn');
+    $('[data-nav-target]').each(function () {
+      const $link = $(this);
+      const target = $link.data('nav-target');
+      const href = navRoutes[target];
 
-    links.forEach(link => {
+      if (!href) return;
 
-      const href = link.getAttribute('href');
+      $link.attr('href', href);
+      $link.removeClass('active');
 
-      // Pega apenas o nome do arquivo
-      const pageName = href.split("/").pop();
-
-      // Remove active de todos
-      link.classList.remove('active');
-
-      // Adiciona active na página atual
-      if (pageName === currentPage) {
-        link.classList.add('active');
+      if (href.split('/').pop() === currentPage) {
+        $link.addClass('active');
       }
-
     });
 
     const infoModalsScriptPath = window.location.pathname.includes('/pages/')

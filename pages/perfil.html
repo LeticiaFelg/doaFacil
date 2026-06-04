@@ -32,12 +32,6 @@
           <h1 id="profileHeroName">Maria Clara Souza</h1>
           <div class="location-line" id="profileHeroLocation"><i class="bi bi-geo-alt"></i> Copacabana, Rio de Janeiro – RJ</div>
 
-          <!-- Multi-profile badges: click to switch view -->
-          <div class="profile-badges" style="margin-top: 12px;">
-            <button class="profile-type-badge type-doador active" data-profile="doador">🤝 Doadora</button>
-            <button class="profile-type-badge type-receptor" data-profile="receptor">🏠 Receptora</button>
-          </div>
-
           <div class="join-date" id="profileJoinDate"><i class="bi bi-calendar3"></i> Membro desde março de 2024</div>
         </div>
 
@@ -74,7 +68,7 @@
         <div class="col-lg-6">
           <!-- Dados pessoais -->
           <div class="section-card">
-            <h3><i class="bi bi-person-lines-fill" style="color:var(--green-mid)"></i> Dados do doador</h3>
+            <h3><i class="bi bi-person-lines-fill" style="color:var(--green-mid)"></i> Dados do usuário</h3>
             <div class="info-grid">
               <div class="info-item"><label>Nome</label><div class="value" id="profileNameValue">Maria Clara Souza</div></div>
               <div class="info-item"><label>E-mail</label><div class="value" id="profileEmailValue">maria@email.com</div></div>
@@ -127,21 +121,9 @@
       </div>
     </div>
 
-    <!-- ═══ VIEW: RECEPTOR ═════════════════════════════ -->
+    <!-- ═══ ITENS RECEBIDOS ═════════════════════════════ -->
     <div class="profile-view" id="view-receptor">
       <div class="row g-4">
-        <div class="col-lg-6">
-          <div class="section-card">
-            <h3><i class="bi bi-house-heart" style="color:var(--green-mid)"></i> Dados do receptor</h3>
-            <div class="info-grid">
-              <div class="info-item"><label>Nome</label><div class="value" id="profileReceptorNameValue">Maria Clara Souza</div></div>
-              <div class="info-item"><label>Composição familiar</label><div class="value">4 pessoas</div></div>
-              <div class="info-item"><label>Bairro</label><div class="value" id="profileReceptorNeighborhoodValue">Copacabana</div></div>
-              <div class="info-item"><label>Status de cadastro</label><div class="value" style="color:var(--green-mid);">✅ Verificado</div></div>
-            </div>
-          </div>
-        </div>
-
         <div class="col-12">
           <div class="section-card">
             <h3><i class="bi bi-clock-history" style="color:var(--green-mid)"></i> Itens recebidos recentemente</h3>
@@ -419,16 +401,6 @@
           window.location.href = 'login.html';
         });
 
-      // Troca de visão Doador / Receptor
-      // Substitui: switchProfile() com querySelectorAll + classList
-      $(document).on('click', '.profile-type-badge', function () {
-        const type = $(this).data('profile');
-        $('.profile-type-badge').removeClass('active');
-        $(this).addClass('active');
-        $('.profile-view').removeClass('active');
-        $('#view-' + type).addClass('active');
-      });
-    
       // Mini-cards de doações ativas → navegam para item.html
       // Substitui: onclick="window.location.href='04-item.html?id=...'"
       // Bug corrigido: '04-item.html' → 'item.html' (mesma pasta pages/)
