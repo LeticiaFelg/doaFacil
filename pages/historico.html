@@ -199,9 +199,13 @@ const mockRecebido = [];
       const id = Number(item.item_id || item.id || 1);
       const normalizedId = ((id - 1) % 12) + 1;
       const apiOrigin = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
-      const image = item.image || `../assets/img/items/item${normalizedId}.jpg`;
+      const image = Array.isArray(item.images) && item.images.length
+        ? item.images[0]
+        : item.image || `../assets/img/items/item${normalizedId}.jpg`;
 
-      return image.startsWith('/uploads') ? `${apiOrigin}${image}` : image;
+      if (image.startsWith('/uploads')) return `${apiOrigin}${image}`;
+      if (image.startsWith('./assets/')) return `.${image}`;
+      return image;
     }
 
     function formatDate(value) {
@@ -367,7 +371,7 @@ const mockRecebido = [];
 
         return `
           <div class="history-row cols-doado ${item.status === 'concluido' ? 'recurrent-row' : ''}">
-            <div class="item-cell">
+            <div class="item-cell btn-edit-history-item" data-item-id="${item.item_id || item.id}" title="Editar item" style="cursor:pointer;">
               <div class="item-emoji-thumb" style="overflow:hidden;background:#eee;"><img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;"></div>
               <div>
                 <div class="item-cell-name">${item.name}</div>
@@ -462,6 +466,33 @@ const mockRecebido = [];
     // Usa delegação porque o elemento é criado após o carregamento da página
     $(document).on('click', '.btn-mini', function () {
       alert('Detalhes: ' + $(this).data('name'));
+    });
+
+    $(document).on('click', '.btn-edit-history-item', function () {
+      const itemId = Number($(this).data('item-id'));
+
+      if (!window.DoaFacilItemEditor || !Number.isFinite(itemId) || itemId <= 0) {
+        alert('Editor de item indisponivel.');
+        return;
+      }
+
+      window.DoaFacilItemEditor.open(itemId, {
+        onSaved: function (updatedItem) {
+          doadoRows = $.map(doadoRows, function (item) {
+            if (Number(item.item_id || item.id) === itemId) {
+              return {
+                ...item,
+                name: updatedItem.title || item.name,
+                cat: updatedItem.category || item.cat,
+                image: getFallbackImage(updatedItem),
+                status: normalizeStatus(updatedItem.status || item.status)
+              };
+            }
+            return item;
+          });
+          applyFilters();
+        }
+      });
     });
 
     $(document).on('click', '.btn-cancel-item', function () {

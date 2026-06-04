@@ -334,7 +334,7 @@ router.post('/', auth, upload.array('images', MAX_ITEM_IMAGES), async (req, res)
 });
 
 // Atualizar item
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, upload.array('images', MAX_ITEM_IMAGES), async (req, res) => {
   try {
     const item = await Item.findByPk(req.params.id);
 
@@ -346,9 +346,34 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(403).json({ error: 'Sem permissao' });
     }
 
-    const { title, description, condition, status, images, dimensions, material, color, pickup, address } = req.body;
+    const {
+      title,
+      description,
+      category,
+      emoji,
+      condition,
+      status,
+      location,
+      images,
+      dimensions,
+      material,
+      color,
+      pickup,
+      address
+    } = req.body;
+    const uploadedImages = getUploadedImageUrls(req.files);
+    const parsedImages = Array.isArray(images)
+      ? images
+      : typeof images === 'string' && images
+        ? [images]
+        : [];
+    const parsedAddress = typeof address === 'string'
+      ? JSON.parse(address || '{}')
+      : address;
 
     if (title) item.title = title;
+    if (category) item.category = category;
+    if (emoji) item.emoji = emoji;
     if (description) {
       if (description.length > ITEM_DESCRIPTION_MAX_LENGTH) {
         return res.status(400).json({ error: `Descricao deve ter no maximo ${ITEM_DESCRIPTION_MAX_LENGTH} caracteres` });
@@ -357,12 +382,15 @@ router.put('/:id', auth, async (req, res) => {
     }
     if (condition) item.condition = condition;
     if (status) item.status = status;
-    if (images) item.images = images;
+    if (location) item.location = location;
+    if (uploadedImages.length || parsedImages.length) {
+      item.images = uploadedImages.length ? uploadedImages : parsedImages;
+    }
     if (dimensions !== undefined) item.dimensions = dimensions;
     if (material !== undefined) item.material = material;
     if (color !== undefined) item.color = color;
     if (pickup !== undefined) item.pickup = pickup;
-    if (address !== undefined) item.address = address;
+    if (parsedAddress !== undefined) item.address = parsedAddress;
 
     await item.save();
 

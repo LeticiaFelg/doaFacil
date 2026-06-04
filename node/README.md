@@ -1,149 +1,151 @@
-# 🌿 DoaFácil API - Node.js + Express
+# DoaFacil API - Node.js, Express e SQLite
 
-API backend completa em Node.js com Express e SQLite para o projeto DoaFácil.
+API backend ativa do projeto DoaFacil.
 
-## 🚀 Início Rápido
+## Inicio Rapido
 
-### 1. Instalar dependências
-
-```bash
-cd node
+```powershell
+cd "C:\Users\Lucas R\Documents\IBMR\2026.1\A3\node"
 npm install
-```
-
-### 2. Configurar ambiente
-
-```bash
-cp .env.example .env
-```
-
-### 3. Executar
-
-```bash
 npm run dev
 ```
 
-Acesse: `http://localhost:5000/api/health`
+A API roda em:
 
----
-
-## 📦 Estrutura
-
+```text
+http://localhost:5000/api
 ```
+
+Health check:
+
+```powershell
+Invoke-RestMethod "http://localhost:5000/api/health"
+```
+
+## Banco de Dados
+
+O banco atual e SQLite:
+
+```text
+node/doafacil.db
+```
+
+A configuracao fica em:
+
+```text
+node/src/config/database.js
+```
+
+O seed demonstrativo fica em:
+
+```text
+node/src/seed/demoData.js
+```
+
+Ao iniciar o backend, `src/server.js` sincroniza as tabelas e executa o seed.
+
+## Estrutura
+
+```text
 node/
-├── src/
-│   ├── server.js              # Arquivo principal
-│   ├── config/
-│   │   └── database.js        # Configuração Sequelize
-│   ├── models/
-│   │   ├── User.js
-│   │   ├── Item.js
-│   │   ├── Reservation.js
-│   │   └── History.js
-│   ├── middleware/
-│   │   └── auth.js            # JWT middleware
-│   └── routes/
-│       ├── auth.js            # Autenticação
-│       ├── items.js           # Itens/Doações
-│       ├── users.js           # Perfis
-│       ├── reservations.js    # Reservas
-│       └── history.js         # Histórico
-├── package.json
-├── .env.example
-└── README.md
+  src/
+    server.js
+    config/database.js
+    middleware/auth.js
+    models/
+      User.js
+      Item.js
+      Reservation.js
+      History.js
+    routes/
+      auth.js
+      users.js
+      items.js
+      reservations.js
+      history.js
+    seed/demoData.js
+  uploads/items/
+  package.json
 ```
 
----
+## Rotas Principais
 
-## 📡 Rotas Principais
+### Health
 
-### Autenticação `/api/auth`
+- `GET /api/health`
 
-- **POST** `/register` — Cadastro
-- **POST** `/login` — Login
-- **GET** `/me` — Dados do usuário (requer auth)
+### Usuarios
 
-### Itens `/api/items`
+- `POST /api/users/register`
+- `POST /api/users/login`
+- `POST /api/users/logout`
+- `GET /api/users/me`
+- `PUT /api/users/me`
+- `DELETE /api/users/me`
+- `GET /api/users/me/profile`
+- `GET /api/users/me/donations`
 
-- **GET** `/` — Listar itens (com filtros)
-- **GET** `/:id` — Detalhes do item
-- **POST** `/` — Criar item (requer auth)
-- **PUT** `/:id` — Atualizar item (requer auth)
-- **DELETE** `/:id` — Deletar item (requer auth)
-- **GET** `/category/:category` — Itens por categoria
+### Auth Legado
 
-### Usuários `/api/users`
+As rotas abaixo existem por compatibilidade com organizacao anterior:
 
-- **GET** `/:id` — Perfil do usuário
-- **GET** `/me/profile` — Meu perfil (requer auth)
-- **PUT** `/me/profile` — Atualizar perfil (requer auth)
-- **GET** `/me/donations` — Minhas doações (requer auth)
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
 
-### Reservas `/api/reservations`
+### Itens
 
-- **POST** `/` — Criar reserva (requer auth)
-- **GET** `/:id` — Detalhes (requer auth)
-- **PUT** `/:id/confirm` — Confirmar (requer auth)
-- **PUT** `/:id/complete` — Completar (requer auth)
-- **PUT** `/:id/cancel` — Cancelar (requer auth)
+- `GET /api/items`
+- `GET /api/items?status=all`
+- `GET /api/items/category/:category`
+- `GET /api/items/:id`
+- `GET /api/items/my`
+- `POST /api/items`
+- `PUT /api/items/:id`
+- `DELETE /api/items/:id`
+- `POST /api/items/:id/contact/whatsapp`
 
-### Histórico `/api/history`
+### Reservas
 
-- **GET** `/my/donations` — Histórico de doações (requer auth)
-- **GET** `/my/received` — Itens recebidos (requer auth)
-- **GET** `/statistics` — Estatísticas globais
+- `POST /api/reservations`
+- `GET /api/reservations/received`
+- `GET /api/reservations/donated`
+- `GET /api/reservations/:id`
+- `PUT /api/reservations/:id/confirm`
+- `PUT /api/reservations/:id/complete`
+- `PUT /api/reservations/:id/cancel`
+- `PATCH /api/reservations/:id/status`
 
----
+### Historico
 
-## 🔐 Autenticação com JWT
+- `GET /api/history/my`
+- `GET /api/history/my/donations`
+- `GET /api/history/my/received`
+- `GET /api/history/my/statistics`
+- `GET /api/history/statistics`
 
-### Login
+## Uploads
 
-```bash
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"usuario@example.com","password":"senha123"}'
+Imagens enviadas pelo modal de nova doacao sao salvas em:
+
+```text
+node/uploads/items
 ```
 
-### Usar token
+E servidas por:
 
-```bash
-curl -X GET http://localhost:5000/api/users/me/profile \
-  -H "Authorization: Bearer {token}"
+```text
+http://localhost:5000/uploads/items/NOME_DO_ARQUIVO
 ```
 
----
+## Scripts
 
-## 📝 Scripts
-
-```bash
-# Desenvolvimento com auto-reload
+```powershell
 npm run dev
-
-# Produção
 npm start
-
-# Testes
 npm test
 ```
 
----
+## Observacao Sobre backend/
 
-## 📚 Stack
-
-- **Express.js** — Framework web
-- **Sequelize** — ORM para SQLite
-- **JWT** — Autenticação
-- **bcryptjs** — Hashing de senhas
-- **CORS** — Requisições cross-origin
-- **SQLite** — Banco de dados local
-
----
-
-<div align="center">
-
-**API DoaFácil** 🌿
-
-Backend em Node.js para conectar doadores com quem precisa
-
-</div>
+A pasta `backend/` da raiz contem uma estrutura antiga/paralela. A API ativa deste projeto e a pasta `node/`.
