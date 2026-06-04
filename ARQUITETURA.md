@@ -6,10 +6,12 @@ Este documento registra as decisoes tecnicas e arquiteturais do projeto. O READM
 
 O DoaFacil e dividido em duas partes:
 
-- Frontend estatico: HTML, CSS e JavaScript servidos localmente por `python -m http.server 8000` e, futuramente, publicados em S3.
+- Frontend estatico: HTML, CSS e JavaScript servidos localmente por `python -m http.server 8000` ou Live Server e, futuramente, publicados em S3.
 - Backend separado: API Node.js/Express em `node/src`, servida em `http://localhost:5000`.
 
 O frontend consome a API por `window.API_BASE_URL`, definido em `assets/js/config.js`.
+
+A pasta `backend/` existe no repositorio como estrutura antiga/paralela. Ela nao e a API ativa do fluxo atual. O backend em uso e a pasta `node/`.
 
 ## Banco De Dados Atual
 
@@ -30,7 +32,7 @@ Conceitualmente:
 - `health` responde se a API esta viva.
 - `ready` responderia se a API esta pronta para atender usuarios, incluindo banco e dependencias.
 
-Decisao atual: `GET /api/health` verifica tambem a conexao com o banco via Sequelize. Isso foi escolhido porque, neste projeto, a home usa essa chamada para decidir se deve usar dados reais ou fallback. Se o banco nao estiver acessivel, a API nao consegue cumprir os fluxos principais.
+Decisao atual: `GET /api/health` verifica tambem a conexao com o banco via Sequelize. Isso foi escolhido porque, neste projeto, a API nao consegue cumprir os fluxos principais sem acesso ao banco.
 
 Alternativa futura: criar `GET /api/ready` para checar banco e dependencias, mantendo `GET /api/health` apenas para o processo Express.
 
@@ -39,9 +41,9 @@ Alternativa futura: criar `GET /api/ready` para checar banco e dependencias, man
 O seed inicial cria:
 
 - Maria Clara Souza como usuaria demonstrativa.
-- 12 itens iniciais da home associados a Maria.
-- Receptores demonstrativos para historico.
-- Reservas e historicos demonstrativos para itens concluidos/cancelados.
+- Itens iniciais associados a Maria Clara.
+- Usuarios demonstrativos usados como receptores e doadores auxiliares.
+- Reservas e historicos demonstrativos para itens concluidos, reservados, cancelados e recebidos.
 
 O seed evita duplicacao procurando registros existentes antes de criar novos.
 
@@ -88,14 +90,20 @@ Guarda fatos consolidados do sistema, como doacoes concluidas e cancelamentos re
 
 Cancelamento de item pelo doador e soft delete: o item muda para `cancelado`.
 
-## Fallback Do Frontend
+## Dependencia Do Frontend Na API
 
-A home tenta consultar a API.
+Decisao atual: o frontend deve usar os dados do backend sempre que o backend estiver disponivel.
 
-- API/banco disponivel: usa dados reais e preserva sessao real do usuario logado.
-- API/banco indisponivel e sem sessao real: ativa fallback visual com Maria Clara.
+As paginas principais buscam dados por API:
 
-O fallback da Maria nao deve ser tratado como login real. Paginas protegidas, como perfil, devem redirecionar para login se nao houver sessao real.
+- Home: `GET /api/items` e `GET /api/items/category/:category`.
+- Pagina de item: `GET /api/items/:id`.
+- Perfil: `GET /api/users/me`, `GET /api/items/my` e reservas do usuario.
+- Historico: `GET /api/history/my`.
+
+Os mocks antigos dos HTMLs foram mantidos apenas como blocos comentados `LEGACY MOCK`, para consulta historica. Eles nao devem ser usados como fonte ativa de dados quando a API estiver rodando.
+
+Se a API estiver indisponivel, paginas que dependem de dados reais devem exibir estado de erro/carregamento em vez de substituir silenciosamente por um item hardcoded.
 
 ## Imagens De Itens
 

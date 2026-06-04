@@ -244,13 +244,6 @@
   <script>
     window.DoaFacilHomeAuthReady = (function () {
       const apiBase = window.API_BASE_URL || 'http://localhost:5000/api';
-      const fallbackMaria = {
-        id: 1,
-        name: 'Maria Clara Souza',
-        email: 'maria.clara@example.com',
-        avatar: 'MC',
-        roles: ['doador', 'receptor']
-      };
 
       function clearStoredSession() {
         localStorage.removeItem('doafacil_token');
@@ -265,26 +258,14 @@
         }
       }
 
-      function hasRealSession() {
-        return localStorage.getItem('doafacil_token') &&
-          localStorage.getItem('doafacil_fallback_session') !== 'true';
-      }
-
-      function enableFallbackSession() {
-        if (hasRealSession()) return;
-
-        localStorage.setItem('doafacil_current_user', JSON.stringify(fallbackMaria));
-        localStorage.setItem('doafacil_user', JSON.stringify(fallbackMaria));
-        localStorage.setItem('doafacil_token', 'mock-maria-clara');
-        localStorage.setItem('doafacil_fallback_session', 'true');
-      }
+      clearFallbackSession();
 
       return fetch(`${apiBase}/health`, { cache: 'no-store' })
         .then(function (response) {
           if (!response.ok) throw new Error('API indisponivel');
           clearFallbackSession();
         })
-        .catch(enableFallbackSession);
+        .catch(clearFallbackSession);
     })();
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -338,7 +319,8 @@ const mockItems = [];
         }
         if (item.image) return item.image.startsWith('/uploads') ? `${apiOrigin}${item.image}` : item.image;
 
-        const id = Number(item.id || 1);
+        const id = Number(item.id);
+        if (!Number.isFinite(id) || id <= 0) return '';
         const normalizedId = ((id - 1) % 12) + 1;
         return `./assets/img/items/item${normalizedId}.jpg`;
       }
@@ -365,23 +347,6 @@ const mockItems = [];
           donor: item.donor?.name || item.donor || '',
           donorRecurrent: Boolean(item.donorRecurrent || item.donor?.verified)
         };
-      }
-
-      function rememberSelectedItem(itemId) {
-        const id = Number(itemId);
-        const item = $.grep(loadedItems.concat(mockItems), function (candidate) {
-          return Number(candidate.id) === id;
-        })[0];
-
-        if (item) {
-          sessionStorage.setItem('doafacil_selected_item', JSON.stringify(item));
-        }
-      }
-
-      function fallbackItemsForCurrentFilters() {
-        return $.grep(mockItems, function (item) {
-          return currentFilter === 'all' || item.category === currentFilter;
-        });
       }
 
       // ── Renderiza os cards no feed ──────────────────────────
@@ -514,7 +479,7 @@ const mockItems = [];
 
       function loadItemsByCategory() {
         if (!window.DoaFacilAPI?.Items) {
-          loadedItems = fallbackItemsForCurrentFilters();
+          loadedItems = [];
           applyFilters();
           return;
         }
@@ -530,7 +495,7 @@ const mockItems = [];
             applyFilters();
           })
           .fail(function () {
-            loadedItems = fallbackItemsForCurrentFilters();
+            loadedItems = [];
             applyFilters();
           });
       }
@@ -558,12 +523,7 @@ const mockItems = [];
         e.preventDefault();
         e.stopPropagation();
         const id = $(this).data('id');
-        alert('Para reservar, acesse a página do item. (ID: ' + id + ')');
-      });
-
-      // ── Contador animado ────────────────────────────────────
-      $(document).on('click', '.js-item-link', function () {
-        rememberSelectedItem($(this).data('id'));
+        window.location.href = `pages/item.html?id=${id}`;
       });
 
       function animateCounter($el, target) {

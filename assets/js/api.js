@@ -144,6 +144,20 @@ const DoaFacilAPI = (() => {
       });
     },
     update(id, data)     { return _request('PUT',    `/items/${id}`, data); },
+    updateWithImages(id, formData) {
+      const headers = {};
+      const token = localStorage.getItem('doafacil_token');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      return $.ajax({
+        url: `${BASE_URL}/items/${id}`,
+        method: 'PUT',
+        headers,
+        data: formData,
+        processData: false,
+        contentType: false
+      });
+    },
     delete(id)           { return _request('DELETE', `/items/${id}`); },
   };
 

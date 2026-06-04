@@ -22,9 +22,9 @@
   <div class="breadcrumb-bar">
     <a href="../index.html">Feed</a>
     <i class="bi bi-chevron-right"></i>
-    <a href="#" id="breadcrumb-category">-</a>
+    <a href="#" id="breadcrumb-category">Carregando</a>
     <i class="bi bi-chevron-right"></i>
-    <span style="color:var(--text-dark)" id="breadcrumb-title">-</span>
+    <span style="color:var(--text-dark)" id="breadcrumb-title">Item</span>
   </div>
 
   <div class="page-container">
@@ -42,11 +42,9 @@
         <div class="detail-card">
           <h3><i class="bi bi-card-text" style="color:var(--green-mid)"></i> Descrição</h3>
           <p id="item-desc-main" style="color:var(--text-muted);line-height:1.75;font-size:.92rem;">
-            Carregando descrição...
+            Carregando dados do item...
           </p>
-          <p id="item-desc-extra" style="color:var(--text-muted);line-height:1.75;font-size:.92rem;margin-top:10px;">
-            Carregando detalhes...
-          </p>
+          <p id="item-desc-extra" style="color:var(--text-muted);line-height:1.75;font-size:.92rem;margin-top:10px;"></p>
         </div>
 
         <!-- Specs -->
@@ -93,8 +91,8 @@
           <h3 id="location-title"><i class="bi bi-map" style="color:var(--green-mid)"></i> Localização aproximada</h3>
           <div id="location-map" style="background:var(--cream-dark);border-radius:14px;height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-muted);overflow:hidden;">
             <i class="bi bi-geo-alt" style="font-size:2.5rem;color:var(--green-light)"></i>
-            <div style="font-weight:600;font-size:.95rem;" id="item-location-name">Carregando localização...</div>
-            <div style="font-size:.8rem;">Endereço exato informado após reserva</div>
+            <div style="font-weight:600;font-size:.95rem;">Carregando localizacao...</div>
+            <div style="font-size:.8rem;">Os dados serao carregados pela API.</div>
           </div>
         </div>
 
@@ -112,7 +110,7 @@
 
         <!-- Main action card -->
         <div class="action-card">
-          <div class="item-category-badge" id="item-category-badge">-</div>
+          <div class="item-category-badge" id="item-category-badge">Item</div>
           <h1 class="item-title-main" id="item-title-main">Carregando item...</h1>
 
           <div class="condition-bar">
@@ -125,8 +123,8 @@
           <div class="location-block">
             <div class="loc-icon">📍</div>
             <div>
-              <div class="loc-name" id="item-location-name">-</div>
-              <div class="loc-sub" id="item-location-sub">-</div>
+              <div class="loc-name" id="item-location-name">Localizacao</div>
+              <div class="loc-sub" id="item-location-sub">Carregando localizacao...</div>
             </div>
           </div>
 
@@ -137,7 +135,7 @@
             </label>
           </div>
 
-          <button class="btn-reserve" id="btn-reserve-action" data-bs-toggle="modal" data-bs-target="#reserveModal" disabled>
+          <button class="btn-reserve" id="btn-reservar-item" data-bs-toggle="modal" data-bs-target="#reserveModal" disabled>
             <i class="bi bi-bookmark-check"></i> Reservar este item
           </button>
 
@@ -151,9 +149,9 @@
         <div class="donor-card">
           <div class="donor-avatar" id="donor-avatar">👤</div>
           <div class="donor-info">
-            <div class="d-name" id="donor-name">-</div>
-            <div class="d-sub" id="donor-donations">-</div>
-            <div class="donor-recurrent" id="donor-recurrent">-</div>
+            <div class="d-name" id="donor-name">Doador</div>
+            <div class="d-sub" id="donor-donations">Dados carregados pela API</div>
+            <div class="donor-recurrent" id="donor-recurrent">⭐ Doador Recorrente</div>
           </div>
         </div>
 
@@ -173,8 +171,8 @@
           <div style="display:flex;align-items:center;gap:14px;background:var(--cream);border-radius:14px;padding:14px;margin-bottom:20px;">
             <span id="modal-item-emoji" style="font-size:2.5rem">📦</span>
             <div>
-              <div id="modal-item-title" style="font-weight:700">Carregando...</div>
-              <div id="modal-item-sub" style="font-size:.82rem;color:var(--text-muted)">-</div>
+              <div id="modal-item-title" style="font-weight:700">Item</div>
+              <div id="modal-item-sub" style="font-size:.82rem;color:var(--text-muted)"></div>
             </div>
           </div>
           <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:16px;">
@@ -237,7 +235,6 @@ const mockItems = [
       { id:12, title: 'Mochila escolar',        category: 'escolar',    categoryLabel: 'Escolar',    image: '../assets/img/items/item12.jpg', condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Nova, nunca usada, tamanho médio.',                                         location: 'Santa Cruz, RJ', generalMapsQuery: 'Santa+Cruz,+Rio+de+Janeiro', fullAddress: 'Av. Santa Cruz 1500, Santa Cruz, Rio de Janeiro', mapAddress: 'Av.+Santa+Cruz+1500,+Santa+Cruz,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+23565-250', donor: 'Olivia C.',   donorRecurrent: false },
     ];
 */
-const mockItems = [];
 
     let currentItem = null;
     const categoryLabels = {
@@ -272,7 +269,13 @@ const mockItems = [];
     }
 
     function getCurrentUser() {
-      return JSON.parse(localStorage.getItem('doafacil_current_user') || 'null');
+      try {
+        if (typeof localStorage === 'undefined') return null;
+        const rawUser = localStorage.getItem('doafacil_current_user') || localStorage.getItem('doafacil_user');
+        return rawUser ? JSON.parse(rawUser) : null;
+      } catch (error) {
+        return null;
+      }
     }
   
     // ── Carrega os dados do item conforme ?id= na URL ────────
@@ -327,23 +330,11 @@ const mockItems = [];
         color: item.color || '',
         pickup: item.pickup || '',
         donor: item.donor?.name || item.donor || 'Doador',
+        donorId: item.donor_id || item.donor?.id || item.donorId || null,
         donorRecurrent: Boolean(item.donorRecurrent || item.donor?.verified),
         status: item.status || 'disponivel',
         emoji: item.emoji || '📦'
       };
-    }
-
-    function getCachedSelectedItem(itemId) {
-      try {
-        const cachedItem = JSON.parse(sessionStorage.getItem('doafacil_selected_item') || 'null');
-        if (cachedItem && Number(cachedItem.id) === Number(itemId)) {
-          return normalizeApiItem(cachedItem);
-        }
-      } catch (error) {
-        sessionStorage.removeItem('doafacil_selected_item');
-      }
-
-      return null;
     }
 
     function buildMissingItem(itemId) {
@@ -366,52 +357,109 @@ const mockItems = [];
         color: '',
         pickup: '',
         donor: 'Doador',
+        donorId: null,
         donorRecurrent: false,
         status: 'indisponivel',
         emoji: '📦'
       };
     }
 
+    function renderLoadingItem() {
+      $('#breadcrumb-category').text('Carregando');
+      $('#breadcrumb-title').text('Item');
+      $('#gallery-visual').html('<span id="gallery-emoji" style="font-size:4rem;">📦</span>');
+      $('#item-desc-main').text('Carregando dados do item...');
+      $('#item-desc-extra').text('');
+      $('#spec-category').text('-');
+      $('#spec-condition').text('-');
+      $('.spec-item').eq(2).find('.s-value').text('-');
+      $('#spec-material').text('-');
+      $('#spec-color').text('-');
+      $('#spec-pickup').text('-');
+      $('#item-location-name').text('Localizacao');
+      $('#item-location-sub').text('Carregando localizacao...');
+      $('#item-category-badge').text('Item');
+      $('#item-title-main').text('Carregando item...');
+      $('#item-condition-text').text('-');
+      $('#donor-name').text('Doador');
+      $('#modal-item-title').text('Item');
+      $('#modal-item-sub').text('');
+      $('#btn-reservar-item')
+        .html('<i class="bi bi-bookmark-check"></i> Carregando item...')
+        .prop('disabled', true)
+        .attr('aria-disabled', 'true')
+        .removeAttr('data-bs-toggle')
+        .removeAttr('data-bs-target')
+        .addClass('disabled');
+    }
+
     function setReservationState(item) {
       const status = item.status || 'disponivel';
-
-      if (status === 'disponivel') {
-        $('.status-pill')
-          .addClass('status-available')
-          .removeAttr('style')
-          .html('<i class="bi bi-check-circle-fill"></i> Disponivel');
-
-        $('#btn-reserve-action')
-          .html('<i class="bi bi-bookmark-check"></i> Reservar este item')
-          .removeAttr('disabled')
-          .removeAttr('aria-disabled')
-          .attr('data-bs-toggle', 'modal')
-          .attr('data-bs-target', '#reserveModal')
-          .removeClass('disabled')
-          .css({ background: '', color: '', 'pointer-events': '' });
-        return;
-      }
-
+      const currentUser = getCurrentUser();
+      const isOwner = currentUser && Number(currentUser.id) === Number(item.donorId);
       const styles = {
         reservado: { background: '#FFF3CD', color: '#856404' },
         concluido: { background: '#D4EDD0', color: '#2D5A27' },
         cancelado: { background: '#F8D7DA', color: '#842029' },
         indisponivel: { background: '#F8D7DA', color: '#842029' }
       };
+
+      if (status === 'disponivel') {
+        $('.status-pill')
+          .addClass('status-available')
+          .removeAttr('style')
+          .html('<i class="bi bi-check-circle-fill"></i> Disponivel');
+      } else {
+        const style = styles[status] || styles.reservado;
+        $('.status-pill')
+          .removeClass('status-available')
+          .css(style)
+          .html(`<i class="bi bi-hourglass-split"></i> ${statusLabels[status] || status}`);
+      }
+
+      if (isOwner) {
+        $('.form-check:has(#checkbox-habilitar-reserva)').hide();
+        $('#btn-reservar-item')
+          .html('<i class="bi bi-pencil-square"></i> Editar item')
+          .css({ background: '', color: '', 'pointer-events': '' })
+          .prop('disabled', false)
+          .attr('aria-disabled', 'false')
+          .removeAttr('data-bs-toggle')
+          .removeAttr('data-bs-target')
+          .attr('data-item-id', item.id)
+          .addClass('btn-edit-owned-item')
+          .removeClass('disabled');
+        return;
+      }
+
+      $('.form-check:has(#checkbox-habilitar-reserva)').show();
+
+      if (status === 'disponivel') {
+        const canReserve = $('#checkbox-habilitar-reserva').is(':checked');
+
+        $('#btn-reservar-item')
+          .html('<i class="bi bi-bookmark-check"></i> Reservar este item')
+          .prop('disabled', !canReserve)
+          .attr('aria-disabled', String(!canReserve))
+          .attr('data-bs-toggle', 'modal')
+          .attr('data-bs-target', '#reserveModal')
+          .removeAttr('data-item-id')
+          .removeClass('btn-edit-owned-item')
+          .removeClass('disabled')
+          .css({ background: '', color: '', 'pointer-events': '' });
+        return;
+      }
+
       const style = styles[status] || styles.reservado;
-
-      $('.status-pill')
-        .removeClass('status-available')
-        .css(style)
-        .html(`<i class="bi bi-hourglass-split"></i> ${statusLabels[status] || status}`);
-
-      $('#btn-reserve-action')
+      $('#btn-reservar-item')
         .html(`<i class="bi bi-bookmark-check"></i> Item ${statusLabels[status] || status}`)
         .css({ ...style, 'pointer-events': 'none' })
         .attr('disabled', 'disabled')
         .attr('aria-disabled', 'true')
         .removeAttr('data-bs-toggle')
         .removeAttr('data-bs-target')
+        .removeAttr('data-item-id')
+        .removeClass('btn-edit-owned-item')
         .addClass('disabled');
     }
 
@@ -453,54 +501,19 @@ const mockItems = [];
       setReservationState(item);
     }
 
-    function loadMockItem() {
-      const params = new URLSearchParams(window.location.search);
-      const itemId = Number(params.get('id')) || 1;
-      const item   = mockItems.find(i => i.id === itemId) || mockItems[0];
-      currentItem = item;
-    
-      // Breadcrumb
-      $('#breadcrumb-category').text(item.categoryLabel);
-      $('#breadcrumb-title').text(item.title);
-    
-      // Galeria
-      if (item.image) {
-        $('#gallery-visual').html(`<img id="gallery-img" src="${item.image}" alt="${item.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`);
-      } else {
-        $('#gallery-visual').html(`<span id="gallery-emoji" style="font-size:4rem;">${item.emoji}</span>`);
-      }
-    
-      // Descrição
-      $('#item-desc-main').text(item.desc);
-      $('#item-desc-extra').text(`${item.title} disponível para retirada a combinar.`);
-    
-      // Especificações
-      $('#spec-category').text(item.categoryLabel);
-      $('#spec-condition').text(item.condLabel);
-    
-      // Localização (aproximada antes da reserva)
-      $('#item-location-name').text(item.location.split(',')[0]);
-      $('#item-location-sub').text(item.location);
-      $('#location-map').html(buildMapIframe(item.location, 'Mapa da localização aproximada'));
-    
-      // Painel de ação
-      $('#item-category-badge').text(item.categoryLabel);
-      $('#item-title-main').text(item.title);
-      $('#item-condition-text').text(item.condLabel);
-    
-      // Modal
-      $('#modal-item-emoji').text(item.emoji);
-      $('#modal-item-title').text(item.title);
-      $('#modal-item-sub').text(`${item.location} · ${item.condLabel}`);
-    }
-  
     function loadItemFromApi() {
       const params = new URLSearchParams(window.location.search);
-      const itemId = Number(params.get('id')) || 1;
-      const fallbackItem = getCachedSelectedItem(itemId) || mockItems.find(i => i.id === itemId) || buildMissingItem(itemId);
+      const itemId = Number(params.get('id'));
+
+      renderLoadingItem();
+
+      if (!Number.isFinite(itemId) || itemId <= 0) {
+        renderItem(buildMissingItem(null));
+        return;
+      }
 
       if (!window.DoaFacilAPI?.Items?.getById) {
-        renderItem(fallbackItem);
+        renderItem(buildMissingItem(itemId));
         return;
       }
 
@@ -509,12 +522,12 @@ const mockItems = [];
           renderItem(normalizeApiItem(item));
         })
         .fail(function () {
-          renderItem(fallbackItem);
+          renderItem(buildMissingItem(itemId));
         });
     }
 
-    // Substitui: window.addEventListener('load', loadItem)
-    $(window).on('load', loadItemFromApi);
+    // A pagina depende do id da URL e deve buscar o item assim que o DOM estiver pronto.
+    loadItemFromApi();
   
     // ── Navegação da galeria por dots ────────────────────────
     // Substitui: switchImg() com querySelectorAll + classList + getElementById
@@ -530,7 +543,27 @@ const mockItems = [];
   
     $('#btn-reservar-item').prop('disabled', !$('#checkbox-habilitar-reserva').is(':checked'));
     $(document).on('change', '#checkbox-habilitar-reserva', function () {
-      $('#btn-reservar-item').prop('disabled', !$(this).is(':checked'));
+      if (currentItem?.status === 'disponivel') {
+        const disabled = !$(this).is(':checked');
+        $('#btn-reservar-item')
+          .prop('disabled', disabled)
+          .attr('aria-disabled', String(disabled));
+      }
+    });
+
+    $(document).on('click', '.btn-edit-owned-item', function (event) {
+      event.preventDefault();
+
+      if (!window.DoaFacilItemEditor || !currentItem?.id) {
+        alert('Editor de item indisponivel.');
+        return;
+      }
+
+      window.DoaFacilItemEditor.open(currentItem.id, {
+        onSaved: function () {
+          loadItemFromApi();
+        }
+      });
     });
   
     // ── Botão WhatsApp ───────────────────────────────────────
@@ -567,8 +600,13 @@ const mockItems = [];
       }
 
       const $button = $(this);
-      const itemId = currentItem?.id || Number(new URLSearchParams(window.location.search).get('id')) || 1;
+      const itemId = currentItem?.id || Number(new URLSearchParams(window.location.search).get('id'));
       const message = $('#reservation-message').val().trim();
+
+      if (!Number.isFinite(Number(itemId)) || Number(itemId) <= 0) {
+        alert('Item nao encontrado para reserva.');
+        return;
+      }
 
       if (message.length > RESERVATION_MESSAGE_MAX_LENGTH) {
         alert(`A mensagem deve ter no máximo ${RESERVATION_MESSAGE_MAX_LENGTH} caracteres.`);
@@ -583,14 +621,14 @@ const mockItems = [];
           modal.hide();
 
           setTimeout(function () {
-            const item = mockItems.find(i => i.id === itemId) || mockItems[0];
+            const item = currentItem || buildMissingItem(itemId);
 
             $('.status-pill')
               .removeClass('status-available')
               .css({ background: '#FFF3CD', color: '#856404' })
               .html('<i class="bi bi-hourglass-split"></i> Reservado');
 
-            $('#btn-reserve-action')
+            $('#btn-reservar-item')
               .html('<i class="bi bi-bookmark-check"></i> Item Reservado')
               .css({ background: '#FFF3CD', color: '#856404', 'pointer-events': 'none' })
               .attr('disabled', 'disabled')
@@ -599,8 +637,8 @@ const mockItems = [];
               .removeAttr('data-bs-target')
               .addClass('disabled');
 
-            $('#item-location-name').text(item.fullAddress.split(',')[0]);
-            $('#item-location-sub').text(item.fullAddress);
+            $('#item-location-name').text((item.fullAddress || item.location || '').split(',')[0] || 'Localizacao');
+            $('#item-location-sub').text(item.fullAddress || item.location || 'Localizacao nao informada');
 
             $('#location-title').html('<i class="bi bi-map" style="color:var(--green-mid)"></i> LocalizaÃ§Ã£o exata');
             $('#location-map').html(buildMapIframe(item.mapAddress, 'Mapa da localizaÃ§Ã£o exata'));
@@ -615,61 +653,6 @@ const mockItems = [];
         .always(function () {
           $button.prop('disabled', false).text('Confirmar reserva');
         });
-
-      return;
-
-      const modal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
-      modal.hide();
-    
-      setTimeout(function () {
-        const params = new URLSearchParams(window.location.search);
-        const itemId = Number(params.get('id')) || 1;
-        const item   = mockItems.find(i => i.id === itemId) || mockItems[0];
-      
-        // Atualiza pill de status
-        // Substitui: document.querySelector('.status-pill').style... + innerHTML
-        $('.status-pill')
-          .removeClass('status-available')
-          .css({ background: '#FFF3CD', color: '#856404' })
-          .html('<i class="bi bi-hourglass-split"></i> Reservado');
-
-        // Atualiza botão de reservar na action panel (texto, cor e torna não clicável)
-        $('#btn-reserve-action')
-          .html('<i class="bi bi-bookmark-check"></i> Item Reservado')
-          .css({ background: '#FFF3CD', color: '#856404', 'pointer-events': 'none' })
-          .attr('disabled', 'disabled')
-          .attr('aria-disabled', 'true')
-          .removeAttr('data-bs-toggle')
-          .removeAttr('data-bs-target')
-          .addClass('disabled');
-      
-        // Salva reserva em memória para histórico
-        const currentUser = getCurrentUser();
-        if (currentUser) {
-          const reservations = JSON.parse(localStorage.getItem('doafacil_reservations') || '[]');
-          reservations.push({
-            itemId: item.id,
-            name: item.title,
-            image: item.image,
-            cat: item.categoryLabel,
-            doador: item.donor,
-            receiverEmail: currentUser.email,
-            date: new Date().toLocaleDateString('pt-BR'),
-            status: 'reservado',
-          });
-          localStorage.setItem('doafacil_reservations', JSON.stringify(reservations));
-        }
-
-        // Revela endereço exato após confirmação
-        $('#item-location-name').text(item.fullAddress.split(',')[0]);
-        $('#item-location-sub').text(item.fullAddress);
-
-        // Atualiza mapa para localização exata
-        $('#location-title').html('<i class="bi bi-map" style="color:var(--green-mid)"></i> Localização exata');
-        $('#location-map').html(buildMapIframe(item.mapAddress, 'Mapa da localização exata'));
-
-        alert('✅ Item reservado com sucesso!\nEntre em contato via WhatsApp para combinar a retirada.');
-      }, 300);
     });
 
   });
