@@ -79,6 +79,7 @@
           <i class="bi bi-arrow-right-circle"></i> Entrar
         </button>
 
+        <div id="login-sucesso" class="alert alert-success" style="display:none;"></div>
         <div id="login-erro" class="alert alert-danger" style="display:none;"></div>
         <div class="note">
           Não tem conta? <a href="#" style="color:var(--green-mid);text-decoration:none;" data-tab="register">Crie uma grátis</a>
@@ -271,6 +272,30 @@
       localStorage.removeItem(STORAGE_CURRENT_USER_KEY);
     }
 
+    function clearAuthSession() {
+      localStorage.removeItem('doafacil_token');
+      localStorage.removeItem('doafacil_user');
+      localStorage.removeItem('doafacil_current_user');
+      localStorage.removeItem('doafacil_fallback_session');
+    }
+
+    let successTimer = null;
+
+    function showLoginSuccess(message) {
+      const successBox = document.getElementById('login-sucesso');
+      const errorBox = document.getElementById('login-erro');
+
+      if (successTimer) clearTimeout(successTimer);
+      if (errorBox) errorBox.style.display = 'none';
+
+      successBox.textContent = message;
+      successBox.style.display = 'block';
+
+      successTimer = setTimeout(() => {
+        successBox.style.display = 'none';
+      }, 4500);
+    }
+
     function emailAlreadyRegistered(email) {
       return !!findUserByEmail(email);
     }
@@ -322,8 +347,14 @@
         password
       })
         .done(() => {
-          saveRegisteredEmail(email);
-          window.location.href = '../index.html';
+          clearAuthSession();
+          document.getElementById('login-email').value = email;
+          document.getElementById('login-password').value = '';
+          document.querySelectorAll('#panel-register input').forEach(input => {
+            input.value = '';
+          });
+          switchTab('login');
+          showLoginSuccess('Conta criada com sucesso');
         })
         .fail((jqXHR) => {
           const message = jqXHR.responseJSON?.error || 'NÃ£o foi possÃ­vel criar a conta.';
