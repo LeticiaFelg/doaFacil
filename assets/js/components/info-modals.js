@@ -7,7 +7,9 @@ function initInfoModals() {
 
   $('body').append('<div id="infoModalsMount"></div>');
 
-  $('#infoModalsMount').load(componentPath, function () {
+  const cacheSafeComponentPath = `${componentPath}?v=${Date.now()}`;
+
+  $('#infoModalsMount').load(cacheSafeComponentPath, function () {
     function closeInfoModal() {
       $('#infoModalOverlay').removeClass('active').attr('aria-hidden', 'true');
       $('.info-modal-panel').removeClass('active');

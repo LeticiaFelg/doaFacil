@@ -473,29 +473,23 @@
         $('#profileReceptorNameValue').text(name);
       }
 
-      const editProfileModal = document.getElementById('editProfileModal');
-      const editProfileClose = editProfileModal.querySelector('.modal-close');
-      const editProfileForm = document.getElementById('editProfileForm');
-
       function openEditProfileModal() {
         fillProfileForm();
-        editProfileModal.classList.add('active');
-        editProfileModal.setAttribute('aria-hidden', 'false');
+        $('#editProfileModal').addClass('active').attr('aria-hidden', 'false');
       }
 
       function closeEditProfileModal() {
-        editProfileModal.classList.remove('active');
-        editProfileModal.setAttribute('aria-hidden', 'true');
+        $('#editProfileModal').removeClass('active').attr('aria-hidden', 'true');
       }
 
-      $(document).on('click', '.btn-edit', function (e) {
+      $(document).on('click', '.btn-edit:not(#btn-logout):not(#btn-delete-account):not(#btn-solicitar-inst)', function (e) {
         e.preventDefault();
         openEditProfileModal();
       });
 
-      editProfileClose.addEventListener('click', closeEditProfileModal);
-      editProfileModal.addEventListener('click', function (e) {
-        if (e.target === editProfileModal) {
+      $('#editProfileModal .modal-close').on('click', closeEditProfileModal);
+      $('#editProfileModal').on('click', function (e) {
+        if (e.target === this) {
           closeEditProfileModal();
         }
       });
