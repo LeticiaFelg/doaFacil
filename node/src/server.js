@@ -9,6 +9,7 @@ const User = require('./models/User');
 const Item = require('./models/Item');
 const Reservation = require('./models/Reservation');
 const History = require('./models/History');
+const PasswordReset = require('./models/PasswordReset');
 
 // Rotas
 const authRoutes = require('./routes/auth');
@@ -50,6 +51,8 @@ Reservation.belongsTo(User, { as: 'donor', foreignKey: 'donor_id' });
 Item.hasMany(Reservation, { foreignKey: 'item_id' });
 User.hasMany(Reservation, { as: 'receivedReservations', foreignKey: 'user_id' });
 User.hasMany(Reservation, { as: 'donationReservations', foreignKey: 'donor_id' });
+PasswordReset.belongsTo(User, { as: 'user', foreignKey: 'user_id' });
+User.hasMany(PasswordReset, { as: 'passwordResets', foreignKey: 'user_id' });
 
 // Rotas
 app.use('/api/auth', authRoutes);

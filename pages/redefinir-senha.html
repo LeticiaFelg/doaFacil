@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DoaFácil - Redefinir senha</title>
+  <link rel="icon" type="image/png" href="../public/faveicon4.png">
+  <link rel="stylesheet" href="../assets/css/login.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <div class="panel-left">
+    <div class="brand">
+      <div class="brand-icon">🌿</div>
+      <span class="brand-name">DoaFácil</span>
+    </div>
+
+    <div class="hero-text">
+      <h1>Conectar quem<br>doa com quem<br><em>mais precisa.</em></h1>
+      <p>Plataforma digital para redistribuição de bens materiais, promovendo solidariedade e impacto social real.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat">
+        <div class="num">4.2k+</div>
+        <div class="lbl">Itens doados</div>
+      </div>
+      <div class="stat">
+        <div class="num">1.8k</div>
+        <div class="lbl">Famílias atendidas</div>
+      </div>
+      <div class="stat">
+        <div class="num">320</div>
+        <div class="lbl">Instituições parceiras</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-right">
+    <div class="auth-card">
+      <div class="form-panel active">
+        <h2>Redefina sua senha</h2>
+        <p class="subtitle">Crie uma nova senha para acessar sua conta.</p>
+
+        <form id="resetPasswordForm">
+          <div class="form-group-custom">
+            <label for="reset-password">Nova senha</label>
+            <div class="input-wrap">
+              <i class="bi bi-lock icon"></i>
+              <input type="password" id="reset-password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <div class="form-group-custom">
+            <label for="reset-confirm-password">Confirme a senha</label>
+            <div class="input-wrap">
+              <i class="bi bi-shield-lock icon"></i>
+              <input type="password" id="reset-confirm-password" placeholder="Repita a nova senha" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <div id="reset-password-success" class="alert alert-success" style="display:none;"></div>
+          <div id="reset-password-error" class="alert alert-danger" style="display:none;"></div>
+
+          <button type="submit" class="btn-primary-custom" id="btn-reset-password">
+            <i class="bi bi-check-circle"></i> Salvar nova senha
+          </button>
+        </form>
+
+        <div class="note">
+          Lembrou a senha? <a href="login.html" style="color:var(--green-mid);text-decoration:none;">Voltar para login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script>
+    const resetToken = new URLSearchParams(window.location.search).get('token') || '';
+
+    function showResetError(message) {
+      $('#reset-password-success').hide().text('');
+      $('#reset-password-error').text(message).show();
+    }
+
+    function showResetSuccess(message) {
+      $('#reset-password-error').hide().text('');
+      $('#reset-password-success').text(message).show();
+    }
+
+    if (!resetToken) {
+      showResetError('Link de redefinição inválido ou incompleto.');
+      $('#btn-reset-password').prop('disabled', true);
+    }
+
+    $('#resetPasswordForm').on('submit', function (event) {
+      event.preventDefault();
+
+      const password = $('#reset-password').val();
+      const confirmPassword = $('#reset-confirm-password').val();
+      const $button = $('#btn-reset-password');
+      const buttonText = $button.html();
+
+      $('#reset-password, #reset-confirm-password').removeClass('error');
+
+      if (!resetToken) {
+        return showResetError('Link de redefinição inválido ou incompleto.');
+      }
+
+      if (!password || password.length < 6) {
+        $('#reset-password').addClass('error');
+        return showResetError('A nova senha deve ter pelo menos 6 caracteres.');
+      }
+
+      if (password !== confirmPassword) {
+        $('#reset-confirm-password').addClass('error');
+        return showResetError('A confirmação de senha não confere.');
+      }
+
+      $button.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> Salvando...');
+
+      DoaFacilAPI.Auth.resetPassword(resetToken, password, confirmPassword)
+        .done(function () {
+          showResetSuccess('Senha redefinida com sucesso.');
+          setTimeout(function () {
+            window.location.href = 'login.html';
+          }, 1800);
+        })
+        .fail(function (jqXHR) {
+          const message = jqXHR.responseJSON?.error || 'Não foi possível redefinir a senha. Solicite um novo link e tente novamente.';
+          showResetError(message);
+          $button.prop('disabled', false).html(buttonText);
+        });
+    });
+  </script>
+</body>
+</html>

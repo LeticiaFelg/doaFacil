@@ -1,10 +1,17 @@
 const express = require('express');
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Item = require('../models/Item');
 const Reservation = require('../models/Reservation');
 const auth = require('../middleware/auth');
+const {
+  createPasswordResetToken,
+  findValidPasswordReset,
+  markPasswordResetAsUsed,
+  sendPasswordResetEmail
+} = require('../services/passwordResetService');
 
 const router = express.Router();
 
@@ -35,6 +42,16 @@ function isValidPhone(phone) {
 
 function isValidCpf(cpf) {
   return normalizeDigits(cpf).length === 11;
+}
+
+function isValidPassword(password) {
+  return typeof password === 'string' && password.length >= 6;
+}
+
+function sendPasswordResetEmailInBackground(user, resetToken) {
+  sendPasswordResetEmail(user, resetToken).catch((error) => {
+    console.error('[forgot-password] Falha ao enviar e-mail de redefinicao:', error.message);
+  });
 }
 
 async function buildUserProfile(userId) {
@@ -170,6 +187,71 @@ router.post('/login', async (req, res) => {
       token,
       access_token: token
     });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Solicitar redefinicao de senha. A resposta e neutra para proteger e-mails cadastrados.
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const email = normalizeEmail(req.body.email);
+    const responseMessage = 'Se o e-mail estiver cadastrado, enviaremos instrucoes para redefinir sua senha.';
+
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ error: 'Email invalido' });
+    }
+
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.json({ message: responseMessage });
+    }
+
+    const resetToken = await createPasswordResetToken(user.id);
+    sendPasswordResetEmailInBackground(user, resetToken);
+
+    return res.json({ message: responseMessage });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Redefinir senha usando o token temporario enviado por e-mail.
+router.put('/reset-password', async (req, res) => {
+  try {
+    const { token, password, confirmPassword } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ error: 'Token obrigatorio' });
+    }
+
+    if (!isValidPassword(password)) {
+      return res.status(400).json({ error: 'Senha deve ter pelo menos 6 caracteres' });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: 'Confirmacao de senha nao confere' });
+    }
+
+    const passwordReset = await findValidPasswordReset(token);
+
+    if (!passwordReset) {
+      return res.status(400).json({ error: 'Token invalido ou expirado' });
+    }
+
+    const user = await User.findByPk(passwordReset.user_id);
+
+    if (!user) {
+      await markPasswordResetAsUsed(passwordReset);
+      return res.status(404).json({ error: 'Usuario nao encontrado' });
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
+    await markPasswordResetAsUsed(passwordReset);
+
+    return res.json({ message: 'Senha redefinida com sucesso' });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
