@@ -115,6 +115,8 @@
 
   /* ── RIGHT PANEL ─────────────────────────────── */
   .panel-right {
+    position: relative;
+    isolation: isolate;
     flex: 1;
     display: flex;
     align-items: center;
@@ -265,6 +267,20 @@
   }
   .btn-primary-custom:hover { background: var(--green-mid); }
   .btn-primary-custom:active { transform: scale(.98); }
+  #btn-forgot-password.btn-forgot-password-sent,
+  #btn-forgot-password.btn-forgot-password-sent:hover,
+  #btn-forgot-password.btn-forgot-password-sent:active,
+  #btn-forgot-password.btn-forgot-password-sent:focus {
+    background: #d8ded5 !important;
+    color: #60705d !important;
+    cursor: default !important;
+    pointer-events: none !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 
   .divider {
     display: flex; align-items: center; gap: 12px;
@@ -294,6 +310,26 @@
     margin-top: 16px;
   }
 
+  .panel-right > #forgotPasswordModal.login-modal-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 48px clamp(40px, 8vw, 76px) 48px 40px;
+    background: rgba(0, 0, 0, 0.32);
+  }
+  .info-modal.login-modal {
+    width: min(100%, 466px);
+    margin: 0;
+  }
+  #forgotPasswordForm .alert {
+    font-size: .86rem;
+    margin-bottom: 12px;
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     body { flex-direction: column; }
@@ -301,6 +337,11 @@
     .hero-text h1 { font-size: 2rem; }
     .stats-row { display: none; }
     .panel-right { padding: 32px 20px; }
+    .panel-right > #forgotPasswordModal.login-modal-overlay {
+      align-items: flex-start;
+      justify-content: center;
+      padding: 60px 18px 32px;
+    }
     .auth-card { max-width: 100%; }
   }
 
@@ -309,4 +350,11 @@
     .hero-text h1 { font-size: 1.85rem; }
     .panel-right { padding: 28px 16px; }
     .brand-name { font-size: 1.4rem; }
+    .panel-right > #forgotPasswordModal.login-modal-overlay {
+      padding: 60px 16px 28px;
+    }
+    .info-modal.login-modal {
+      width: 100%;
+      padding: 30px 22px;
+    }
   }

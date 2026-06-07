@@ -73,6 +73,14 @@ const DoaFacilAPI = (() => {
       });
     },
 
+    forgotPassword(email) {
+      return _request('POST', '/users/forgot-password', { email });
+    },
+
+    resetPassword(token, password, confirmPassword) {
+      return _request('PUT', '/users/reset-password', { token, password, confirmPassword });
+    },
+
     logout() {
       return _request('POST', '/users/logout').always(() => {
         localStorage.removeItem('doafacil_token');

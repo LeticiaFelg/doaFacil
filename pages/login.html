@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../assets/css/login.css">
   <link rel="stylesheet" href="../assets/css/components/footer.css">
   <link rel="stylesheet" href="../assets/css/components/navbar.css">
+  <link rel="stylesheet" href="../assets/css/components/info-modals.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -73,7 +74,7 @@
           </div>
         </div>
 
-        <a href="#" class="forgot-link">Esqueceu a senha?</a>
+        <a href="#" class="forgot-link" id="forgot-password-link">Esqueceu a senha?</a>
 
         <button class="btn-primary-custom" id="btn-entrar">
           <i class="bi bi-arrow-right-circle"></i> Entrar
@@ -146,6 +147,32 @@
         <div class="note">
           Ao criar uma conta, você concorda com nossos <a href="#" style="color:var(--green-mid);text-decoration:none;">Termos de uso</a>
         </div>
+      </div>
+    </div>
+
+    <div id="forgotPasswordModal" class="info-modal-overlay login-modal-overlay" aria-hidden="true">
+      <div class="info-modal login-modal" role="dialog" aria-modal="true" aria-labelledby="forgotPasswordTitle">
+        <button type="button" class="info-modal-close login-modal-close" aria-label="Fechar">&times;</button>
+        <section class="info-modal-panel active">
+          <h2 id="forgotPasswordTitle">Recuperar senha</h2>
+          <p>
+            Informe o e-mail cadastrado para receber as instruções de redefinição de senha.
+          </p>
+          <form id="forgotPasswordForm">
+          <div class="form-group-custom">
+            <label for="forgot-password-email">E-mail</label>
+            <div class="input-wrap">
+              <i class="bi bi-envelope icon"></i>
+              <input type="email" id="forgot-password-email" placeholder="seu@email.com" required />
+            </div>
+          </div>
+          <div id="forgot-password-success" class="alert alert-success" style="display:none;"></div>
+          <div id="forgot-password-error" class="alert alert-danger" style="display:none;"></div>
+          <button type="submit" class="btn-primary-custom" id="btn-forgot-password">
+            <i class="bi bi-envelope-check"></i> Enviar instruções
+          </button>
+        </form>
+        </section>
       </div>
     </div>
   </div>
@@ -296,6 +323,36 @@
       }, 4500);
     }
 
+    const forgotPasswordMessage = 'Se o e-mail estiver cadastrado, enviaremos instruções para redefinir sua senha.';
+
+    function resetForgotPasswordFeedback() {
+      $('#forgot-password-success, #forgot-password-error').hide().text('');
+      $('#forgot-password-email').removeClass('error');
+      $('#btn-forgot-password')
+        .removeClass('btn-forgot-password-sent')
+        .prop('disabled', false)
+        .attr('aria-disabled', 'false')
+        .attr('type', 'submit')
+        .css({
+          background: '',
+          color: '',
+          cursor: ''
+        })
+        .html('<i class="bi bi-envelope-check"></i> Enviar instruções');
+    }
+
+    function openForgotPasswordModal() {
+      resetForgotPasswordFeedback();
+      $('#forgot-password-email').val($('#login-email').val().trim());
+      $('#forgotPasswordModal').addClass('active').attr('aria-hidden', 'false');
+      $('#forgot-password-email').trigger('focus');
+    }
+
+    function closeForgotPasswordModal() {
+      $('#forgotPasswordModal').removeClass('active').attr('aria-hidden', 'true');
+      resetForgotPasswordFeedback();
+    }
+
     function emailAlreadyRegistered(email) {
       return !!findUserByEmail(email);
     }
@@ -307,6 +364,61 @@
     }
 
     redirectIfLoggedIn();
+
+    $('#forgot-password-link').on('click', function (e) {
+      e.preventDefault();
+      openForgotPasswordModal();
+    });
+
+    $('.login-modal-close').on('click', closeForgotPasswordModal);
+
+    $('#forgotPasswordModal').on('click', function (e) {
+      if (e.target === this) {
+        closeForgotPasswordModal();
+      }
+    });
+
+    $(document).on('keydown', function (e) {
+      if (e.key === 'Escape' && $('#forgotPasswordModal').hasClass('active')) {
+        closeForgotPasswordModal();
+      }
+    });
+
+    $('#forgotPasswordForm').on('submit', function (e) {
+      e.preventDefault();
+
+      if ($('#btn-forgot-password').hasClass('btn-forgot-password-sent')) {
+        return;
+      }
+
+      resetForgotPasswordFeedback();
+
+      const email = $('#forgot-password-email').val().trim();
+
+      if (!email || !isValidEmail(email)) {
+        $('#forgot-password-email').addClass('error');
+        $('#forgot-password-error').text('Informe um e-mail válido.').show();
+        return;
+      }
+
+      $('#forgot-password-success').text(forgotPasswordMessage).show();
+      $('#btn-forgot-password')
+        .addClass('btn-forgot-password-sent')
+        .prop('disabled', true)
+        .attr('aria-disabled', 'true')
+        .attr('type', 'button')
+        .css({
+          background: '#d8ded5',
+          color: '#60705d',
+          cursor: 'default'
+        })
+        .html('<i class="bi bi-check-circle"></i> E-mail enviado');
+
+      DoaFacilAPI.Auth.forgotPassword(email)
+        .fail(function (jqXHR) {
+          console.warn('Falha ao solicitar redefinicao de senha:', jqXHR.responseJSON?.error || jqXHR.statusText);
+        });
+    });
 
     document.getElementById('btn-criar-conta')?.addEventListener('click', function(e) {
       e.preventDefault();
