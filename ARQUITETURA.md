@@ -1,152 +1,368 @@
 # Arquitetura DoaFacil
 
-Este documento registra as decisoes tecnicas e arquiteturais do projeto. O README deve ficar mais direto, com instalacao, comandos e uso. Este arquivo guarda o "por que" das escolhas.
+Este documento registra as principais decisoes tecnicas do projeto. O README fica mais direto, com visao geral e instrucoes de uso; este arquivo explica como as partes se conectam e por que algumas escolhas foram feitas.
 
 ## Visao Geral
 
-O DoaFacil e dividido em duas partes:
+O DoaFacil e uma aplicacao web dividida em duas camadas:
 
-- Frontend estatico: HTML, CSS e JavaScript servidos localmente por `python -m http.server 8000` ou Live Server e, futuramente, publicados em S3.
-- Backend separado: API Node.js/Express em `node/src`, servida em `http://localhost:5000`.
+- Frontend estatico em HTML, CSS, Bootstrap, jQuery e JavaScript.
+- Backend Node.js/Express em `node/`, com banco SQLite via Sequelize.
+
+Fluxo local atual:
+
+```text
+Browser -> Frontend estatico em localhost:8000 -> API Express em localhost:5000 -> SQLite em node/doafacil.db
+```
 
 O frontend consome a API por `window.API_BASE_URL`, definido em `assets/js/config.js`.
 
-A pasta `backend/` existe no repositorio como estrutura antiga/paralela. Ela nao e a API ativa do fluxo atual. O backend em uso e a pasta `node/`.
+## Pasta backend/
 
-## Banco De Dados Atual
+A pasta `backend/` existe no repositorio como uma estrutura antiga/paralela, com referencias a serverless, DynamoDB e outra organizacao de API.
 
-O banco atual e SQLite, salvo em:
+Ela nao e a API ativa usada pelas paginas atuais. A API em uso fica em:
+
+```text
+node/
+```
+
+## Frontend
+
+As paginas principais sao:
+
+- `index.html`: home/feed de itens, carrossel, categorias, busca e destaques.
+- `pages/login.html`: login, cadastro e modal de recuperacao de senha.
+- `pages/redefinir-senha.html`: pagina acessada pelo link temporario para criar nova senha.
+- `pages/perfil.html`: dados do usuario, doacoes ativas e itens recebidos.
+- `pages/item.html`: detalhes do item, reserva, contato WhatsApp e edicao pelo doador.
+- `pages/historico.html`: historico de doacoes feitas e itens recebidos.
+
+Componentes reutilizaveis:
+
+- `assets/components/navbar.html`
+- `assets/components/footer.html`
+- `assets/components/info-modals.html`
+
+Scripts principais:
+
+- `assets/js/api.js`: camada jQuery AJAX para a API.
+- `assets/js/config.js`: URL base da API.
+- `assets/js/modal.js`: criacao e edicao de itens.
+- `assets/js/components/*.js`: carregamento de navbar, footer e modais informativos.
+
+## Backend Ativo
+
+A API ativa fica em `node/src`.
+
+Principais arquivos:
+
+```text
+node/src/server.js
+node/src/config/database.js
+node/src/models/
+node/src/routes/
+node/src/services/
+node/src/seed/demoData.js
+node/uploads/items/
+```
+
+O servidor registra:
+
+- CORS para origens locais e `FRONTEND_URL`.
+- JSON parser.
+- Servico estatico de uploads em `/uploads`.
+- Associacoes Sequelize.
+- Rotas em `/api`.
+- Health check em `/api/health`.
+- Sincronizacao do banco e seed demonstrativo ao iniciar.
+
+## Banco De Dados
+
+O banco atual e SQLite:
 
 ```text
 node/doafacil.db
 ```
 
-A escolha por SQLite simplifica o desenvolvimento local e evita configurar um servidor de banco neste momento. O arquivo `.db` nao deve ir para o repositorio.
+Ele e criado/sincronizado automaticamente por `sequelize.sync()` ao iniciar o backend. O arquivo `.db` nao deve ser versionado.
 
-No futuro, para system tests mais fieis, planejamos rodar o ambiente em container.
+Configuracao:
 
-## Health E Ready
+```text
+node/src/config/database.js
+```
 
-Conceitualmente:
+## Modelos
 
-- `health` responde se a API esta viva.
-- `ready` responderia se a API esta pronta para atender usuarios, incluindo banco e dependencias.
+### User
 
-Decisao atual: `GET /api/health` verifica tambem a conexao com o banco via Sequelize. Isso foi escolhido porque, neste projeto, a API nao consegue cumprir os fluxos principais sem acesso ao banco.
+Guarda usuarios da plataforma.
 
-Alternativa futura: criar `GET /api/ready` para checar banco e dependencias, mantendo `GET /api/health` apenas para o processo Express.
+Campos principais:
 
-## Seed Inicial
+- `name`
+- `email`
+- `password`
+- `phone`
+- `cpf`
+- `bairro`
+- `location`
+- `avatar`
+- `bio`
+- `verified`
+- `roles`
 
-O seed inicial cria:
+A senha e armazenada com hash `bcryptjs`. A resposta JSON remove o campo `password`.
 
-- Maria Clara Souza como usuaria demonstrativa.
-- Itens iniciais associados a Maria Clara.
-- Usuarios demonstrativos usados como receptores e doadores auxiliares.
-- Reservas e historicos demonstrativos para itens concluidos, reservados, cancelados e recebidos.
+### Item
 
-O seed evita duplicacao procurando registros existentes antes de criar novos.
+Guarda o catalogo de itens.
 
-## Papel Das Tabelas
+Campos principais:
 
-### users
+- `title`
+- `description`
+- `category`
+- `condition`
+- `location`
+- `status`
+- `donor_id`
+- `images`
+- `dimensions`
+- `material`
+- `color`
+- `pickup`
+- `address`
 
-Guarda os usuarios da plataforma, incluindo doadores e receptores. Um usuario pode ter mais de um papel.
+`description` e `TEXT`. No backend, a descricao de item e limitada a 1000 caracteres.
 
-### items
-
-Guarda o catalogo de itens e o status atual do item. Exemplos de status:
+Status usados:
 
 - `disponivel`
 - `reservado`
 - `concluido`
 - `cancelado`
 
-### reservations
+### Reservation
 
-Guarda as reservas feitas por receptores em itens de doadores. Uma reserva aponta para:
+Guarda reservas feitas por receptores.
 
-- item reservado;
-- receptor;
-- doador;
-- mensagem opcional;
-- status da reserva.
+Campos principais:
 
-### histories
+- `item_id`
+- `user_id`
+- `donor_id`
+- `status`
+- `message`
+- `completed_at`
 
-Guarda fatos consolidados do sistema, como doacoes concluidas e cancelamentos relevantes. O historico preserva `item_id`, `donor_id` e `receiver_id` para reconstruir a tela de historico com doador, receptor, data e status.
+`message` e `TEXT`. No backend, a mensagem ao doador e limitada a 500 caracteres.
 
-## Fluxo De Doacao E Reserva
+Status usados:
 
-1. Doador cria item.
-2. Item nasce como `disponivel`.
-3. Receptor reserva item.
-4. Reserva nasce como `pendente`.
-5. Item passa para `reservado`.
-6. Doador pode cancelar a reserva, voltando o item para `disponivel`.
-7. Doador pode confirmar entrega, tornando reserva `concluida`.
-8. Item passa para `concluido`.
-9. Um registro e criado em `histories`.
+- `pendente`
+- `confirmada`
+- `concluida`
+- `cancelada`
 
-Cancelamento de item pelo doador e soft delete: o item muda para `cancelado`.
+### History
 
-## Dependencia Do Frontend Na API
+Guarda fatos consolidados para historico.
 
-Decisao atual: o frontend deve usar os dados do backend sempre que o backend estiver disponivel.
+Campos principais:
 
-As paginas principais buscam dados por API:
+- `item_id`
+- `donor_id`
+- `receiver_id`
+- `transaction_type`
+- `status`
+- `notes`
 
-- Home: `GET /api/items` e `GET /api/items/category/:category`.
-- Pagina de item: `GET /api/items/:id`.
-- Perfil: `GET /api/users/me`, `GET /api/items/my` e reservas do usuario.
-- Historico: `GET /api/history/my`.
+Tipos usados:
 
-Os mocks antigos dos HTMLs foram mantidos apenas como blocos comentados `LEGACY MOCK`, para consulta historica. Eles nao devem ser usados como fonte ativa de dados quando a API estiver rodando.
+- `doacao`
+- `recepcao`
+- `cancelamento`
 
-Se a API estiver indisponivel, paginas que dependem de dados reais devem exibir estado de erro/carregamento em vez de substituir silenciosamente por um item hardcoded.
+### PasswordReset
 
-## Imagens De Itens
+Guarda tokens temporarios de recuperacao de senha.
 
-### Implementacao Local Atual
+Campos principais:
 
-O upload local fica no backend:
+- `user_id`
+- `token_hash`
+- `expires_at`
+- `used_at`
+
+O token enviado ao usuario nao e salvo puro no banco. O banco guarda o hash SHA-256 do token. O prazo atual de validade e 15 minutos.
+
+## Relacionamentos
+
+```text
+User hasMany Item
+Item belongsTo User as donor
+
+Reservation belongsTo Item
+Reservation belongsTo User as receiver
+Reservation belongsTo User as donor
+Item hasMany Reservation
+
+User hasMany PasswordReset
+PasswordReset belongsTo User
+```
+
+## Autenticacao E Sessao
+
+O login e o cadastro retornam JWT.
+
+O frontend salva:
+
+- `doafacil_token`
+- `doafacil_user`
+- `doafacil_current_user`
+
+As rotas protegidas usam:
+
+```http
+Authorization: Bearer TOKEN
+```
+
+Quando a API responde `401` em uma rota protegida, `assets/js/api.js` limpa a sessao local e redireciona para `pages/login.html`.
+
+## Recuperacao De Senha
+
+Fluxo atual:
+
+1. Usuario clica em "Esqueceu a senha?".
+2. Frontend abre modal em `pages/login.html`.
+3. Frontend chama `POST /api/users/forgot-password`.
+4. Backend valida o formato do e-mail.
+5. Se o usuario existir, gera token temporario de 15 minutos.
+6. Backend salva somente o hash do token em `PasswordReset`.
+7. Backend monta link para `pages/redefinir-senha.html?token=...`.
+8. E-mail e enviado por Ethereal, SMTP/Mailtrap ou log de desenvolvimento.
+9. Usuario abre o link e envia nova senha.
+10. Frontend chama `PUT /api/users/reset-password`.
+11. Backend valida token, expiracao e uso anterior.
+12. Senha e atualizada e o token e marcado como usado.
+
+A resposta de solicitacao e neutra:
+
+```text
+Se o e-mail estiver cadastrado, enviaremos instrucoes para redefinir sua senha.
+```
+
+Isso evita revelar se um e-mail existe no sistema.
+
+## E-mail
+
+Configuracao em `node/.env.example`:
+
+```text
+EMAIL_PROVIDER=ethereal
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=
+```
+
+Modos suportados:
+
+- `ethereal`: gera conta de teste e exibe preview URL no terminal.
+- `smtp`: usa SMTP, adequado para Mailtrap ou provedor real.
+- log de desenvolvimento: imprime o conteudo no terminal quando nao ha provedor configurado.
+
+## Upload De Imagens
+
+Implementacao local atual:
 
 ```text
 node/uploads/items
 ```
 
-As imagens enviadas pelo modal de nova doacao sao recebidas pela API com `multipart/form-data`, salvas localmente e servidas por:
+Rotas de criacao e edicao de item aceitam `multipart/form-data` com ate 3 imagens.
+
+Limites atuais:
+
+- maximo de 3 imagens por item;
+- ate 5 MB por imagem;
+- apenas arquivos com MIME `image/*`.
+
+As URLs sao salvas como caminhos relativos:
 
 ```text
-http://localhost:5000/uploads/items/NOME_DO_ARQUIVO
+/uploads/items/nome-do-arquivo.jpg
 ```
 
-O banco salva a URL relativa, por exemplo:
+O frontend transforma esses caminhos em URLs completas usando a origem da API.
 
-```text
-/uploads/items/arquivo.jpg
-```
+## Preparacao Para S3
 
-O frontend transforma essa URL relativa em URL absoluta da API.
+Para producao, o frontend estatico pode ser publicado em S3, mas o S3 nao executa Express nem SQLite.
 
-Nao usamos `assets/img` para upload em runtime porque essa pasta pertence ao frontend estatico. Quando o front estiver publicado em S3, o navegador nao podera gravar arquivos nessa pasta.
-
-### Preparacao Para S3
-
-O caminho correto para producao e usar S3 com presigned URLs:
+Para imagens em producao, o caminho planejado e:
 
 1. Frontend seleciona o arquivo.
-2. Frontend pede ao backend uma URL assinada.
-3. Backend gera a URL assinada no S3.
-4. Browser envia o arquivo direto para o bucket.
-5. Backend salva no banco a `key` ou URL publica do arquivo.
+2. Frontend pede uma URL assinada ao backend.
+3. Backend gera presigned URL no S3.
+4. Browser envia a imagem diretamente ao bucket.
+5. Backend salva a URL ou key da imagem no banco.
 
-O codigo futuro para gerar presigned URL esta comentado em `node/src/routes/items.js`. Ele nao esta ativo agora porque depende de AWS SDK, bucket, CORS e credenciais.
+Existe um bloco comentado em `node/src/routes/items.js` com esboco real de implementacao futura usando AWS SDK.
 
-## Proximos Pontos Planejados
+## Seed Inicial
 
-- Criar container para system tests.
-- Implementar testes unitarios.
-- Implementar testes de integracao.
-- Implementar testes de sistema automatizados.
-- Separar `GET /api/health` de `GET /api/ready`, se o projeto exigir uma distincao mais formal.
+O seed fica em:
+
+```text
+node/src/seed/demoData.js
+```
+
+Ele cria ou atualiza:
+
+- Maria Clara Souza como usuaria demonstrativa.
+- 12 itens iniciais da Maria Clara.
+- usuarios demonstrativos usados como receptores e doadores auxiliares.
+- reservas demonstrativas.
+- historicos demonstrativos de doacoes, recebimentos e cancelamentos.
+
+O seed procura registros existentes antes de criar novos, evitando duplicacao simples ao reiniciar o backend.
+
+## Health E Ready
+
+Rota atual:
+
+```http
+GET /api/health
+```
+
+Ela verifica se a API esta viva e se o Sequelize consegue autenticar no banco.
+
+Decisao atual: manter banco dentro do health check porque os fluxos principais dependem do banco para funcionar.
+
+Possivel evolucao:
+
+- `GET /api/health`: apenas processo Express vivo.
+- `GET /api/ready`: API pronta, banco e dependencias externas funcionando.
+
+## Testes
+
+O projeto possui script:
+
+```powershell
+cd node
+npm test
+```
+
+Mas a suite automatizada ainda precisa ser criada.
+
+Proximos pontos planejados:
+
+- container para system tests;
+- testes unitarios;
+- testes de integracao;
+- testes de sistema automatizados.
