@@ -1,110 +1,234 @@
 # Funcionalidades do DoaFacil
 
-## Descrição do projeto
+Este documento descreve o que o DoaFacil oferece para o usuario final. Ele nao substitui a documentacao tecnica; a ideia aqui e explicar a experiencia, os fluxos e os recursos da plataforma.
 
-O DoaFacil e uma plataforma digital de redistribuição de bens materiais. O projeto conecta pessoas que possuem itens em bom estado a outras pessoas que precisam desses itens, facilitando doações, reservas, contato entre usuários e acompanhamento do histórico.
+## Descricao Do Projeto
 
-A proposta e tornar o processo de doação mais simples, organizado e acessível, fortalecendo a solidariedade local, o reaproveitamento de recursos e a economia circular.
+O DoaFacil e uma plataforma digital de redistribuicao de bens materiais. O projeto conecta pessoas que possuem itens em bom estado a outras pessoas que precisam desses itens, facilitando doacoes, reservas, contato entre usuarios e acompanhamento de historico.
 
-## Sobre o DoaFacil
+A proposta e tornar o processo de doacao mais simples, organizado e acessivel, fortalecendo a solidariedade local, o reaproveitamento de recursos e a economia circular.
+
+## Sobre O DoaFacil
 
 O DoaFacil nasceu para simplificar a solidariedade, conectando pessoas que possuem itens em bom estado a quem realmente precisa.
 
-A plataforma fortalece a economia circular, incentiva o reaproveitamento e ajuda doadores e receptores a combinarem doações de forma mais organizada.
+A plataforma fortalece a economia circular, incentiva o reaproveitamento e ajuda doadores e receptores a combinarem doacoes de forma mais organizada.
 
-Principais valores do projeto:
+Principais valores:
 
-1. Doação segura.
+1. Doacao segura.
 2. Impacto local.
 3. Reuso consciente.
 4. Comunidade ativa.
 
-## Cadastro e login
+## Cadastro E Login
 
-O usuário pode criar uma conta informando seus dados pessoais basicos, como nome, e-mail, telefone, CPF, bairro e senha.
+O usuario pode criar uma conta informando dados basicos:
 
-Depois de criada a conta, o usuário pode fazer login com e-mail e senha. Ao entrar, o sistema mantém a sessão ativa por meio de um token de autenticação, permitindo acessar áreas protegidas, como perfil, histórico, criação de doações e reservas.
+- nome;
+- e-mail;
+- telefone;
+- CPF;
+- bairro;
+- senha.
 
-## Recuperação de senha
+Depois do cadastro, o usuario pode fazer login com e-mail e senha. A sessao e mantida por token JWT, permitindo acessar areas protegidas, como perfil, historico, criacao de doacoes, edicao de itens, reservas e contato com doadores.
 
-O usuário pode solicitar a recuperação de senha pelo link "Esqueceu a senha?", na tela de login.
+Ao criar uma conta, o sistema exibe uma mensagem de sucesso e direciona o usuario para o login.
 
-Nesse fluxo, o sistema recebe o e-mail informado e, se houver uma conta cadastrada, gera um link temporário de redefinição. Esse link possui validade limitada e permite que o usuário defina uma nova senha com segurança.
+## Recuperacao De Senha
 
-## Visualização de itens disponíveis
+O usuario pode solicitar recuperacao pelo link "Esqueceu a senha?", na tela de login.
 
-Na página inicial, o usuário pode visualizar os itens cadastrados para doação.
+O fluxo funciona assim:
 
-Cada card mostra informações resumidas do item, como nome, categoria, estado de conservação, localização, descrição curta e imagem. A partir da home, o usuário pode acessar a página de detalhes de cada item.
+1. O usuario informa o e-mail.
+2. A tela mostra uma mensagem neutra dizendo que, se o e-mail estiver cadastrado, as instrucoes serao enviadas.
+3. O sistema gera um link temporario de redefinicao.
+4. O usuario abre o link e acessa a pagina "Redefina sua senha".
+5. O usuario informa e confirma a nova senha.
+6. A senha e atualizada e o usuario volta para a tela de login.
 
-## Filtros e busca
+A mensagem neutra protege a privacidade, pois nao revela se o e-mail informado existe ou nao no sistema.
 
-O usuário pode filtrar os itens por categoria, como moveis, eletro, roupas, calcados, utensílios, escolar, brinquedos e outros.
+## Home E Feed De Itens
 
-A home também possui campo de busca e ordenação, ajudando o usuário a encontrar itens específicos com mais facilidade.
+Na home, o usuario visualiza os itens cadastrados para doacao.
 
-## Página de detalhes do item
+Cada card mostra:
 
-Ao clicar em um item, o usuário acessa uma página com informações mais completas, incluindo descrição, categoria, condição, localização, especificações e dados do doador.
+- imagem;
+- nome do item;
+- categoria;
+- estado de conservacao;
+- descricao curta;
+- localizacao;
+- destaque de doador recorrente, quando aplicavel.
 
-Essa página também centraliza as ações principais relacionadas ao item, como reservar, entrar em contato ou editar, dependendo do usuário logado.
+Ao clicar em um card, o usuario acessa a pagina de detalhes daquele item.
 
-## Criação de doação
+## Categorias, Busca E Ordenacao
 
-Um usuário logado pode cadastrar um novo item para doação.
+A home permite filtrar itens por categoria:
 
-O cadastro permite informar nome, categoria, fotos, descrição, condição, dimensões, material, cor, forma de retirada e endereço. Depois de cadastrado, o item passa a aparecer no sistema conforme seu status.
+- moveis;
+- eletro;
+- roupas;
+- calcados;
+- utensilios;
+- escolar;
+- brinquedos;
+- outros.
 
-## Edição de item
+Tambem existe busca por texto e ordenacao visual para ajudar o usuario a encontrar itens com mais facilidade.
 
-O usuário doador pode editar as informações dos itens que cadastrou.
+## Destaques Da Semana
 
-Essa funcionalidade permite corrigir dados, atualizar descrição, trocar detalhes do item e manter as informações mais precisas para os interessados.
+A home exibe uma area de destaques, usando itens carregados da API. Essa area ajuda a dar visibilidade para itens recentes ou relevantes.
 
-## Cancelamento de item
+## Pagina Do Item
 
-O usuário doador pode cancelar um item doado quando ele não estiver mais disponível.
+A pagina do item mostra informacoes completas:
 
-O cancelamento funciona como uma exclusão logica: o item deixa de estar disponível para novas reservas, mas seu registro pode continuar existindo para manter o histórico da plataforma.
+- titulo;
+- imagens;
+- categoria;
+- condicao;
+- status;
+- localizacao;
+- descricao;
+- dimensoes;
+- material;
+- cor;
+- forma de retirada;
+- dados basicos do doador.
 
-## Reserva de item
+Se o usuario logado nao for o doador, ele pode reservar o item quando estiver disponivel.
 
-Um usuário logado pode reservar um item disponível.
+Se o usuario logado for o doador, o botao principal muda para edicao do item, evitando que alguem reserve o proprio item.
 
-Ao reservar, o usuário pode enviar uma mensagem ao doador. O status do item passa a refletir a reserva, evitando que outras pessoas reservem o mesmo item ao mesmo tempo.
+## Criacao De Doacao
 
-## Cancelamento de reserva
+Um usuario logado pode cadastrar um novo item para doacao pelo botao "Doar" da navbar ou pela area de doacoes ativas no perfil.
 
-Quando uma reserva ainda não foi concluída, ela pode ser cancelada.
+O formulario permite informar:
 
-Ao cancelar uma reserva, o item pode voltar a ficar disponível, permitindo que outra pessoa demonstre interesse nele.
+- nome do item;
+- categoria;
+- fotos;
+- descricao;
+- condicao;
+- dimensoes;
+- material;
+- cor;
+- forma de retirada;
+- endereco/localizacao.
 
-## Confirmação de entrega
+O item nasce com status `disponivel`.
 
-O doador pode confirmar que a entrega do item foi concluída.
+## Upload De Fotos
 
-Essa ação muda o status da reserva e do item para concluído, registrando que a doação foi finalizada com sucesso.
+O modal de criacao e edicao aceita imagens do computador do usuario.
 
-## Histórico
+No ambiente local, as imagens sao salvas pelo backend na pasta:
 
-A página de histórico permite acompanhar doações feitas e itens recebidos.
+```text
+node/uploads/items
+```
 
-Nela, o usuário consegue visualizar status, datas, categorias, receptores, doadores e ações disponíveis para cada item ou reserva. O histórico ajuda a manter rastreabilidade das interações realizadas na plataforma.
+O sistema permite ate 3 imagens por item, com limite de tamanho por arquivo.
 
-## Perfil do usuário
+## Edicao De Item
 
-A página de perfil exibe os dados do usuário, suas doações ativas e os itens recebidos recentemente.
+O doador pode editar itens que ele mesmo cadastrou.
 
-O usuário também pode editar suas informações pessoais, sair da conta ou apagar sua conta.
+A edicao usa um modal semelhante ao de criacao e permite atualizar informacoes como nome, categoria, fotos, descricao, condicao, dimensoes, material, cor, retirada e endereco.
 
-## Contato com o doador
+## Cancelamento De Item
 
-Na página de detalhes do item, o usuário pode iniciar contato com o doador para combinar a retirada.
+O doador pode cancelar um item quando ele nao estiver mais disponivel.
 
-O sistema pode gerar um link de contato via WhatsApp sem expor diretamente o telefone do doador nas consultas públicas do item.
+Esse cancelamento funciona como exclusao logica: o item muda para status `cancelado`, preservando rastreabilidade para historico e consulta interna.
 
-## Menu de informações
+## Reserva De Item
 
-O menu hamburguer oferece acesso a informações institucionais do projeto, incluindo Sobre, FAQ e Contato.
+Um usuario logado pode reservar um item disponivel.
 
-Essas seções ajudam o usuário a entender melhor a proposta da plataforma, tirar dúvidas frequentes e encontrar canais de contato.
+Ao reservar, o usuario pode enviar uma mensagem opcional ao doador. Depois da reserva:
+
+- a reserva fica como `pendente`;
+- o item passa para `reservado`;
+- outras pessoas nao conseguem reservar o mesmo item ao mesmo tempo.
+
+## Contato Com O Doador
+
+Na pagina do item, o usuario pode iniciar contato via WhatsApp.
+
+O telefone do doador nao aparece nas consultas publicas. A API gera o link de contato quando o usuario logado solicita essa acao.
+
+## Cancelamento De Reserva
+
+Uma reserva ainda nao concluida pode ser cancelada.
+
+Quando uma reserva e cancelada, o item pode voltar ao status `disponivel`, permitindo que outra pessoa manifeste interesse.
+
+## Confirmacao De Entrega
+
+O doador pode confirmar que a entrega foi concluida.
+
+Quando isso acontece:
+
+- a reserva passa para `concluida`;
+- o item passa para `concluido`;
+- um registro pode ser criado no historico.
+
+## Perfil Do Usuario
+
+A pagina de perfil mostra:
+
+- dados do usuario;
+- estatisticas de doacoes e recebimentos;
+- doacoes ativas;
+- itens recebidos recentemente;
+- botao para editar perfil;
+- botao para sair;
+- opcao de apagar conta.
+
+## Historico
+
+A pagina de historico permite acompanhar:
+
+- doacoes feitas;
+- itens recebidos;
+- receptor ou doador relacionado;
+- categoria;
+- data;
+- status;
+- acoes disponiveis, como cancelar ou concluir.
+
+A tela possui busca, filtro por status e ordenacao.
+
+## Menu De Informacoes
+
+O menu hamburguer abre modais informativos:
+
+- Sobre;
+- FAQ;
+- Contato.
+
+Essas secoes explicam a proposta do projeto, respondem duvidas frequentes e exibem canais de contato.
+
+## Recurso Demonstrativo
+
+Ao iniciar o backend, o seed cria dados demonstrativos, incluindo Maria Clara Souza, itens iniciais, reservas e historicos. Isso permite testar a plataforma com conteudo realista sem precisar cadastrar tudo manualmente.
+
+## Recursos Planejados
+
+Pontos planejados para evolucao:
+
+- container para testes de sistema;
+- testes unitarios, de integracao e de sistema automatizados;
+- deploy estatico do frontend em S3;
+- upload de imagens em S3 por presigned URL;
+- separacao formal entre health check e readiness check;
+- melhoria do conteudo final do FAQ.

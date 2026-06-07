@@ -1,371 +1,437 @@
-# 🌿 DoaFácil
+# DoaFacil
 
-> **Plataforma digital de redistribuição de bens materiais, conectando doadores com quem mais precisa**
+> Plataforma digital de redistribuicao de bens materiais, conectando doadores com quem mais precisa.
 
 [![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-blue)](#)
 [![License](https://img.shields.io/badge/License-MIT-green)](#license)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple)](https://getbootstrap.com)
-[![Responsive](https://img.shields.io/badge/Design-Responsivo-brightgreen)](#)
+[![Backend](https://img.shields.io/badge/API-Node.js%20%2B%20Express-brightgreen)](#stack-tecnologico)
+[![Database](https://img.shields.io/badge/Database-SQLite-lightgrey)](#stack-tecnologico)
 
 ---
 
-## 📋 Sumário
+## Sumario
 
-- [Sobre](#-sobre)
-- [Features](#-features)
-- [Stack Tecnológico](#-stack-tecnológico)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
-- [Como Usar](#-como-usar)
-- [Telas Principais](#-telas-principais)
-- [Guia de Navegação](#-guia-de-navegação)
-- [Roadmap](#-roadmap)
-- [Contribuindo](#-contribuindo)
-- [Licença](#-licença)
-
----
-
-## 💡 Sobre
-
-O **DoaFácil** é uma plataforma web inovadora que democratiza o acesso a bens materiais através de um sistema inteligente de doações. Conecta:
-
-- 🤝 **Doadores** que desejam redistribuir bens em bom estado
-- 🏠 **Receptores** que necessitam de suporte material
-- 🏛️ **Instituições** parceiras que amplificam o impacto social
-
-Com interface intuitiva, filtros inteligentes e rastreamento em tempo real, o DoaFácil promove **solidariedade e sustentabilidade** em uma única plataforma.
-
-### 🎯 Missão
-
-Reduzir desigualdades e desperdício através da conexão direta entre quem pode doar e quem necessita.
+- [Sobre](#sobre)
+- [Features](#features)
+- [Stack Tecnologico](#stack-tecnologico)
+- [Estrutura Do Projeto](#estrutura-do-projeto)
+- [Como Usar](#como-usar)
+- [Telas Principais](#telas-principais)
+- [Documentacao](#documentacao)
+- [Roadmap](#roadmap)
+- [Contribuindo](#contribuindo)
+- [Licenca](#licenca)
 
 ---
 
-## ✨ Features
+## Sobre
 
-### Autenticação & Perfis Múltiplos
+O **DoaFacil** e uma plataforma web para redistribuicao de bens materiais. A proposta e conectar pessoas que possuem itens em bom estado a pessoas que precisam desses itens, facilitando cadastro de doacoes, reservas, contato entre usuarios e acompanhamento de historico.
 
-- ✅ Login e cadastro com painel atrativo
-- 👥 Suporte para múltiplos perfis simultâneos (Doador, Receptor, Instituição)
-- 🔐 Sistema de verificação com badges
+A plataforma busca fortalecer:
 
-### Feed de Doações
+- solidariedade local;
+- reaproveitamento de recursos;
+- economia circular;
+- organizacao do processo de doacao.
 
-- 📱 Grid responsivo de cards com preview de itens
-- 🏷️ Categorização inteligente (Móveis, Eletrônicos, Roupas, Utensílios, etc.)
-- 📍 Localização aproximada de cada doação
-- 🔍 Busca e filtros por categoria e disponibilidade
-- 📊 Painel de Impacto em tempo real com contadores animados
+### Missao
 
-### Gerenciamento de Itens
-
-- 📷 Galeria multi-imagem com navegação
-- 📋 Especificações técnicas detalhadas
-- 🗺️ Mapa de localização integrado
-- 🔄 Itens relacionados sugeridos automaticamente
-- ⭐ Sistema de status dinâmico (Disponível, Reservado, Concluído)
-
-### Perfil de Usuário
-
-- 🎯 Dashboard personalizável por tipo de perfil
-- 📈 Estatísticas de atividade
-- 💾 Histórico de transações
-- 🔔 Notificações de reservas
-
-### Sistema de Reservas
-
-- 📅 Reserva com confirmação modal
-- 💬 Integração WhatsApp para contato direto
-- ✉️ Notificação automática ao doador
-- 🔄 Atualização visual instantânea do status
-
-### Histórico Centralizado
-
-- 📊 Dashboard com duas abas (Doações / Recebimentos)
-- 🎨 Status visuais com pills coloridas
-- 📑 Ordenação, busca e filtros funcionais
-- 📈 Métricas resumidas
+Simplificar a solidariedade e reduzir desperdicios conectando quem doa com quem mais precisa.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Features
 
-| Componente        | Tecnologia                    | Versão          |
-| ----------------- | ----------------------------- | --------------- |
-| **Markup**        | HTML5 Semântico               | -               |
-| **Styling**       | CSS3 + Variáveis Customizadas | -               |
-| **Framework CSS** | Bootstrap                     | 5.3.2           |
-| **Icons**         | Bootstrap Icons               | 1.11.3          |
-| **JavaScript**    | Vanilla JS                    | -               |
-| **Tipografia**    | Fraunces + DM Sans            | Google Fonts    |
-| **Design**        | Mobile-First                  | 100% Responsivo |
+### Autenticacao E Conta
 
-**Sem dependências externas complexas** — foco em performance e leveza.
+- Cadastro de usuario com nome, e-mail, telefone, CPF, bairro e senha.
+- Login com JWT.
+- Sessao salva no frontend.
+- Edicao de perfil.
+- Exclusao de conta.
+- Recuperacao de senha com token temporario e envio de e-mail.
+
+### Home E Feed
+
+- Listagem de itens pela API.
+- Cards responsivos com imagem, categoria, condicao, descricao e localizacao.
+- Filtro por categoria.
+- Busca por texto.
+- Ordenacao visual.
+- Destaques da semana.
+- Painel de impacto.
+
+### Itens
+
+- Criacao de item para doacao.
+- Upload local de ate 3 imagens por item.
+- Pagina de detalhes carregada por `GET /api/items/:id`.
+- Edicao de item pelo doador.
+- Cancelamento de item por soft delete.
+- Status: `disponivel`, `reservado`, `concluido`, `cancelado`.
+
+### Reservas
+
+- Reserva de item disponivel.
+- Mensagem opcional ao doador.
+- Alteracao automatica do item para `reservado`.
+- Cancelamento de reserva.
+- Confirmacao/conclusao de entrega.
+- Contato via WhatsApp sem expor telefone nas consultas publicas.
+
+### Perfil E Historico
+
+- Perfil com dados do usuario.
+- Doacoes ativas.
+- Itens recebidos recentemente.
+- Historico de doacoes feitas e itens recebidos.
+- Filtros, busca, ordenacao e acoes por status.
+
+### Conteudo Informativo
+
+- Menu hamburguer com modais de Sobre, FAQ e Contato.
+- Footer reutilizavel.
+- Navbar reutilizavel.
 
 ---
 
-## 📁 Estrutura do Projeto
+## Stack Tecnologico
 
-```
+| Camada | Tecnologia |
+| --- | --- |
+| Frontend | HTML5, CSS3, Bootstrap 5.3, Bootstrap Icons |
+| JavaScript | jQuery + JavaScript |
+| Componentes | HTML parcial carregado por JS |
+| Backend | Node.js + Express |
+| Banco | SQLite + Sequelize |
+| Autenticacao | JWT + bcryptjs |
+| Upload | multer + pasta local `node/uploads/items` |
+| E-mail | nodemailer com Ethereal, SMTP/Mailtrap ou log local |
+| Desenvolvimento | nodemon |
+
+---
+
+## Estrutura Do Projeto
+
+```text
 DoaFacil/
-├── index.html                 # Página de entrada (Feed)
-├── README.md                  # Este arquivo
+├── index.html
+├── pages/
+│   ├── login.html
+│   ├── redefinir-senha.html
+│   ├── perfil.html
+│   ├── item.html
+│   └── historico.html
 ├── assets/
 │   ├── components/
-│   │   └── navbar.html        # Componente de navegação
-│   └── css/
-│       ├── index.css           # Estilos do feed
-│       ├── historico.css      # Estilos do histórico
-│       ├── item.css           # Estilos de descrição do item
-│       ├── login.css          # Estilos de login/cadastro
-│       └── perfil.css         # Estilos do perfil
-└── pages/
-    ├── login.html             # Tela de autenticação
-    ├── historico.html         # Tela de histórico
-    ├── item.html              # Tela de descrição do item
-    └── perfil.html            # Tela de perfil do usuário
+│   │   ├── navbar.html
+│   │   ├── footer.html
+│   │   └── info-modals.html
+│   ├── css/
+│   ├── js/
+│   │   ├── api.js
+│   │   ├── config.js
+│   │   ├── modal.js
+│   │   └── components/
+│   └── img/
+├── node/
+│   ├── src/
+│   │   ├── server.js
+│   │   ├── config/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── seed/
+│   │   └── services/
+│   ├── uploads/
+│   ├── package.json
+│   └── .env.example
+├── backend/
+├── API_DOCUMENTACAO.md
+├── ARQUITETURA.md
+├── FUNCIONALIDADES.md
+└── guia_deploy_local.md
 ```
+
+Observacao: a pasta `backend/` contem uma estrutura antiga/paralela. A API ativa do projeto fica em `node/`.
 
 ---
 
-## 🚀 Como Usar
+## Como Usar
 
-### 1. **Clonar o Repositório**
+### 1. Clonar O Repositorio
 
 ```bash
-git clone https://github.com/seu-usuario/doafacil.git
-cd doafacil
+git clone https://github.com/LeticiaFelg/doaFacil.git
+cd doaFacil
 ```
 
-### 2. **Abrir no Navegador**
+### 2. Instalar Dependencias Do Backend
 
-- **Opção 1**: Abra `index.html` diretamente no navegador
-- **Opção 2**: Use um servidor local (recomendado)
-
-  ```bash
-  # Python
-  python -m http.server 8000
-
-  # Node.js
-  npx http-server
-
-  # Live Server (VS Code)
-  # Instale a extensão Live Server e clique "Go Live"
-  ```
-
-### 3. **Acessar**
-
-Navegue para `http://localhost:8000` (ou a porta configurada)
-
----
-
-## 📱 Telas Principais
-
-### 1️⃣ **Login & Cadastro** (`pages/login.html`)
-
-**Seção Esquerda (Hero):**
-
-- Branding com identidade visual verde-escuro
-- Proposta de valor da plataforma
-- 📊 Estatísticas de impacto animadas
-
-**Seção Direita (Formulário):**
-
-- Abas Login/Cadastro
-- Seletor visual de perfis múltiplos
-- Validação de formulários
-
-```
-┌─────────────────────────────────────┐
-│ 🌿 DoaFácil  │  Bem-vindo de volta  │
-│ Conectar...  │  📧 Email            │
-│ Estatísticas │  🔒 Senha            │
-│ 4.2k itens   │  [Entrar]            │
-└─────────────────────────────────────┘
+```bash
+cd node
+npm install
 ```
 
----
+### 3. Configurar Ambiente
 
-### 2️⃣ **Feed de Doações** (`index.html`)
+Copie o arquivo de exemplo:
 
-**Layout:**
-
-```
-┌──────────────────────────────────────────┐
-│  🌿 DoaFácil │ 🏠 Home  👤 Perfil       │
-├──────┬───────────────────────────────────┤
-│      │                                    │
-│ 📊   │  ┌────┐  ┌────┐  ┌────┐          │
-│Impac-│  │Card│  │Card│  │Card│          │
-│ to   │  └────┘  └────┘  └────┘          │
-│      │                                    │
-│ 🔍   │  ┌────┐  ┌────┐  ┌────┐          │
-│Categ │  │Card│  │Card│  │Card│          │
-│oria  │  └────┘  └────┘  └────┘          │
-│      │                                    │
-└──────┴───────────────────────────────────┘
+```bash
+cp .env.example .env
 ```
 
-**Features:**
+No PowerShell, se preferir:
 
-- Grid responsivo com cards de itens
-- Sidebar com Painel de Impacto (📦 4.2k itens, 👨‍👩‍👧 1.8k famílias, etc.)
-- Filtros por categoria e disponibilidade
-- Em mobile: painel vira offcanvas
-
----
-
-### 3️⃣ **Perfil de Usuário** (`pages/perfil.html`)
-
-**Hero Card:**
-
-- Avatar com badge de verificação ✅
-- Nome, localização e data de ingresso
-- 🏷️ Badges de tipo (clicáveis)
-
-**Conteúdo Dinâmico:**
-
-- **Modo Doador**: Doações ativas, estatísticas, badges de recorrência
-- **Modo Receptor**: Itens de interesse, histórico resumido
-- **Modo Instituição**: Botão de solicitação, estatísticas de impacto
-
----
-
-### 4️⃣ **Descrição do Item** (`pages/item.html`)
-
-**Layout 2 Colunas:**
-
-_Coluna 1 (Esquerda):_
-
-- 📷 Galeria com navegação por pontos
-- 📋 Especificações técnicas
-- 🗺️ Mapa de localização
-- 🔗 Itens relacionados
-
-_Coluna 2 (Direita - Fixa):_
-
-- ⭐ Status do item
-- 📍 Localização
-- 🔘 Botão "Reservar"
-- 💬 Botão WhatsApp
-
-**Modal de Confirmação:**
-
-- Mensagem pré-preenchida ao doador
-- Status muda em tempo real após confirmação
-
----
-
-### 5️⃣ **Histórico** (`pages/historico.html`)
-
-**Abas:**
-
-- 📤 Doações Feitas
-- 📥 Itens Recebidos
-
-**Funcionalidades:**
-
-- 📊 Métricas no topo (totais, status, etc.)
-- 🎨 Tabela com pills coloridas por status
-- ✅ Linhas verdes para itens concluídos
-- 🔍 Busca, filtro por status e ordenação
-
----
-
-## 🗺️ Guia de Navegação
-
+```powershell
+Copy-Item .env.example .env
 ```
-┌─ LOGIN/CADASTRO (pages/login.html)
-│  ├─ Múltiplos perfis
-│  ├─ Validação
-│  └─ [Entrar] ────────────┐
-│                           ▼
-└──────────────────► FEED (index.html) ◄─────────┐
-                    ├─ Grid de cards              │
-                    ├─ Painel de Impacto         │
-                    ├─ Filtros                   │
-                    ├─ Clica em card ────┐       │
-                    │                    │       │
-                    │                    ▼       │
-                    │            ITEM (pages/item.html)
-                    │            ├─ Galeria      │
-                    │            ├─ Detalhes     │
-                    │            ├─ Reservar ──┐ │
-                    │            │   Modal ◄───┘ │
-                    │            └─────────────────┘
-                    │
-                    ├─ Nav Links
-                    ├─► PERFIL (pages/perfil.html)
-                    │   ├─ Hero card
-                    │   ├─ Badges (clicáveis)
-                    │   └─ Histórico resumido
-                    │
-                    └─► HISTÓRICO (pages/historico.html)
-                        ├─ Abas (Doações/Recebimentos)
-                        ├─ Métricas
-                        └─ Tabela com filtros
+
+Configuracao local recomendada:
+
+```text
+NODE_ENV=development
+PORT=5000
+FRONTEND_URL=http://localhost:8000
+EMAIL_PROVIDER=ethereal
+```
+
+### 4. Rodar Backend
+
+Dentro da pasta `node/`:
+
+```bash
+npm run dev
+```
+
+A API deve ficar em:
+
+```text
+http://localhost:5000/api
+```
+
+Teste rapido:
+
+```powershell
+Invoke-RestMethod "http://localhost:5000/api/health"
+```
+
+Ao iniciar, o backend sincroniza o SQLite e executa o seed demonstrativo com Maria Clara Souza, itens, reservas e historicos.
+
+### 5. Rodar Frontend
+
+Em outro terminal, volte para a raiz do projeto:
+
+```bash
+cd ..
+python -m http.server 8000
+```
+
+Acesse:
+
+```text
+http://localhost:8000
+```
+
+### 6. Login Demonstrativo
+
+Usuario criado pelo seed:
+
+```text
+E-mail: maria.clara@example.com
+Senha: senha123
+```
+
+### 7. Recuperacao De Senha Em Desenvolvimento
+
+Com `EMAIL_PROVIDER=ethereal`, o backend imprime no terminal uma URL de preview do e-mail. Use essa preview para abrir o link de redefinicao.
+
+Fluxo:
+
+1. Acesse `pages/login.html`.
+2. Clique em "Esqueceu a senha?".
+3. Informe o e-mail.
+4. Veja a preview URL no terminal do backend.
+5. Abra o link de redefinicao.
+6. Defina a nova senha.
+
+### 8. Atualizar Branch Apos Merge Do PR
+
+Depois que `back_novo` for mergeada em `main`:
+
+```bash
+git checkout main
+git pull origin main
+git checkout back_novo
+git merge main
+git push origin back_novo
 ```
 
 ---
 
-## 🎨 Design System
+## Telas Principais
 
-### Paleta de Cores
+### Login E Cadastro
 
-- **Verde Escuro** (Principal): #1a5f3f — Confiança, natureza, crescimento
-- **Verde Médio** (Secundário): #2d9966 — Destaque, CTAs
-- **Branco** (Background): #fafbf9
-- **Cinza Escuro** (Texto): #2d3436
+Arquivo:
 
-### Tipografia
+```text
+pages/login.html
+```
 
-- **Display**: Fraunces (Headlines, branding)
-- **Corpo**: DM Sans (Texto, UI)
-- **Pesos**: 300, 400, 500, 600, 700
+Recursos:
 
-### Responsividade
+- login;
+- cadastro;
+- alerta apos conta criada;
+- modal de recuperacao de senha;
+- redirecionamento para perfil apos login.
 
-- ✅ Mobile (< 768px)
-- ✅ Tablet (768px - 1024px)
-- ✅ Desktop (> 1024px)
+### Redefinir Senha
+
+Arquivo:
+
+```text
+pages/redefinir-senha.html
+```
+
+Recursos:
+
+- leitura de token pela URL;
+- nova senha;
+- confirmacao de senha;
+- chamada para `PUT /api/users/reset-password`;
+- alerta de sucesso;
+- redirecionamento para login.
+
+### Home
+
+Arquivo:
+
+```text
+index.html
+```
+
+Recursos:
+
+- carrossel principal;
+- destaques;
+- feed carregado da API;
+- filtro por categoria;
+- busca;
+- cards clicaveis para pagina de item.
+
+### Item
+
+Arquivo:
+
+```text
+pages/item.html
+```
+
+Recursos:
+
+- busca por ID na API;
+- detalhes do item;
+- dados basicos do doador;
+- reserva;
+- contato por WhatsApp;
+- edicao quando o usuario logado e o doador.
+
+### Perfil
+
+Arquivo:
+
+```text
+pages/perfil.html
+```
+
+Recursos:
+
+- dados do usuario;
+- edicao de perfil;
+- doacoes ativas;
+- itens recebidos recentemente;
+- sair da conta;
+- apagar conta.
+
+### Historico
+
+Arquivo:
+
+```text
+pages/historico.html
+```
+
+Recursos:
+
+- doacoes feitas;
+- itens recebidos;
+- busca;
+- filtro por status;
+- ordenar;
+- cancelar item/reserva;
+- concluir reserva.
 
 ---
 
-## 👥 Contribuindo
+## Documentacao
 
-Contribuições são bem-vindas! Para contribuir:
+Arquivos de apoio:
 
-1. Crie uma **branch** para sua feature (`git checkout -b feature/MinhaFeature`)
-2. **Commit** suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
-3. **Push** para a branch (`git push origin feature/MinhaFeature`)
-4. Abra um **Pull Request**
-
-### Diretrizes
-
-- Mantenha o código limpo e bem comentado
-- Siga o design system estabelecido
-- Teste em mobile e desktop
-- Use nomes descritivos para variáveis e classes
+- [ARQUITETURA.md](ARQUITETURA.md): decisoes tecnicas, modelos, banco, upload e recuperacao de senha.
+- [API_DOCUMENTACAO.md](API_DOCUMENTACAO.md): endpoints, parametros e exemplos.
+- [FUNCIONALIDADES.md](FUNCIONALIDADES.md): explicacao funcional para usuarios e apresentacao.
+- [guia_deploy_local.md](guia_deploy_local.md): notas sobre execucao local e deploy estatico.
+- [node/README.md](node/README.md): resumo especifico da API.
 
 ---
 
-## 📄 Licença
+## Roadmap
 
-Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para detalhes.
+Pontos planejados:
+
+- Criar container para system tests.
+- Implementar testes unitarios.
+- Implementar testes de integracao.
+- Implementar testes de sistema automatizados.
+- Evoluir upload de imagens para S3 com presigned URL.
+- Separar `GET /api/health` e `GET /api/ready`, caso necessario.
+- Refinar conteudo final do FAQ.
 
 ---
 
-## 👨‍💻 Desenvolvedor
+## Contribuindo
 
-**Projeto desenvolvido para**: IBMR - Usabilidade, Desenvolvimento Web e Mobile (2026.1)
+1. Crie uma branch para sua alteracao.
+2. Faca commits com mensagens claras.
+3. Envie para o remoto.
+4. Abra um Pull Request.
+5. Depois do merge, atualize `main` e sincronize sua branch de trabalho.
 
-**Tecnologias**: HTML5 · CSS3 · Bootstrap 5.3 · JavaScript Vanilla
+Exemplo:
+
+```bash
+git checkout -b feature/minha-feature
+git add .
+git commit -m "feat: descreve minha feature"
+git push origin feature/minha-feature
+```
+
+---
+
+## Licenca
+
+Este projeto esta sob a licenca MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ---
 
 <div align="center">
 
-**Conectar quem doa com quem mais precisa** 🌿
+**Conectar quem doa com quem mais precisa**
 
-Made by UI - Devs Squad - Way Ânima Hub
+Made by UI - Devs Squad - Way Anima Hub
 
 </div>
