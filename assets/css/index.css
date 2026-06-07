@@ -91,6 +91,14 @@ section,div {
 #about-section {
     grid-column: 1 / -1;
 }
+
+#about-section img.object-fit-cover {
+    width: 100% !important;
+    max-width: none;
+    object-fit: cover;
+    display: block;
+}
+
 .card-body {
     background: #f0f7ee;
 }

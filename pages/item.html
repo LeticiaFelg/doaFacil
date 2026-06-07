@@ -617,7 +617,7 @@ const mockItems = [
 
       DoaFacilAPI.Reservations.create(itemId, message)
         .done(function () {
-          const modal = bootstrap.Modal.getInstance(document.getElementById('reserveModal'));
+          const modal = bootstrap.Modal.getInstance($('#reserveModal')[0]);
           modal.hide();
 
           setTimeout(function () {

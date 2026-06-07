@@ -184,52 +184,43 @@
   <script>
     // ─── Tab navigation ─────────────────────────────────────────
     function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tab === tab);
+      $('.tab-btn').each(function () {
+        $(this).toggleClass('active', $(this).data('tab') === tab);
       });
-      document.getElementById('panel-login').classList.toggle('active', tab === 'login');
-      document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+      $('#panel-login').toggleClass('active', tab === 'login');
+      $('#panel-register').toggleClass('active', tab === 'register');
     }
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    $('.tab-btn').on('click', function () {
+      switchTab($(this).data('tab'));
     });
 
-    document.querySelectorAll('a[data-tab]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        switchTab(link.dataset.tab);
-      });
+    $('a[data-tab]').on('click', function (e) {
+      e.preventDefault();
+      switchTab($(this).data('tab'));
     });
 
     function toggleProfile(el) {
-      el.classList.toggle('selected');
+      $(el).toggleClass('selected');
     }
 
     // ─── Register Validation ────────────────────────────────────
     function showRegisterError(message, fieldId = null) {
-      const errorBox = document.getElementById('reg-erro');
-      errorBox.textContent = message;
-      errorBox.style.display = 'block';
+      $('#reg-erro').text(message).show();
       
       // Limpar erros anteriores de todos os campos
-      document.querySelectorAll('#panel-register input').forEach(input => {
-        input.classList.remove('error');
-      });
+      $('#panel-register input').removeClass('error');
       
       // Adicionar erro ao campo específico se fornecido
       if (fieldId) {
-        const field = document.getElementById(fieldId);
-        if (field) field.classList.add('error');
+        $(`#${fieldId}`).addClass('error');
       }
     }
 
     function hideRegisterError() {
-      document.getElementById('reg-erro').style.display = 'none';
+      $('#reg-erro').hide();
       // Remover classe error de todos os campos
-      document.querySelectorAll('#panel-register input').forEach(input => {
-        input.classList.remove('error');
-      });
+      $('#panel-register input').removeClass('error');
     }
 
     function normalizeDigits(value) {
@@ -309,17 +300,13 @@
     let successTimer = null;
 
     function showLoginSuccess(message) {
-      const successBox = document.getElementById('login-sucesso');
-      const errorBox = document.getElementById('login-erro');
-
       if (successTimer) clearTimeout(successTimer);
-      if (errorBox) errorBox.style.display = 'none';
+      $('#login-erro').hide();
 
-      successBox.textContent = message;
-      successBox.style.display = 'block';
+      $('#login-sucesso').text(message).show();
 
       successTimer = setTimeout(() => {
-        successBox.style.display = 'none';
+        $('#login-sucesso').hide();
       }, 4500);
     }
 
@@ -420,16 +407,16 @@
         });
     });
 
-    document.getElementById('btn-criar-conta')?.addEventListener('click', function(e) {
+    $('#btn-criar-conta').on('click', function(e) {
       e.preventDefault();
       hideRegisterError();
 
-      const nome = document.getElementById('reg-nome').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const phone = document.getElementById('reg-phone').value.trim();
-      const cpf = document.getElementById('reg-cpf').value.trim();
-      const bairro = document.getElementById('reg-bairro').value.trim();
-      const password = document.getElementById('reg-password').value;
+      const nome = $('#reg-nome').val().trim();
+      const email = $('#reg-email').val().trim();
+      const phone = $('#reg-phone').val().trim();
+      const cpf = $('#reg-cpf').val().trim();
+      const bairro = $('#reg-bairro').val().trim();
+      const password = $('#reg-password').val();
 
       if (!nome || nome.length < 3) {
         return showRegisterError('Nome completo obrigatório', 'reg-nome');
@@ -460,11 +447,9 @@
       })
         .done(() => {
           clearAuthSession();
-          document.getElementById('login-email').value = email;
-          document.getElementById('login-password').value = '';
-          document.querySelectorAll('#panel-register input').forEach(input => {
-            input.value = '';
-          });
+          $('#login-email').val(email);
+          $('#login-password').val('');
+          $('#panel-register input').val('');
           switchTab('login');
           showLoginSuccess('Conta criada com sucesso');
         })
@@ -474,23 +459,22 @@
         });
     });
 
-    document.getElementById('reg-phone')?.addEventListener('input', function(e) {
-      e.target.value = formatPhone(e.target.value);
+    $('#reg-phone').on('input', function() {
+      $(this).val(formatPhone($(this).val()));
     });
 
-    document.getElementById('reg-cpf')?.addEventListener('input', function(e) {
-      e.target.value = formatCPF(e.target.value);
+    $('#reg-cpf').on('input', function() {
+      $(this).val(formatCPF($(this).val()));
     });
 
     // ─── Login ──────────────────────────────────────────────────
-    document.getElementById('btn-entrar')?.addEventListener('click', function(e) {
+    $('#btn-entrar').on('click', function(e) {
       e.preventDefault();
-      const email = document.getElementById('login-email').value.trim();
-      const password = document.getElementById('login-password').value;
+      const email = $('#login-email').val().trim();
+      const password = $('#login-password').val();
 
       if (!email || !password) {
-        document.getElementById('login-erro').textContent = 'Preencha e-mail e senha.';
-        document.getElementById('login-erro').style.display = 'block';
+        $('#login-erro').text('Preencha e-mail e senha.').show();
         return;
       }
 
@@ -499,8 +483,7 @@
           window.location.href = '../pages/perfil.html';
         })
         .fail((jqXHR) => {
-          document.getElementById('login-erro').textContent = jqXHR.responseJSON?.error || 'E-mail ou senha incorretos.';
-          document.getElementById('login-erro').style.display = 'block';
+          $('#login-erro').text(jqXHR.responseJSON?.error || 'E-mail ou senha incorretos.').show();
         });
     });
   </script>
