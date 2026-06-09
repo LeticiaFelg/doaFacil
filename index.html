@@ -279,9 +279,7 @@
   <script src="./assets/js/api.js"></script>
   <script>
     $(function () {
-      // ── Dados mockados (remover quando a API estiver conectada) ──
-      /* LEGACY MOCK migrado para node/src/seed/demoData.js. Mantido somente para consulta.
-const mockItems = [
+      const mockItems = [
         { id: 1, title: 'Sofá de 3 lugares', category: 'moveis', categoryLabel: 'Móveis', image: './assets/img/items/item1.jpg', condition: 'bom', condLabel: 'Bom estado', desc: 'Sofá em tecido cinza, leve desgaste nos braços.', location: 'Copacabana, RJ', donor: 'Maria S.', donorRecurrent: true },
         { id: 2, title: 'Guarda-roupa 4 portas', category: 'moveis', categoryLabel: 'Móveis', image: './assets/img/items/item2.jpg', condition: 'bom', condLabel: 'Bom estado', desc: 'Madeira clara, espelho interno, sem trincas.', location: 'Botafogo, RJ', donor: 'João P.', donorRecurrent: false },
         { id: 3, title: 'Micro-ondas 30L', category: 'eletro', categoryLabel: 'Eletro', image: './assets/img/items/item3.jpg', condition: 'otimo', condLabel: 'Ótimo', desc: 'Funcionando perfeitamente, acompanha prato giratório.', location: 'Tijuca, RJ', donor: 'Ana C.', donorRecurrent: true },
@@ -295,8 +293,6 @@ const mockItems = [
         { id: 11, title: 'Geladeira 280L', category: 'eletro', categoryLabel: 'Eletro', image: './assets/img/items/item11.jpg', condition: 'usado', condLabel: 'Usado', desc: 'Funciona bem, pequenas marcas externas.', location: 'Bangu', donor: 'Hugo S.', donorRecurrent: true },
         { id: 12, title: 'Mochila escolar', category: 'escolar', categoryLabel: 'Escolar', image: './assets/img/items/item12.jpg', condition: 'otimo', condLabel: 'Ótimo', desc: 'Nova, nunca usada, tamanho médio.', location: 'Santa Cruz', donor: 'Olivia C.', donorRecurrent: false }
       ];
-*/
-const mockItems = [];
 
       let currentFilter = 'all';
       let currentSearch = '';
@@ -482,7 +478,7 @@ const mockItems = [];
 
       function loadItemsByCategory() {
         if (!window.DoaFacilAPI?.Items) {
-          loadedItems = [];
+          loadedItems = mockItems;
           applyFilters();
           return;
         }
@@ -498,7 +494,7 @@ const mockItems = [];
             applyFilters();
           })
           .fail(function () {
-            loadedItems = [];
+            loadedItems = mockItems;
             applyFilters();
           });
       }
@@ -506,7 +502,7 @@ const mockItems = [];
       // ── Botão Reservar dentro do card ──────────────────────
       function loadFeaturedItems() {
         if (!window.DoaFacilAPI?.Items) {
-          loadedFeaturedItems = [];
+          loadedFeaturedItems = mockItems;
           renderFeatured();
           return;
         }
@@ -517,7 +513,7 @@ const mockItems = [];
             renderFeatured();
           })
           .fail(function () {
-            loadedFeaturedItems = [];
+            loadedFeaturedItems = mockItems;
             renderFeatured();
           });
       }

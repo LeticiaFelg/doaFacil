@@ -6,6 +6,10 @@ authReady
   .then(data => {
     $('#navbar').html(data);
 
+    const isPagesPath = window.location.pathname.includes('/pages/');
+    const assetsPath = isPagesPath ? '../assets' : './assets';
+    $('.brand-logo').attr('src', `${assetsPath}/img/Logo.webp`);
+
     function getCurrentUser() {
       return JSON.parse(localStorage.getItem('doafacil_current_user') || 'null');
     }
@@ -20,7 +24,6 @@ authReady
       }
     }
 
-    const isPagesPath = window.location.pathname.includes('/pages/');
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const navRoutes = {
       home: isPagesPath ? '../index.html' : 'index.html',
