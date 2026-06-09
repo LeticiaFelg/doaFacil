@@ -153,8 +153,7 @@
     loadCurrentUserContext();
 
     // ── Dados mockados ──────────────────────────────────────
-    /* LEGACY MOCK migrado para node/src/seed/demoData.js. Mantido somente para consulta.
-const mockDoado = [
+    const mockDoado = [
       { id:1,  image:'../assets/img/items/item1.jpg', name:'Sofá de 3 lugares',        cat:'Móveis',     receptor:'Carlos M.',    date:'19/05/2026', status:'disponivel' },
       { id:2,  image:'../assets/img/items/item3.jpg', name:'Micro-ondas 30L',           cat:'Eletro',     receptor:'Ana Lima',     date:'12/05/2026', status:'reservado'  },
       { id:3,  image:'../assets/img/items/item4.jpg', name:'Kit roupas infantis',       cat:'Roupas',     receptor:'ONG Recomeço', date:'08/05/2026', status:'concluido'  },
@@ -168,11 +167,8 @@ const mockDoado = [
       { id:11, image:'../assets/img/items/item12.jpg', name:'Mochila escolar',           cat:'Escolar',    receptor:'Inst. Educar', date:'20/03/2026', status:'concluido'  },
       { id:12, image:'../assets/img/items/item11.jpg', name:'Geladeira 280L',            cat:'Eletro',     receptor:'Maria F.',     date:'14/03/2026', status:'concluido'  },
     ];
-*/
-const mockDoado = [];
   
-    /* LEGACY MOCK migrado para node/src/seed/demoData.js. Mantido somente para consulta.
-const mockRecebido = [
+    const mockRecebido = [
       { id:1, image:'../assets/img/items/item5.jpg', name:'Mesa escritório',         cat:'Móveis',     doador:'Lara C.',    date:'25/04/2026', status:'concluido' },
       { id:2, image:'../assets/img/items/item8.jpg', name:'Livros didáticos',        cat:'Escolar',    doador:'Roberto S.', date:'18/04/2026', status:'concluido' },
       { id:3, image:'../assets/img/items/item4.jpg', name:'Roupas tamanho M (lote)', cat:'Roupas',     doador:'Ana P.',     date:'10/04/2026', status:'concluido' },
@@ -181,8 +177,6 @@ const mockRecebido = [
       { id:6, image:'../assets/img/items/item10.jpg', name:'Kit brinquedos',          cat:'Brinquedos', doador:'Inst.Vida',  date:'15/03/2026', status:'concluido' },
       { id:7, image:'../assets/img/items/item1.jpg', name:'Poltrona de leitura',    cat:'Móveis',     doador:'Hugo B.',    date:'05/03/2026', status:'reservado' },
     ];
-*/
-const mockRecebido = [];
   
     const statusMap = {
       concluido:  '<span class="pill pill-concluido">✅ Concluído</span>',
