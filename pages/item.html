@@ -219,8 +219,7 @@
     updateReservationMessageCounter();
   
     // ── Dados mockados ──────────────────────────────────────
-    /* LEGACY MOCK migrado para node/src/seed/demoData.js. Mantido somente para consulta.
-const mockItems = [
+    const mockItems = [
       { id: 1, title: 'Sofá de 3 lugares',      category: 'moveis',     categoryLabel: 'Móveis',     image: '../assets/img/items/item1.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: 'Sofá em tecido cinza, leve desgaste nos braços, estrutura firme.',          location: 'Ipanema, RJ', generalMapsQuery: 'Ipanema,+Rio+de+Janeiro', fullAddress: 'Rua Nascimento Silva 107, Ipanema, Rio de Janeiro', mapAddress: 'Rua+Nascimento+Silva+107,+Ipanema,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22421-000', donor: 'Maria Clara Souza',    donorRecurrent: true  },
       { id: 2, title: 'Guarda-roupa 4 portas',  category: 'moveis',     categoryLabel: 'Móveis',     image: '../assets/img/items/item2.jpg', condition: 'bom',    condLabel: 'Bom estado',   desc: 'Madeira clara, espelho interno, sem trincas.',                              location: 'Urca, RJ',   generalMapsQuery: 'Urca,+Rio+de+Janeiro', fullAddress: 'Av. Pasteur 520, Urca, Rio de Janeiro', mapAddress: 'Av.+Pasteur+520,+Urca,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22290-240', donor: 'João P.',     donorRecurrent: false },
       { id: 3, title: 'Micro-ondas 30L',        category: 'eletro',     categoryLabel: 'Eletro',     image: '../assets/img/items/item3.jpg', condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Funcionando perfeitamente, acompanha prato giratório.',                     location: 'Tijuca, RJ',     generalMapsQuery: 'Tijuca,+Rio+de+Janeiro', fullAddress: 'Rua Barão de Mesquita 1200, Tijuca, Rio de Janeiro', mapAddress: 'Rua+Barão+de+Mesquita+1200,+Tijuca,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+20540-003', donor: 'Maria Clara Souza',      donorRecurrent: true  },
@@ -234,7 +233,6 @@ const mockItems = [
       { id:11, title: 'Geladeira 280L',         category: 'eletro',     categoryLabel: 'Eletro',     image: '../assets/img/items/item11.jpg', condition: 'usado',  condLabel: 'Usado',        desc: 'Funciona bem, pequenas marcas externas.',                                   location: 'Flamengo, RJ',   generalMapsQuery: 'Flamengo,+Rio+de+Janeiro', fullAddress: 'Rua Fernando Osório 68, Flamengo, Rio de Janeiro', mapAddress: 'Rua+Fernando+Osorio+68,+Flamengo,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+22210-030', donor: 'Hugo S.',     donorRecurrent: true  },
       { id:12, title: 'Mochila escolar',        category: 'escolar',    categoryLabel: 'Escolar',    image: '../assets/img/items/item12.jpg', condition: 'otimo',  condLabel: 'Ótimo',        desc: 'Nova, nunca usada, tamanho médio.',                                         location: 'Santa Cruz, RJ', generalMapsQuery: 'Santa+Cruz,+Rio+de+Janeiro', fullAddress: 'Av. Santa Cruz 1500, Santa Cruz, Rio de Janeiro', mapAddress: 'Av.+Santa+Cruz+1500,+Santa+Cruz,+Rio+de+Janeiro,+RJ,+Brasil,+CEP+23565-250', donor: 'Olivia C.',   donorRecurrent: false },
     ];
-*/
 
     let currentItem = null;
     const categoryLabels = {
@@ -258,6 +256,20 @@ const mockItems = [
       concluido: 'Concluido',
       cancelado: 'Cancelado',
       indisponivel: 'Indisponivel'
+    };
+    const mockItemSpecs = {
+      1: { dimensions: '220 x 85 x 90 cm', material: 'Tecido / Madeira', color: 'Cinza claro', pickup: 'A combinar', published: '19 mai. 2026', views: '48 visitas' },
+      2: { dimensions: '180 x 200 x 55 cm', material: 'Madeira / Espelho', color: 'Madeira clara', pickup: 'Retirar no local', published: '28 mar. 2026', views: '37 visitas' },
+      3: { dimensions: '30 litros', material: 'Metal / Plastico', color: 'Prata', pickup: 'A combinar', published: '12 mai. 2026', views: '42 visitas' },
+      4: { dimensions: 'Tamanhos 4 a 8 anos', material: 'Algodao / Malha', color: 'Variadas', pickup: 'A combinar', published: '08 mai. 2026', views: '54 visitas' },
+      5: { dimensions: '120 x 60 cm', material: 'Madeira', color: 'Marrom escuro', pickup: 'Retirar no local', published: '02 mai. 2026', views: '33 visitas' },
+      6: { dimensions: '5 pecas', material: 'Antiaderente / Inox', color: 'Prata / Vermelho', pickup: 'A combinar', published: '22 abr. 2026', views: '29 visitas' },
+      7: { dimensions: 'Tamanho 42', material: 'Tecido / Borracha', color: 'Cinza / Verde', pickup: 'A combinar', published: '15 abr. 2026', views: '31 visitas' },
+      8: { dimensions: 'Colecao ensino medio', material: 'Papel', color: 'Variadas', pickup: 'A combinar', published: '28 abr. 2026', views: '45 visitas' },
+      9: { dimensions: '188 x 88 cm', material: 'Madeira / Espuma', color: 'Madeira clara', pickup: 'Retirar no local', published: '03 abr. 2026', views: '39 visitas' },
+      10: { dimensions: '1 caixa media', material: 'Plastico / Madeira', color: 'Variadas', pickup: 'A combinar', published: '10 abr. 2026', views: '62 visitas' },
+      11: { dimensions: '280 litros', material: 'Metal / Plastico', color: 'Branca', pickup: 'Retirar no local', published: '14 mar. 2026', views: '57 visitas' },
+      12: { dimensions: 'Tamanho medio', material: 'Poliester', color: 'Preta', pickup: 'A combinar', published: '20 mar. 2026', views: '36 visitas' }
     };
 
     // ── Helper: monta iframe do Google Maps ─────────────────
@@ -299,6 +311,26 @@ const mockItems = [
       return resolveImage(item.image || '');
     }
 
+    function formatDisplayDate(value) {
+      if (!value) return '';
+
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+
+      return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }).replace(' de ', ' ').replace(' de ', ' ');
+    }
+
+    function formatViews(value) {
+      if (value === undefined || value === null || value === '') return '';
+      if (typeof value === 'string' && value.includes('visita')) return value;
+
+      return `${value} visitas`;
+    }
+
     function normalizeApiItem(item) {
       const category = item.category || 'outros';
       const condition = item.condition || 'bom';
@@ -329,6 +361,8 @@ const mockItems = [
         material: item.material || '',
         color: item.color || '',
         pickup: item.pickup || '',
+        published: formatDisplayDate(item.published || item.createdAt),
+        views: formatViews(item.views || item.view_count),
         donor: item.donor?.name || item.donor || 'Doador',
         donorId: item.donor_id || item.donor?.id || item.donorId || null,
         donorRecurrent: Boolean(item.donorRecurrent || item.donor?.verified),
@@ -364,6 +398,33 @@ const mockItems = [
       };
     }
 
+    function normalizeMockItem(item) {
+      const spec = mockItemSpecs[item.id] || {};
+
+      return {
+        ...item,
+        donorId: item.donorId || null,
+        status: item.status || 'disponivel',
+        dimensions: item.dimensions || spec.dimensions || '',
+        material: item.material || spec.material || '',
+        color: item.color || spec.color || '',
+        pickup: item.pickup || spec.pickup || '',
+        published: item.published || spec.published || '',
+        views: item.views || spec.views || '',
+        emoji: item.emoji || '📦'
+      };
+    }
+
+    function getMockItemById(itemId) {
+      return $.map(mockItems, function (item) {
+        return Number(item.id) === Number(itemId) ? normalizeMockItem(item) : null;
+      })[0] || null;
+    }
+
+    function renderFallbackItem(itemId) {
+      renderItem(getMockItemById(itemId) || buildMissingItem(itemId));
+    }
+
     function renderLoadingItem() {
       $('#breadcrumb-category').text('Carregando');
       $('#breadcrumb-title').text('Item');
@@ -376,6 +437,8 @@ const mockItems = [
       $('#spec-material').text('-');
       $('#spec-color').text('-');
       $('#spec-pickup').text('-');
+      $('#spec-published').text('-');
+      $('#spec-views').text('-');
       $('#item-location-name').text('Localizacao');
       $('#item-location-sub').text('Carregando localizacao...');
       $('#item-category-badge').text('Item');
@@ -484,6 +547,8 @@ const mockItems = [
       $('#spec-material').text(item.material || '-');
       $('#spec-color').text(item.color || '-');
       $('#spec-pickup').text(item.pickup || 'A combinar');
+      $('#spec-published').text(item.published || '-');
+      $('#spec-views').text(item.views || '-');
 
       $('#item-location-name').text((item.location || '').split(',')[0] || 'Localizacao');
       $('#item-location-sub').text(item.location || 'Localizacao nao informada');
@@ -508,12 +573,12 @@ const mockItems = [
       renderLoadingItem();
 
       if (!Number.isFinite(itemId) || itemId <= 0) {
-        renderItem(buildMissingItem(null));
+        renderFallbackItem(null);
         return;
       }
 
       if (!window.DoaFacilAPI?.Items?.getById) {
-        renderItem(buildMissingItem(itemId));
+        renderFallbackItem(itemId);
         return;
       }
 
@@ -522,7 +587,7 @@ const mockItems = [
           renderItem(normalizeApiItem(item));
         })
         .fail(function () {
-          renderItem(buildMissingItem(itemId));
+          renderFallbackItem(itemId);
         });
     }
 
