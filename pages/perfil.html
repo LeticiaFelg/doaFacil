@@ -205,20 +205,24 @@
   <script>
     $(function () {
       const hasRealSession = DoaFacilAPI.Auth.hasRealSession();
+      const $protectedContent = $('.page-container, #footer');
 
-      function startLoginRedirectCountdown(totalSeconds) {
+      if (!hasRealSession) {
+        $protectedContent.hide();
+      }
+
+      function clearStoredSession() {
+        localStorage.removeItem('doafacil_token');
+        localStorage.removeItem('doafacil_user');
+        localStorage.removeItem('doafacil_current_user');
+        localStorage.removeItem('doafacil_fallback_session');
+      }
+
+      function startSilentLoginRedirectCountdown(totalSeconds) {
         let remainingSeconds = totalSeconds;
-        const $alert = $(`
-          <div id="profile-login-redirect-alert" style="position:fixed;top:84px;left:50%;transform:translateX(-50%);z-index:1080;max-width:620px;width:calc(100% - 32px);background:#FFF3CD;color:#664D03;border:1px solid #FFECB5;border-radius:12px;padding:12px 16px;box-shadow:0 8px 24px rgba(0,0,0,.12);font-family:'DM Sans',sans-serif;font-size:.95rem;text-align:center;">
-            Você está visualizando um perfil de demonstração. Você será redirecionado para o login em <strong data-countdown>${remainingSeconds}</strong> segundos.
-          </div>
-        `);
-
-        $('body').append($alert);
 
         const timer = setInterval(function () {
           remainingSeconds -= 1;
-          $alert.find('[data-countdown]').text(remainingSeconds);
 
           if (remainingSeconds <= 0) {
             clearInterval(timer);
@@ -227,12 +231,28 @@
         }, 1000);
       }
 
+      function checkApiHealth() {
+        const apiBase = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/$/, '');
+
+        return $.ajax({
+          url: `${apiBase}/health`,
+          method: 'GET',
+          cache: false,
+          timeout: 2500
+        });
+      }
+
       if (!hasRealSession) {
-        localStorage.removeItem('doafacil_token');
-        localStorage.removeItem('doafacil_user');
-        localStorage.removeItem('doafacil_current_user');
-        localStorage.removeItem('doafacil_fallback_session');
-        startLoginRedirectCountdown(31);
+        clearStoredSession();
+
+        checkApiHealth()
+          .done(function () {
+            window.location.href = 'login.html';
+          })
+          .fail(function () {
+            $protectedContent.show();
+            startSilentLoginRedirectCountdown(31);
+          });
       }
 
       function applyProfile(user) {
