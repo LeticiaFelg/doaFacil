@@ -27,13 +27,52 @@ function initModal() {
     return window.location.pathname.includes('/pages/') ? './login.html' : './pages/login.html';
   }
 
+  function checkApiHealth() {
+    const apiBase = (window.API_BASE_URL || 'http://localhost:5000/api').replace(/\/$/, '');
+
+    if (window.$) {
+      return $.ajax({
+        url: `${apiBase}/health`,
+        method: 'GET',
+        cache: false,
+        timeout: 2500
+      });
+    }
+
+    return fetch(`${apiBase}/health`, { cache: 'no-store' });
+  }
+
   function openDonationModal() {
-    if (!isLoggedIn()) {
-      window.location.href = getLoginPath();
+    if (isLoggedIn()) {
+      doarModal.classList.add('active');
       return;
     }
 
-    doarModal.classList.add('active');
+    const healthRequest = checkApiHealth();
+
+    if (healthRequest.done) {
+      healthRequest
+        .done(() => {
+          window.location.href = getLoginPath();
+        })
+        .fail(() => {
+          doarModal.classList.add('active');
+        });
+      return;
+    }
+
+    healthRequest
+      .then((response) => {
+        if (response.ok) {
+          window.location.href = getLoginPath();
+          return;
+        }
+
+        doarModal.classList.add('active');
+      })
+      .catch(() => {
+        doarModal.classList.add('active');
+      });
   }
 
   function updateCharCounter(field) {
