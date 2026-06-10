@@ -1,4 +1,4 @@
-# DoaFacil
+﻿# DoaFacil
 
 > Plataforma digital de redistribuicao de bens materiais, conectando doadores com quem mais precisa.
 
@@ -107,7 +107,7 @@ Simplificar a solidariedade e reduzir desperdicios conectando quem doa com quem 
 | Backend | Node.js + Express |
 | Banco | SQLite + Sequelize |
 | Autenticacao | JWT + bcryptjs |
-| Upload | multer + pasta local `node/uploads/items` |
+| Upload | multer + pasta local `backend/uploads/items` |
 | E-mail | nodemailer com Ethereal, SMTP/Mailtrap ou log local |
 | Desenvolvimento | nodemon |
 
@@ -136,7 +136,7 @@ DoaFacil/
 │   │   ├── modal.js
 │   │   └── components/
 │   └── img/
-├── node/
+├── backend_legacy/
 │   ├── src/
 │   │   ├── server.js
 │   │   ├── config/
@@ -155,7 +155,7 @@ DoaFacil/
 └── guia_deploy_local.md
 ```
 
-Observacao: a pasta `backend/` contem uma estrutura antiga/paralela. A API ativa do projeto fica em `node/`.
+Observacao: a pasta `backend_legacy/` contem uma estrutura antiga/paralela. A API ativa do projeto fica em `backend/`.
 
 ---
 
@@ -171,7 +171,7 @@ cd doaFacil
 ### 2. Instalar Dependencias Do Backend
 
 ```bash
-cd node
+cd backend
 npm install
 ```
 
@@ -200,7 +200,7 @@ EMAIL_PROVIDER=ethereal
 
 ### 4. Rodar Backend
 
-Dentro da pasta `node/`:
+Dentro da pasta `backend/`:
 
 ```bash
 npm run dev
@@ -385,7 +385,7 @@ Arquivos de apoio:
 - [API_DOCUMENTACAO.md](API_DOCUMENTACAO.md): endpoints, parametros e exemplos.
 - [FUNCIONALIDADES.md](FUNCIONALIDADES.md): explicacao funcional para usuarios e apresentacao.
 - [guia_deploy_local.md](guia_deploy_local.md): notas sobre execucao local e deploy estatico.
-- [node/README.md](node/README.md): resumo especifico da API.
+- [backend/README.md](backend/README.md): resumo especifico da API.
 
 ---
 
@@ -435,3 +435,4 @@ Este projeto esta sob a licenca MIT. Veja o arquivo [LICENSE](LICENSE) para deta
 Made by UI - Devs Squad - Way Anima Hub
 
 </div>
+

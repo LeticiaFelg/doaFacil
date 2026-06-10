@@ -1,4 +1,4 @@
-# Funcionalidades do DoaFacil
+﻿# Funcionalidades do DoaFacil
 
 Este documento descreve o que o DoaFacil oferece para o usuario final. Ele nao substitui a documentacao tecnica; a ideia aqui e explicar a experiencia, os fluxos e os recursos da plataforma.
 
@@ -133,7 +133,7 @@ O modal de criacao e edicao aceita imagens do computador do usuario.
 No ambiente local, as imagens sao salvas pelo backend na pasta:
 
 ```text
-node/uploads/items
+backend/uploads/items
 ```
 
 O sistema permite ate 3 imagens por item, com limite de tamanho por arquivo.
@@ -232,3 +232,4 @@ Pontos planejados para evolucao:
 - upload de imagens em S3 por presigned URL;
 - separacao formal entre health check e readiness check;
 - melhoria do conteudo final do FAQ.
+

@@ -1,179 +1,430 @@
-// src/routes/items.js
-
-const express        = require('express');
-const ItemModel      = require('../models/Item');
-const authMiddleware = require('../middleware/auth');
-const upload         = require('../middleware/upload');
+const express = require('express');
+const { Op } = require('sequelize');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const Item = require('../models/Item');
+const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// ─── GET /api/items ───────────────────────────────────────
-// Lista itens públicos. Filtros: ?category=&status=&search=
-router.get('/', (req, res) => {
-  try {
-    const { category, status, search } = req.query;
-    const items = ItemModel.list({ category, status, search });
-    return res.json({ items, total: items.length });
-  } catch (err) {
-    console.error('[GET /items]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
+const donorAttributes = ['id', 'name', 'avatar', 'verified', 'location'];
+const ITEM_DESCRIPTION_MAX_LENGTH = 1000;
+const MAX_ITEM_IMAGES = 3;
+const uploadDir = path.join(__dirname, '../../uploads/items');
+
+fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename(req, file, cb) {
+    const extension = path.extname(file.originalname).toLowerCase();
+    const safeBaseName = path.basename(file.originalname, extension)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 60) || 'item';
+
+    cb(null, `${Date.now()}-${safeBaseName}${extension}`);
   }
 });
 
-// ─── GET /api/items/my ────────────────────────────────────
-router.get('/my', authMiddleware, (req, res) => {
-  try {
-    const items = ItemModel.listByDonor(req.user.userId);
-    return res.json({ items, total: items.length });
-  } catch (err) {
-    console.error('[GET /items/my]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
-  }
-});
-
-// ─── GET /api/items/:id ───────────────────────────────────
-router.get('/:id', (req, res) => {
-  try {
-    const item = ItemModel.findById(req.params.id);
-    if (!item) return res.status(404).json({ error: 'Item não encontrado.' });
-    return res.json({ item });
-  } catch (err) {
-    console.error('[GET /items/:id]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
-  }
-});
-
-// ─── POST /api/items ──────────────────────────────────────
-// Cria um item. Aceita imageUrl como campo de texto opcional.
-// Para enviar imagem por arquivo, use POST /api/items/:id/image depois.
-router.post('/', authMiddleware, (req, res) => {
-  try {
-    const { title, description, category, condition, location, imageUrl } = req.body;
-
-    if (!title || !category || !condition) {
-      return res.status(400).json({ error: 'Título, categoria e condição são obrigatórios.' });
+const upload = multer({
+  storage,
+  limits: {
+    files: MAX_ITEM_IMAGES,
+    fileSize: 5 * 1024 * 1024
+  },
+  fileFilter(req, file, cb) {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Apenas imagens podem ser enviadas'));
     }
 
-    const item = ItemModel.create({
-      donorId: req.user.userId,
+    return cb(null, true);
+  }
+});
+
+function getUploadedImageUrls(files) {
+  return (files || []).map((file) => `/uploads/items/${file.filename}`);
+}
+
+/*
+// Implementacao futura para S3 com presigned URL.
+// Requer instalar/configurar AWS SDK:
+// npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+//
+// const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+// const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+//
+// const s3 = new S3Client({
+//   region: process.env.AWS_REGION
+// });
+//
+// async function createItemImageUploadUrl({ userId, fileName, contentType }) {
+//   const extension = path.extname(fileName).toLowerCase();
+//   const safeBaseName = path.basename(fileName, extension)
+//     .toLowerCase()
+//     .replace(/[^a-z0-9]+/g, '-')
+//     .replace(/^-|-$/g, '')
+//     .slice(0, 60) || 'item';
+//   const key = `items/${userId}/${Date.now()}-${safeBaseName}${extension}`;
+//
+//   const command = new PutObjectCommand({
+//     Bucket: process.env.S3_BUCKET_NAME,
+//     Key: key,
+//     ContentType: contentType
+//   });
+//
+//   const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 60 * 5 });
+//   const publicUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+//
+//   return { key, uploadUrl, publicUrl };
+// }
+*/
+
+function onlyDigits(value) {
+  return String(value || '').replace(/\D/g, '');
+}
+
+function toWhatsAppInternationalNumber(phone) {
+  const digits = onlyDigits(phone);
+
+  if (!digits) return '';
+  if (digits.startsWith('55') && (digits.length === 12 || digits.length === 13)) return digits;
+  if (digits.length === 10 || digits.length === 11) return `55${digits}`;
+
+  return digits;
+}
+
+function buildWhatsAppUrl(phone, itemTitle) {
+  const whatsappNumber = toWhatsAppInternationalNumber(phone);
+
+  if (!whatsappNumber) {
+    return '';
+  }
+
+  const message = encodeURIComponent(
+    `Ola! Vi o item "${itemTitle}" no DoaFacil e gostaria de combinar a retirada.`
+  );
+
+  return `https://wa.me/${whatsappNumber}?text=${message}`;
+}
+
+// Listar itens com filtros
+router.get('/', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const per_page = parseInt(req.query.per_page) || 12;
+    const category = req.query.category;
+    const status = req.query.status || 'disponivel';
+    const search = req.query.search || '';
+
+    let where = {};
+
+    if (category && category !== 'all') {
+      where.category = category;
+    }
+
+    if (status && status !== 'all') {
+      where.status = status;
+    }
+
+    if (search) {
+      where[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } }
+      ];
+    }
+
+    const { count, rows } = await Item.findAndCountAll({
+      where,
+      include: [{
+        model: User,
+        as: 'donor',
+        attributes: donorAttributes
+      }],
+      limit: per_page,
+      offset: (page - 1) * per_page
+    });
+
+    return res.json({
+      items: rows,
+      total: count,
+      pages: Math.ceil(count / per_page),
+      current_page: page
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Meus itens pelo contrato esperado pelo frontend: /api/items/my
+router.get('/my', auth, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const per_page = parseInt(req.query.per_page) || 12;
+
+    const { count, rows } = await Item.findAndCountAll({
+      where: { donor_id: req.userId },
+      include: [{
+        model: User,
+        as: 'donor',
+        attributes: donorAttributes
+      }],
+      limit: per_page,
+      offset: (page - 1) * per_page
+    });
+
+    return res.json({
+      items: rows,
+      total: count,
+      pages: Math.ceil(count / per_page),
+      current_page: page
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Gerar link de contato via WhatsApp sem expor telefone nas consultas de item.
+router.post('/:id/contact/whatsapp', auth, async (req, res) => {
+  try {
+    const item = await Item.findByPk(req.params.id, {
+      include: [{
+        model: User,
+        as: 'donor',
+        attributes: ['id', 'name', 'phone']
+      }]
+    });
+
+    if (!item) {
+      return res.status(404).json({ error: 'Item nao encontrado' });
+    }
+
+    if (!item.donor?.phone) {
+      return res.status(404).json({ error: 'Telefone do doador nao disponivel' });
+    }
+
+    const whatsappUrl = buildWhatsAppUrl(item.donor.phone, item.title);
+
+    if (!whatsappUrl) {
+      return res.status(400).json({ error: 'Telefone do doador invalido' });
+    }
+
+    return res.json({
+      url: whatsappUrl
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Itens por categoria
+router.get('/category/:category', async (req, res) => {
+  try {
+    const items = await Item.findAll({
+      where: {
+        category: req.params.category,
+        status: 'disponivel'
+      },
+      include: [{
+        model: User,
+        as: 'donor',
+        attributes: donorAttributes
+      }]
+    });
+
+    return res.json({
+      category: req.params.category,
+      items
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Obter item por ID
+router.get('/:id', async (req, res) => {
+  try {
+    const item = await Item.findByPk(req.params.id, {
+      include: [{
+        model: User,
+        as: 'donor',
+        attributes: donorAttributes
+      }]
+    });
+
+    if (!item) {
+      return res.status(404).json({ error: 'Item nao encontrado' });
+    }
+
+    return res.json(item);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Criar item
+router.post('/', auth, upload.array('images', MAX_ITEM_IMAGES), async (req, res) => {
+  try {
+    const {
       title,
       description,
       category,
+      emoji,
       condition,
       location,
-      imageUrl: imageUrl || null,
+      images,
+      dimensions,
+      material,
+      color,
+      pickup,
+      address
+    } = req.body;
+    const uploadedImages = getUploadedImageUrls(req.files);
+    const parsedImages = Array.isArray(images)
+      ? images
+      : typeof images === 'string' && images
+        ? [images]
+        : [];
+    const parsedAddress = typeof address === 'string'
+      ? JSON.parse(address || '{}')
+      : address;
+
+    if (!title || !description) {
+      return res.status(400).json({ error: 'Titulo e descricao sao obrigatorios' });
+    }
+
+    if (description.length > ITEM_DESCRIPTION_MAX_LENGTH) {
+      return res.status(400).json({ error: `Descricao deve ter no maximo ${ITEM_DESCRIPTION_MAX_LENGTH} caracteres` });
+    }
+
+    const user = await User.findByPk(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario nao encontrado' });
+    }
+
+    const item = await Item.create({
+      title,
+      description,
+      category: category || 'outros',
+      emoji: emoji || '📦',
+      condition: condition || 'bom',
+      location: location || user.location,
+      images: uploadedImages.length ? uploadedImages : parsedImages,
+      dimensions: dimensions || '',
+      material: material || '',
+      color: color || '',
+      pickup: pickup || '',
+      address: parsedAddress || {},
+      donor_id: req.userId,
+      status: 'disponivel'
     });
 
-    return res.status(201).json({ item });
-  } catch (err) {
-    if (err.message.startsWith('Categoria') || err.message.startsWith('Condição')) {
-      return res.status(400).json({ error: err.message });
-    }
-    console.error('[POST /items]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
-  }
-});
-
-// ─── POST /api/items/:id/image ────────────────────────────
-// Opção A: upload de arquivo (multipart/form-data, campo "image")
-// Opção B: URL externa (JSON com campo "imageUrl")
-//
-// Exemplos de uso com jQuery:
-//
-// Opção A — arquivo:
-//   const formData = new FormData();
-//   formData.append('image', $('#input-file')[0].files[0]);
-//   $.ajax({ url: `/api/items/${id}/image`, method: 'POST',
-//            data: formData, processData: false, contentType: false,
-//            headers: { Authorization: `Bearer ${token}` } });
-//
-// Opção B — URL:
-//   $.ajax({ url: `/api/items/${id}/image`, method: 'POST',
-//            contentType: 'application/json',
-//            data: JSON.stringify({ imageUrl: 'https://...' }),
-//            headers: { Authorization: `Bearer ${token}` } });
-
-router.post('/:id/image', authMiddleware, (req, res, next) => {
-  // Detecta se é upload de arquivo ou URL pela Content-Type
-  const isMultipart = (req.headers['content-type'] || '').includes('multipart/form-data');
-
-  if (isMultipart) {
-    // Opção A: upload de arquivo
-    upload.single('image')(req, res, (err) => {
-      if (err) {
-        const msg = err.code === 'LIMIT_FILE_SIZE'
-          ? 'Arquivo muito grande. Máximo: 5 MB.'
-          : err.message;
-        return res.status(400).json({ error: msg });
-      }
-
-      if (!req.file) {
-        return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
-      }
-
-      // Monta a URL pública do arquivo salvo
-      const publicUrl = `${process.env.PUBLIC_URL || 'http://localhost:3000'}/uploads/${req.file.filename}`;
-
-      try {
-        const item = ItemModel.updateImage(req.params.id, req.user.userId, publicUrl);
-        return res.json({ item, imageUrl: publicUrl });
-      } catch (updateErr) {
-        if (updateErr.code === 'NOT_FOUND') {
-          return res.status(403).json({ error: 'Item não encontrado ou sem permissão.' });
-        }
-        console.error('[POST /items/:id/image — upload]', updateErr);
-        return res.status(500).json({ error: 'Erro interno do servidor.' });
-      }
+    return res.status(201).json({
+      message: 'Item criado com sucesso',
+      item
     });
-  } else {
-    // Opção B: URL externa
-    const { imageUrl } = req.body;
-    if (!imageUrl) {
-      return res.status(400).json({ error: 'imageUrl é obrigatório.' });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Atualizar item
+router.put('/:id', auth, upload.array('images', MAX_ITEM_IMAGES), async (req, res) => {
+  try {
+    const item = await Item.findByPk(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({ error: 'Item nao encontrado' });
     }
 
-    // Validação básica de URL
-    try {
-      new URL(imageUrl);
-    } catch {
-      return res.status(400).json({ error: 'URL de imagem inválida.' });
+    if (item.donor_id !== req.userId) {
+      return res.status(403).json({ error: 'Sem permissao' });
     }
 
-    try {
-      const item = ItemModel.updateImage(req.params.id, req.user.userId, imageUrl);
-      return res.json({ item, imageUrl });
-    } catch (err) {
-      if (err.code === 'NOT_FOUND') {
-        return res.status(403).json({ error: 'Item não encontrado ou sem permissão.' });
+    const {
+      title,
+      description,
+      category,
+      emoji,
+      condition,
+      status,
+      location,
+      images,
+      dimensions,
+      material,
+      color,
+      pickup,
+      address
+    } = req.body;
+    const uploadedImages = getUploadedImageUrls(req.files);
+    const parsedImages = Array.isArray(images)
+      ? images
+      : typeof images === 'string' && images
+        ? [images]
+        : [];
+    const parsedAddress = typeof address === 'string'
+      ? JSON.parse(address || '{}')
+      : address;
+
+    if (title) item.title = title;
+    if (category) item.category = category;
+    if (emoji) item.emoji = emoji;
+    if (description) {
+      if (description.length > ITEM_DESCRIPTION_MAX_LENGTH) {
+        return res.status(400).json({ error: `Descricao deve ter no maximo ${ITEM_DESCRIPTION_MAX_LENGTH} caracteres` });
       }
-      console.error('[POST /items/:id/image — url]', err);
-      return res.status(500).json({ error: 'Erro interno do servidor.' });
+      item.description = description;
     }
+    if (condition) item.condition = condition;
+    if (status) item.status = status;
+    if (location) item.location = location;
+    if (uploadedImages.length || parsedImages.length) {
+      item.images = uploadedImages.length ? uploadedImages : parsedImages;
+    }
+    if (dimensions !== undefined) item.dimensions = dimensions;
+    if (material !== undefined) item.material = material;
+    if (color !== undefined) item.color = color;
+    if (pickup !== undefined) item.pickup = pickup;
+    if (parsedAddress !== undefined) item.address = parsedAddress;
+
+    await item.save();
+
+    return res.json({
+      message: 'Item atualizado com sucesso',
+      item
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 
-// ─── PUT /api/items/:id ───────────────────────────────────
-router.put('/:id', authMiddleware, (req, res) => {
+// Cancelar item (soft delete)
+router.delete('/:id', auth, async (req, res) => {
   try {
-    const item = ItemModel.update(req.params.id, req.user.userId, req.body);
-    return res.json({ item });
-  } catch (err) {
-    if (err.code === 'NOT_FOUND')                        return res.status(403).json({ error: 'Item não encontrado ou sem permissão.' });
-    if (err.message === 'Nenhum campo válido para atualizar.') return res.status(400).json({ error: err.message });
-    console.error('[PUT /items/:id]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
-  }
-});
+    const item = await Item.findByPk(req.params.id);
 
-// ─── DELETE /api/items/:id ────────────────────────────────
-router.delete('/:id', authMiddleware, (req, res) => {
-  try {
-    ItemModel.delete(req.params.id, req.user.userId);
-    return res.json({ message: 'Item removido com sucesso.' });
-  } catch (err) {
-    if (err.code === 'NOT_FOUND') return res.status(403).json({ error: 'Item não encontrado ou sem permissão.' });
-    console.error('[DELETE /items/:id]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
+    if (!item) {
+      return res.status(404).json({ error: 'Item nao encontrado' });
+    }
+
+    if (item.donor_id !== req.userId) {
+      return res.status(403).json({ error: 'Sem permissao' });
+    }
+
+    item.status = 'cancelado';
+    await item.save();
+
+    return res.json({
+      message: 'Item cancelado com sucesso',
+      item
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 

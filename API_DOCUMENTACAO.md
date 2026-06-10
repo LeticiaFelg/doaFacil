@@ -1,4 +1,4 @@
-# Documentacao Da API DoaFacil
+﻿# Documentacao Da API DoaFacil
 
 Referencia rapida das rotas HTTP da API ativa do DoaFacil.
 
@@ -11,10 +11,10 @@ http://localhost:5000/api
 API ativa:
 
 ```text
-node/src
+backend/src
 ```
 
-A pasta `backend/` existe no repositorio, mas representa uma estrutura antiga/paralela e nao e a API usada pelas paginas atuais.
+A pasta `backend_legacy/` existe no repositorio, mas representa uma estrutura antiga/paralela e nao e a API usada pelas paginas atuais.
 
 ## Autenticacao
 
@@ -392,7 +392,7 @@ Upload:
 - maximo de 3 imagens;
 - ate 5 MB por imagem;
 - apenas MIME `image/*`;
-- arquivos locais sao salvos em `node/uploads/items`.
+- arquivos locais sao salvos em `backend/uploads/items`.
 
 ### `PUT /api/items/:id` protegida
 
@@ -583,7 +583,7 @@ Retorna estatisticas globais:
 
 ## E-mail E Recuperacao De Senha
 
-Variaveis em `node/.env.example`:
+Variaveis em `backend/.env.example`:
 
 ```text
 EMAIL_PROVIDER=ethereal
@@ -622,3 +622,4 @@ Itens:
 Invoke-RestMethod "$base/items"
 Invoke-RestMethod "$base/items/category/moveis"
 ```
+
