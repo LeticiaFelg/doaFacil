@@ -1,11 +1,11 @@
-# DoaFacil API - Node.js, Express e SQLite
+﻿# DoaFacil API - Node.js, Express e SQLite
 
 API backend ativa do projeto DoaFacil.
 
 ## Inicio Rapido
 
 ```powershell
-cd "C:\Users\Lucas R\Documents\IBMR\2026.1\A3\node"
+cd "C:\Users\Lucas R\Documents\IBMR\2026.1\A3\\backend"
 npm install
 npm run dev
 ```
@@ -27,19 +27,19 @@ Invoke-RestMethod "http://localhost:5000/api/health"
 O banco atual e SQLite:
 
 ```text
-node/doafacil.db
+backend/doafacil.db
 ```
 
 A configuracao fica em:
 
 ```text
-node/src/config/database.js
+backend/src/config/database.js
 ```
 
 O seed demonstrativo fica em:
 
 ```text
-node/src/seed/demoData.js
+backend/src/seed/demoData.js
 ```
 
 Ao iniciar o backend, `src/server.js` sincroniza as tabelas e executa o seed.
@@ -47,7 +47,7 @@ Ao iniciar o backend, `src/server.js` sincroniza as tabelas e executa o seed.
 ## Estrutura
 
 ```text
-node/
+backend/
   src/
     server.js
     config/database.js
@@ -129,7 +129,7 @@ As rotas abaixo existem por compatibilidade com organizacao anterior:
 Imagens enviadas pelo modal de nova doacao sao salvas em:
 
 ```text
-node/uploads/items
+backend/uploads/items
 ```
 
 E servidas por:
@@ -146,6 +146,7 @@ npm start
 npm test
 ```
 
-## Observacao Sobre backend/
+## Observacao Sobre backend_legacy/
 
-A pasta `backend/` da raiz contem uma estrutura antiga/paralela. A API ativa deste projeto e a pasta `node/`.
+A pasta `backend_legacy/` da raiz contem uma estrutura antiga/paralela. A API ativa deste projeto e a pasta `backend/`.
+

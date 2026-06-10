@@ -1,128 +1,331 @@
-// src/routes/reservations.js
-// Criação e gestão de reservas + histórico de recebimentos.
-
 const express = require('express');
-const ReservationModel = require('../models/Reservation');
-const ItemModel = require('../models/Item');
-const authMiddleware = require('../middleware/auth');
+const { Op } = require('sequelize');
+const Reservation = require('../models/Reservation');
+const Item = require('../models/Item');
+const User = require('../models/User');
+const History = require('../models/History');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
+const RESERVATION_MESSAGE_MAX_LENGTH = 500;
 
-// ─── POST /api/reservations ───────────────────────────────
-// Receptor reserva um item.
-router.post('/', authMiddleware, async (req, res) => {
+// Criar reserva
+router.post('/', auth, async (req, res) => {
   try {
-    const { itemId } = req.body;
+    const { itemId, message } = req.body;
+    const item_id = req.body.item_id || itemId;
 
-    if (!itemId) {
-      return res.status(400).json({ error: 'itemId é obrigatório.' });
+    if (!item_id) {
+      return res.status(400).json({ error: 'Item ID e obrigatorio' });
     }
 
-    // Busca o item para pegar o donorId e validar disponibilidade
-    const item = await ItemModel.findById(itemId);
-    if (!item) return res.status(404).json({ error: 'Item não encontrado.' });
-
-    if (item.status !== 'available') {
-      return res.status(409).json({ error: 'Item não está disponível para reserva.' });
+    if (message && message.length > RESERVATION_MESSAGE_MAX_LENGTH) {
+      return res.status(400).json({ error: `Mensagem deve ter no maximo ${RESERVATION_MESSAGE_MAX_LENGTH} caracteres` });
     }
 
-    if (item.donorId === req.user.userId) {
-      return res.status(400).json({ error: 'Você não pode reservar o próprio item.' });
+    const item = await Item.findByPk(item_id);
+    if (!item) {
+      return res.status(404).json({ error: 'Item nao encontrado' });
     }
 
-    const reservation = await ReservationModel.create({
-      itemId,
-      receiverId: req.user.userId,
-      donorId: item.donorId,
+    if (item.status !== 'disponivel') {
+      return res.status(409).json({ error: 'Item nao esta disponivel para reserva' });
+    }
+
+    const existing = await Reservation.findOne({
+      where: {
+        item_id,
+        status: {
+          [Op.in]: ['pendente', 'confirmada']
+        }
+      }
     });
 
-    return res.status(201).json({ reservation });
-  } catch (err) {
-    if (err.name === 'ConditionalCheckFailedException') {
-      return res.status(409).json({ error: 'Item não está disponível para reserva.' });
-    }
-    console.error('[POST /reservations]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
-  }
-});
-
-// ─── GET /api/reservations/received ──────────────────────
-// Histórico de itens recebidos (pelo receptor logado).
-router.get('/received', authMiddleware, async (req, res) => {
-  try {
-    const reservations = await ReservationModel.listByReceiver(req.user.userId);
-    return res.json({ reservations, total: reservations.length });
-  } catch (err) {
-    console.error('[GET /reservations/received]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
-  }
-});
-
-// ─── GET /api/reservations/donated ───────────────────────
-// Reservas dos itens que o doador logado disponibilizou.
-router.get('/donated', authMiddleware, async (req, res) => {
-  try {
-    const reservations = await ReservationModel.listByDonor(req.user.userId);
-    return res.json({ reservations, total: reservations.length });
-  } catch (err) {
-    console.error('[GET /reservations/donated]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
-  }
-});
-
-// ─── GET /api/reservations/:id ────────────────────────────
-// Detalhe de uma reserva (somente doador ou receptor podem ver).
-router.get('/:id', authMiddleware, async (req, res) => {
-  try {
-    const reservation = await ReservationModel.findById(req.params.id);
-    if (!reservation) return res.status(404).json({ error: 'Reserva não encontrada.' });
-
-    const isParticipant =
-      reservation.donorId === req.user.userId ||
-      reservation.receiverId === req.user.userId;
-
-    if (!isParticipant) {
-      return res.status(403).json({ error: 'Sem permissão para ver esta reserva.' });
+    if (existing) {
+      return res.status(409).json({ error: 'Item ja foi reservado' });
     }
 
-    return res.json({ reservation });
-  } catch (err) {
-    console.error('[GET /reservations/:id]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
+    const userRes = await Reservation.findOne({
+      where: { item_id, user_id: req.userId }
+    });
+
+    if (userRes) {
+      return res.status(409).json({ error: 'Voce ja reservou este item' });
+    }
+
+    const reservation = await Reservation.create({
+      item_id,
+      user_id: req.userId,
+      donor_id: item.donor_id,
+      message: message || '',
+      status: 'pendente'
+    });
+
+    item.status = 'reservado';
+    await item.save();
+
+    return res.status(201).json({
+      message: 'Reserva criada com sucesso',
+      reservation,
+      item
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 
-// ─── PATCH /api/reservations/:id/status ──────────────────
-// Atualiza status: doador confirma/completa; receptor cancela.
-router.patch('/:id/status', authMiddleware, async (req, res) => {
+// Reservas recebidas pelo usuario autenticado como doador.
+router.get('/received', auth, async (req, res) => {
+  try {
+    const reservations = await Reservation.findAll({
+      where: { donor_id: req.userId },
+      include: [
+        { model: Item, as: 'item' },
+        { model: User, as: 'receiver', attributes: ['id', 'name', 'avatar', 'verified', 'location'] }
+      ]
+    });
+
+    return res.json({ reservations });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Reservas feitas pelo usuario autenticado como receptor.
+router.get('/donated', auth, async (req, res) => {
+  try {
+    const reservations = await Reservation.findAll({
+      where: { user_id: req.userId },
+      include: [
+        { model: Item, as: 'item' },
+        { model: User, as: 'donor', attributes: ['id', 'name', 'avatar', 'verified', 'location'] }
+      ]
+    });
+
+    return res.json({ reservations });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Atualizar status pelo contrato esperado pelo frontend: /api/reservations/:id/status
+router.patch('/:id/status', auth, async (req, res) => {
   try {
     const { status } = req.body;
-    if (!status) return res.status(400).json({ error: 'status é obrigatório.' });
+    const allowedStatuses = ['pendente', 'confirmada', 'concluida', 'cancelada'];
 
-    const reservation = await ReservationModel.findById(req.params.id);
-    if (!reservation) return res.status(404).json({ error: 'Reserva não encontrada.' });
-
-    const isDonor    = reservation.donorId    === req.user.userId;
-    const isReceiver = reservation.receiverId === req.user.userId;
-
-    // Regras de negócio: quem pode fazer cada transição
-    const allowedTransitions = {
-      donor:    ['confirmed', 'completed', 'cancelled'],
-      receiver: ['cancelled'],
-    };
-
-    if (isDonor    && !allowedTransitions.donor.includes(status))    return res.status(403).json({ error: 'Transição não permitida para o doador.' });
-    if (isReceiver && !allowedTransitions.receiver.includes(status)) return res.status(403).json({ error: 'Transição não permitida para o receptor.' });
-    if (!isDonor && !isReceiver) return res.status(403).json({ error: 'Sem permissão.' });
-
-    const updated = await ReservationModel.updateStatus(req.params.id, status, req.user.userId);
-    return res.json({ reservation: updated });
-  } catch (err) {
-    if (err.message.startsWith('Status inválido')) {
-      return res.status(400).json({ error: err.message });
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Status invalido' });
     }
-    console.error('[PATCH /reservations/:id/status]', err);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
+
+    const reservation = await Reservation.findByPk(req.params.id);
+
+    if (!reservation) {
+      return res.status(404).json({ error: 'Reserva nao encontrada' });
+    }
+
+    if (reservation.donor_id !== req.userId && reservation.user_id !== req.userId) {
+      return res.status(403).json({ error: 'Sem permissao' });
+    }
+
+    reservation.status = status;
+    if (status === 'concluida') {
+      reservation.completed_at = new Date();
+    }
+    await reservation.save();
+
+    const item = await Item.findByPk(reservation.item_id);
+    if (item) {
+      if (status === 'confirmada') item.status = 'reservado';
+      if (status === 'concluida') item.status = 'concluido';
+      if (status === 'cancelada' && item.status === 'reservado') item.status = 'disponivel';
+      await item.save();
+    }
+
+    return res.json({
+      message: 'Status da reserva atualizado com sucesso',
+      reservation
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Minhas reservas pendentes.
+router.get('/my/pending', auth, async (req, res) => {
+  try {
+    const made = await Reservation.findAll({
+      where: { user_id: req.userId, status: 'pendente' }
+    });
+
+    const received = await Reservation.findAll({
+      where: { donor_id: req.userId, status: 'pendente' }
+    });
+
+    return res.json({
+      reservations_made: made,
+      reservations_received: received
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Reservas de um item.
+router.get('/item/:item_id', async (req, res) => {
+  try {
+    const item = await Item.findByPk(req.params.item_id);
+
+    if (!item) {
+      return res.status(404).json({ error: 'Item nao encontrado' });
+    }
+
+    const reservations = await Reservation.findAll({
+      where: { item_id: req.params.item_id }
+    });
+
+    return res.json({
+      item,
+      reservations
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Obter reserva.
+router.get('/:id', auth, async (req, res) => {
+  try {
+    const reservation = await Reservation.findByPk(req.params.id);
+
+    if (!reservation) {
+      return res.status(404).json({ error: 'Reserva nao encontrada' });
+    }
+
+    return res.json(reservation);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Confirmar reserva (doador).
+router.put('/:id/confirm', auth, async (req, res) => {
+  try {
+    const reservation = await Reservation.findByPk(req.params.id);
+
+    if (!reservation) {
+      return res.status(404).json({ error: 'Reserva nao encontrada' });
+    }
+
+    if (reservation.donor_id !== req.userId) {
+      return res.status(403).json({ error: 'Sem permissao' });
+    }
+
+    if (reservation.status !== 'pendente') {
+      return res.status(409).json({ error: `Reserva ja esta ${reservation.status}` });
+    }
+
+    reservation.status = 'confirmada';
+    await reservation.save();
+
+    const item = await Item.findByPk(reservation.item_id);
+    item.status = 'reservado';
+    await item.save();
+
+    return res.json({
+      message: 'Reserva confirmada com sucesso',
+      reservation
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Completar reserva.
+router.put('/:id/complete', auth, async (req, res) => {
+  try {
+    const reservation = await Reservation.findByPk(req.params.id);
+
+    if (!reservation) {
+      return res.status(404).json({ error: 'Reserva nao encontrada' });
+    }
+
+    if (reservation.donor_id !== req.userId && reservation.user_id !== req.userId) {
+      return res.status(403).json({ error: 'Sem permissao' });
+    }
+
+    if (!['pendente', 'confirmada'].includes(reservation.status)) {
+      return res.status(409).json({ error: 'Apenas reservas pendentes ou confirmadas podem ser completadas' });
+    }
+
+    reservation.status = 'concluida';
+    reservation.completed_at = new Date();
+    await reservation.save();
+
+    const item = await Item.findByPk(reservation.item_id);
+    item.status = 'concluido';
+    await item.save();
+
+    const existingHistory = await History.findOne({
+      where: {
+        item_id: reservation.item_id,
+        donor_id: reservation.donor_id,
+        receiver_id: reservation.user_id,
+        transaction_type: 'doacao'
+      }
+    });
+
+    if (!existingHistory) {
+      await History.create({
+        item_id: reservation.item_id,
+        donor_id: reservation.donor_id,
+        receiver_id: reservation.user_id,
+        transaction_type: 'doacao',
+        status: 'concluida'
+      });
+    }
+
+    return res.json({
+      message: 'Entrega concluida com sucesso',
+      reservation
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Cancelar reserva.
+router.put('/:id/cancel', auth, async (req, res) => {
+  try {
+    const reservation = await Reservation.findByPk(req.params.id);
+
+    if (!reservation) {
+      return res.status(404).json({ error: 'Reserva nao encontrada' });
+    }
+
+    if (reservation.donor_id !== req.userId && reservation.user_id !== req.userId) {
+      return res.status(403).json({ error: 'Sem permissao' });
+    }
+
+    if (['concluida', 'cancelada'].includes(reservation.status)) {
+      return res.status(409).json({ error: `Reserva ja esta ${reservation.status}` });
+    }
+
+    reservation.status = 'cancelada';
+    await reservation.save();
+
+    const item = await Item.findByPk(reservation.item_id);
+    if (item.status === 'reservado') {
+      item.status = 'disponivel';
+      await item.save();
+    }
+
+    return res.json({
+      message: 'Reserva cancelada com sucesso',
+      reservation
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 

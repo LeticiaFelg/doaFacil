@@ -1,32 +1,20 @@
-// src/middleware/auth.js
-// Middleware que valida o token JWT em rotas protegidas.
-
 const jwt = require('jsonwebtoken');
 
-/**
- * Uso: router.get('/rota-protegida', authMiddleware, handler)
- *
- * Adiciona req.user = { userId, email } quando o token é válido.
- */
-const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Token não fornecido.' });
-  }
-
-  const token = authHeader.split(' ')[1];
-
+const auth = (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { userId: decoded.userId, email: decoded.email };
-    next();
-  } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expirado. Faça login novamente.' });
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ error: 'Token não fornecido' });
     }
-    return res.status(401).json({ error: 'Token inválido.' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
+    req.userId = decoded.id;
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Token inválido ou expirado' });
   }
 };
 
-module.exports = authMiddleware;
+module.exports = auth;

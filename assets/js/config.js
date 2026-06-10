@@ -1,4 +1,4 @@
-/**
+﻿/**
  * assets/js/config.js
  *
  * Configuração central do frontend.
@@ -15,5 +15,6 @@
 // ↑ Troque pelo seu subdomínio Cloudflare após configurar o tunnel.
 //   Exemplo real: 'https://doafacil-api.meugrupo.workers.dev/api'
 //
-// Para testes locais (sem o tunnel), usando o backend Node em node/.env:
+// Para testes locais (sem o tunnel), usando o backend Node em backend/.env:
 window.API_BASE_URL = 'http://localhost:5000/api';
+

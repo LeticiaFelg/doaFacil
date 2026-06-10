@@ -1,4 +1,4 @@
-# Arquitetura DoaFacil
+﻿# Arquitetura DoaFacil
 
 Este documento registra as principais decisoes tecnicas do projeto. O README fica mais direto, com visao geral e instrucoes de uso; este arquivo explica como as partes se conectam e por que algumas escolhas foram feitas.
 
@@ -7,24 +7,24 @@ Este documento registra as principais decisoes tecnicas do projeto. O README fic
 O DoaFacil e uma aplicacao web dividida em duas camadas:
 
 - Frontend estatico em HTML, CSS, Bootstrap, jQuery e JavaScript.
-- Backend Node.js/Express em `node/`, com banco SQLite via Sequelize.
+- Backend Node.js/Express em `backend/`, com banco SQLite via Sequelize.
 
 Fluxo local atual:
 
 ```text
-Browser -> Frontend estatico em localhost:8000 -> API Express em localhost:5000 -> SQLite em node/doafacil.db
+Browser -> Frontend estatico em localhost:8000 -> API Express em localhost:5000 -> SQLite em backend/doafacil.db
 ```
 
 O frontend consome a API por `window.API_BASE_URL`, definido em `assets/js/config.js`.
 
-## Pasta backend/
+## Pasta backend_legacy/
 
-A pasta `backend/` existe no repositorio como uma estrutura antiga/paralela, com referencias a serverless, DynamoDB e outra organizacao de API.
+A pasta `backend_legacy/` existe no repositorio como uma estrutura antiga/paralela, com referencias a serverless, DynamoDB e outra organizacao de API.
 
 Ela nao e a API ativa usada pelas paginas atuais. A API em uso fica em:
 
 ```text
-node/
+backend/
 ```
 
 ## Frontend
@@ -53,18 +53,18 @@ Scripts principais:
 
 ## Backend Ativo
 
-A API ativa fica em `node/src`.
+A API ativa fica em `backend/src`.
 
 Principais arquivos:
 
 ```text
-node/src/server.js
-node/src/config/database.js
-node/src/models/
-node/src/routes/
-node/src/services/
-node/src/seed/demoData.js
-node/uploads/items/
+backend/src/server.js
+backend/src/config/database.js
+backend/src/models/
+backend/src/routes/
+backend/src/services/
+backend/src/seed/demoData.js
+backend/uploads/items/
 ```
 
 O servidor registra:
@@ -82,7 +82,7 @@ O servidor registra:
 O banco atual e SQLite:
 
 ```text
-node/doafacil.db
+backend/doafacil.db
 ```
 
 Ele e criado/sincronizado automaticamente por `sequelize.sync()` ao iniciar o backend. O arquivo `.db` nao deve ser versionado.
@@ -90,7 +90,7 @@ Ele e criado/sincronizado automaticamente por `sequelize.sync()` ao iniciar o ba
 Configuracao:
 
 ```text
-node/src/config/database.js
+backend/src/config/database.js
 ```
 
 ## Modelos
@@ -258,7 +258,7 @@ Isso evita revelar se um e-mail existe no sistema.
 
 ## E-mail
 
-Configuracao em `node/.env.example`:
+Configuracao em `backend/.env.example`:
 
 ```text
 EMAIL_PROVIDER=ethereal
@@ -281,7 +281,7 @@ Modos suportados:
 Implementacao local atual:
 
 ```text
-node/uploads/items
+backend/uploads/items
 ```
 
 Rotas de criacao e edicao de item aceitam `multipart/form-data` com ate 3 imagens.
@@ -312,14 +312,14 @@ Para imagens em producao, o caminho planejado e:
 4. Browser envia a imagem diretamente ao bucket.
 5. Backend salva a URL ou key da imagem no banco.
 
-Existe um bloco comentado em `node/src/routes/items.js` com esboco real de implementacao futura usando AWS SDK.
+Existe um bloco comentado em `backend/src/routes/items.js` com esboco real de implementacao futura usando AWS SDK.
 
 ## Seed Inicial
 
 O seed fica em:
 
 ```text
-node/src/seed/demoData.js
+backend/src/seed/demoData.js
 ```
 
 Ele cria ou atualiza:
@@ -354,7 +354,7 @@ Possivel evolucao:
 O projeto possui script:
 
 ```powershell
-cd node
+cd backend
 npm test
 ```
 
@@ -366,3 +366,4 @@ Proximos pontos planejados:
 - testes unitarios;
 - testes de integracao;
 - testes de sistema automatizados.
+
