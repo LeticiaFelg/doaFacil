@@ -145,12 +145,6 @@
           <button class="filter-chip" data-cat="brinquedos">🧸 Brinquedos</button>
           <button class="filter-chip" data-cat="outros">📦 Outros</button>
         </div>
-
-        <h4 style="margin-top:16px;">Disponibilidade</h4>
-        <div>
-          <button class="filter-chip active" data-status="available">✅ Disponível</button>
-          <button class="filter-chip" data-status="reserved">🕐 Reservado</button>
-        </div>
       </div>
     </aside>
 
@@ -441,11 +435,6 @@
         $(this).addClass('active');
         currentFilter = $(this).data('cat');
         loadItemsByCategory();
-      });
-
-      // ── Filtro de disponibilidade ───────────────────────────
-      $(document).on('click', '.filter-chip[data-status]', function () {
-        // Implementar quando conectar à API real
       });
 
       // ── Busca por texto ─────────────────────────────────────

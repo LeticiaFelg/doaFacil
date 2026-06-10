@@ -210,6 +210,33 @@
     outline: none;
     transition: border-color .2s, box-shadow .2s;
   }
+  .input-wrap input[type="password"],
+  .input-wrap input.password-visible {
+    padding-right: 44px;
+  }
+  .password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: color .2s, background-color .2s;
+  }
+  .password-toggle:hover,
+  .password-toggle:focus {
+    color: var(--green-deep);
+    background: var(--green-soft);
+    outline: none;
+  }
   .input-wrap input:focus,
   .input-wrap select:focus {
     border-color: var(--green-mid);
