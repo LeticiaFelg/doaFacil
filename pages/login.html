@@ -454,7 +454,7 @@
           showLoginSuccess('Conta criada com sucesso');
         })
         .fail((jqXHR) => {
-          const message = jqXHR.responseJSON?.error || 'NÃ£o foi possÃ­vel criar a conta.';
+          const message = jqXHR.responseJSON?.error || 'Não foi possível criar a conta.';
           showRegisterError(message, jqXHR.status === 409 ? 'reg-email' : null);
         });
     });

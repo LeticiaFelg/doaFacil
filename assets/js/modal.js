@@ -171,7 +171,7 @@ function initModal() {
         })
         .fail((jqXHR) => {
           if (jqXHR.status === 401) return;
-          alert(jqXHR.responseJSON?.error || 'NÃ£o foi possÃ­vel cadastrar o item.');
+          alert(jqXHR.responseJSON?.error || 'Não foi possível cadastrar o item.');
         });
       return;
     }
