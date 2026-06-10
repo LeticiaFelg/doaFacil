@@ -71,6 +71,9 @@
           <div class="input-wrap">
             <i class="bi bi-lock icon"></i>
             <input type="password" id="login-password" placeholder="••••••••" />
+            <button type="button" class="password-toggle" data-target="login-password" aria-label="Mostrar senha">
+              <i class="bi bi-eye"></i>
+            </button>
           </div>
         </div>
 
@@ -136,6 +139,9 @@
           <div class="input-wrap">
             <i class="bi bi-lock icon"></i>
             <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" />
+            <button type="button" class="password-toggle" data-target="reg-password" aria-label="Mostrar senha">
+              <i class="bi bi-eye"></i>
+            </button>
           </div>
         </div>
 
@@ -309,6 +315,22 @@
         $('#login-sucesso').hide();
       }, 4500);
     }
+
+    $(document).on('click', '.password-toggle', function () {
+      const $button = $(this);
+      const $input = $('#' + $button.data('target'));
+      const shouldShowPassword = $input.attr('type') === 'password';
+
+      $input
+        .attr('type', shouldShowPassword ? 'text' : 'password')
+        .toggleClass('password-visible', shouldShowPassword);
+
+      $button
+        .attr('aria-label', shouldShowPassword ? 'Ocultar senha' : 'Mostrar senha')
+        .find('i')
+        .toggleClass('bi-eye', !shouldShowPassword)
+        .toggleClass('bi-eye-slash', shouldShowPassword);
+    });
 
     const forgotPasswordMessage = 'Se o e-mail estiver cadastrado, enviaremos instruções para redefinir sua senha.';
 
