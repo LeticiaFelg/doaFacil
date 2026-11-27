@@ -577,21 +577,3 @@ const DoaFacilAPI = (() => {
 
 window.DoaFacilAPI = DoaFacilAPI;
 
-// ─── Banner de Modo Demo ────────────────────────────────────
-(function() {
-  if (window.location.pathname.includes('/pages/login.html')) {
-    return;
-  }
-
-  const banner = document.createElement('div');
-  banner.id = 'demo-mode-banner';
-  banner.innerHTML = `
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 16px; text-align: center; font-size: 13px; font-family: 'DM Sans', sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: relative; z-index: 9999;">
-      <strong>🎭 Modo Demo</strong> • Este site funciona sem backend real. Dados são salvos apenas na sua sessão do navegador.
-    </div>
-  `;
-  
-  window.addEventListener('DOMContentLoaded', () => {
-    document.body.insertBefore(banner, document.body.firstChild);
-  });
-})();
