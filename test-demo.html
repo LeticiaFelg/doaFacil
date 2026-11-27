@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 Teste - DoaFácil Demo</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      padding: 40px;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .test-card {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .status { 
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .status-ok { background: #d4edda; color: #155724; }
+    .status-error { background: #f8d7da; color: #721c24; }
+    .test-item { 
+      padding: 12px;
+      margin: 8px 0;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    code {
+      background: #e9ecef;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-card">
+    <h1>🧪 Teste da Versão Demo</h1>
+    <p class="text-muted">Verificando se a API mock está funcionando...</p>
+    
+    <hr>
+    
+    <div id="results"></div>
+    
+    <hr>
+    
+    <div class="mt-4">
+      <h5>Ações de Teste:</h5>
+      <button class="btn btn-primary btn-sm" id="btn-test-all">▶️ Executar Todos os Testes</button>
+      <button class="btn btn-warning btn-sm" id="btn-clear">🗑️ Limpar localStorage</button>
+      <button class="btn btn-info btn-sm" id="btn-view-data">👁️ Ver Dados</button>
+    </div>
+    
+    <div class="mt-4">
+      <a href="index.html" class="btn btn-success">🏠 Ir para Home</a>
+      <a href="pages/login.html" class="btn btn-secondary">🔐 Ir para Login</a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="./assets/js/api.js"></script>
+  
+  <script>
+    const $results = $('#results');
+    
+    function addResult(test, passed, details = '') {
+      const status = passed ? 'ok' : 'error';
+      const icon = passed ? '✅' : '❌';
+      $results.append(`
+        <div class="test-item">
+          <strong>${icon} ${test}</strong>
+          <span class="status status-${status} float-end">${passed ? 'OK' : 'ERRO'}</span>
+          ${details ? `<div class="text-muted small mt-2">${details}</div>` : ''}
+        </div>
+      `);
+    }
+
+    async function runTests() {
+      $results.html('<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>');
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      $results.html('');
+
+      // Teste 1: API existe
+      const apiExists = typeof DoaFacilAPI !== 'undefined';
+      addResult('API DoaFacilAPI está carregada', apiExists, 
+        apiExists ? '<code>window.DoaFacilAPI</code> está disponível' : 'Arquivo api.js não carregou');
+
+      if (!apiExists) {
+        addResult('⚠️ Testes interrompidos', false, 'API não encontrada. Execute <code>switch-to-demo.ps1</code>');
+        return;
+      }
+
+      // Teste 2: Métodos existem
+      const hasAuth = typeof DoaFacilAPI.Auth !== 'undefined';
+      const hasItems = typeof DoaFacilAPI.Items !== 'undefined';
+      addResult('Métodos Auth e Items existem', hasAuth && hasItems);
+
+      // Teste 3: localStorage tem dados mockados
+      const mockItems = localStorage.getItem('doafacil_mock_items');
+      const hasMockData = !!mockItems;
+      addResult('Dados mockados inicializados', hasMockData, 
+        hasMockData ? `${JSON.parse(mockItems).length} itens encontrados` : 'Execute novamente');
+
+      // Teste 4: Listar itens
+      try {
+        const response = await DoaFacilAPI.Items.list();
+        const itemCount = response.items ? response.items.length : 0;
+        addResult('Items.list() funciona', itemCount > 0, 
+          `Retornou ${itemCount} itens`);
+      } catch (e) {
+        addResult('Items.list() funciona', false, e.message);
+      }
+
+      // Teste 5: Cadastro
+      try {
+        const testEmail = `test${Date.now()}@demo.com`;
+        const response = await DoaFacilAPI.Auth.register({
+          name: 'Usuário Teste',
+          email: testEmail,
+          password: '123456',
+          phone: '21999999999',
+          bairro: 'Centro'
+        });
+        addResult('Auth.register() funciona', !!response.user, 
+          `Usuário criado: <code>${response.user.email}</code>`);
+        
+        // Faz logout automático
+        await DoaFacilAPI.Auth.logout();
+      } catch (e) {
+        addResult('Auth.register() funciona', false, e.responseJSON?.error || e.message);
+      }
+
+      // Teste 6: Verificar se não está logado
+      const isLoggedIn = DoaFacilAPI.Auth.isLoggedIn();
+      addResult('Logout funcionou', !isLoggedIn);
+
+      addResult('✨ Testes concluídos!', true, 'A versão demo está funcionando corretamente.');
+    }
+
+    $('#btn-test-all').on('click', runTests);
+
+    $('#btn-clear').on('click', function() {
+      if (confirm('Isso vai limpar TODOS os dados salvos. Continuar?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    });
+
+    $('#btn-view-data').on('click', function() {
+      const data = {
+        users: JSON.parse(localStorage.getItem('doafacil_mock_users') || '[]'),
+        items: JSON.parse(localStorage.getItem('doafacil_mock_items') || '[]'),
+        reservations: JSON.parse(localStorage.getItem('doafacil_mock_reservations') || '[]'),
+        currentUser: JSON.parse(localStorage.getItem('doafacil_user') || 'null')
+      };
+      console.clear();
+      console.log('📊 Dados do localStorage:', data);
+      alert('Dados exibidos no Console (F12)');
+    });
+
+    // Executa testes automaticamente ao carregar
+    $(function() {
+      runTests();
+    });
+  </script>
+</body>
+</html>

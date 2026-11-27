@@ -7,12 +7,14 @@
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple)](https://getbootstrap.com)
 [![Backend](https://img.shields.io/badge/API-Node.js%20%2B%20Express-brightgreen)](#stack-tecnologico)
 [![Database](https://img.shields.io/badge/Database-SQLite-lightgrey)](#stack-tecnologico)
+[![Demo](https://img.shields.io/badge/🎭-Versão_Demo_Disponível-blueviolet)](#versão-demo-github-pages)
 
 ---
 
 ## Sumario
 
 - [Sobre](#sobre)
+- [🎭 Versão Demo (GitHub Pages)](#versão-demo-github-pages)
 - [Features](#features)
 - [Stack Tecnologico](#stack-tecnologico)
 - [Estrutura Do Projeto](#estrutura-do-projeto)
@@ -28,6 +30,44 @@
 ## Sobre
 
 O **DoaFacil** e uma plataforma web para redistribuicao de bens materiais. A proposta e conectar pessoas que possuem itens em bom estado a pessoas que precisam desses itens, facilitando cadastro de doacoes, reservas, contato entre usuarios e acompanhamento de historico.
+
+---
+
+## 🎭 Versão Demo (GitHub Pages)
+
+**Novidade!** Agora você pode testar o DoaFácil sem precisar rodar o backend!
+
+Esta versão funciona 100% no navegador, salvando dados apenas no localStorage. Ideal para:
+- ✅ Portfólio
+- ✅ Demonstrações
+- ✅ Testes de interface
+- ✅ Apresentações
+
+### Como ativar:
+
+```powershell
+# Windows PowerShell
+.\switch-to-demo.ps1
+
+# Ou manualmente:
+# 1. Renomeie api.js para api-backend.js.bak
+# 2. Renomeie api-mock.js para api.js
+```
+
+### Deploy no GitHub Pages:
+
+1. Ative a versão demo (comando acima)
+2. Faça commit: `git add . && git commit -m "Versão demo"`
+3. Push: `git push`
+4. Configure GitHub Pages nas Settings do repo
+
+📖 **[Guia completo de deploy →](GUIA_GITHUB_PAGES.md)**
+
+### Para voltar ao backend:
+
+```powershell
+.\switch-to-backend.ps1
+```
 
 A plataforma busca fortalecer:
 
