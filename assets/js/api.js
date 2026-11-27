@@ -3,14 +3,14 @@
  * Versão Client-Side Mock - DoaFácil (GitHub Pages)
  * 
  * API simulada que funciona 100% no navegador sem backend.
- * Usa localStorage para persistir dados durante a sessão.
+ * Usa sessionStorage para dados temporários (perde ao fechar navegador).
  */
 
 const DoaFacilAPI = (() => {
   
   // ─── Inicializa dados mockados ─────────────────────────────
   function _initMockData() {
-    if (!localStorage.getItem('doafacil_mock_items')) {
+    if (!sessionStorage.getItem('doafacil_mock_items')) {
       const mockItems = [
         { id: 1, title: 'Sofá de 3 lugares', category: 'moveis', images: ['./assets/img/items/item1.jpg'], condition: 'bom', description: 'Sofá em tecido cinza, leve desgaste nos braços.', donor_id: 999, donor: { name: 'Maria S.', location: 'Copacabana, RJ', verified: true }, status: 'disponivel', created_at: new Date().toISOString() },
         { id: 2, title: 'Guarda-roupa 4 portas', category: 'moveis', images: ['./assets/img/items/item2.jpg'], condition: 'bom', description: 'Madeira clara, espelho interno, sem trincas.', donor_id: 998, donor: { name: 'João P.', location: 'Botafogo, RJ', verified: false }, status: 'disponivel', created_at: new Date().toISOString() },
@@ -25,15 +25,15 @@ const DoaFacilAPI = (() => {
         { id: 11, title: 'Geladeira 280L', category: 'eletro', images: ['./assets/img/items/item11.jpg'], condition: 'usado', description: 'Funciona bem, pequenas marcas externas.', donor_id: 989, donor: { name: 'Hugo S.', location: 'Bangu', verified: true }, status: 'disponivel', created_at: new Date().toISOString() },
         { id: 12, title: 'Mochila escolar', category: 'escolar', images: ['./assets/img/items/item12.jpg'], condition: 'otimo', description: 'Nova, nunca usada, tamanho médio.', donor_id: 988, donor: { name: 'Olivia C.', location: 'Santa Cruz', verified: false }, status: 'disponivel', created_at: new Date().toISOString() }
       ];
-      localStorage.setItem('doafacil_mock_items', JSON.stringify(mockItems));
+      sessionStorage.setItem('doafacil_mock_items', JSON.stringify(mockItems));
     }
 
-    if (!localStorage.getItem('doafacil_mock_users')) {
-      localStorage.setItem('doafacil_mock_users', JSON.stringify([]));
+    if (!sessionStorage.getItem('doafacil_mock_users')) {
+      sessionStorage.setItem('doafacil_mock_users', JSON.stringify([]));
     }
 
-    if (!localStorage.getItem('doafacil_mock_reservations')) {
-      localStorage.setItem('doafacil_mock_reservations', JSON.stringify([]));
+    if (!sessionStorage.getItem('doafacil_mock_reservations')) {
+      sessionStorage.setItem('doafacil_mock_reservations', JSON.stringify([]));
     }
   }
 
@@ -58,31 +58,31 @@ const DoaFacilAPI = (() => {
   }
 
   function _getUsers() {
-    return JSON.parse(localStorage.getItem('doafacil_mock_users') || '[]');
+    return JSON.parse(sessionStorage.getItem('doafacil_mock_users') || '[]');
   }
 
   function _saveUsers(users) {
-    localStorage.setItem('doafacil_mock_users', JSON.stringify(users));
+    sessionStorage.setItem('doafacil_mock_users', JSON.stringify(users));
   }
 
   function _getItems() {
-    return JSON.parse(localStorage.getItem('doafacil_mock_items') || '[]');
+    return JSON.parse(sessionStorage.getItem('doafacil_mock_items') || '[]');
   }
 
   function _saveItems(items) {
-    localStorage.setItem('doafacil_mock_items', JSON.stringify(items));
+    sessionStorage.setItem('doafacil_mock_items', JSON.stringify(items));
   }
 
   function _getReservations() {
-    return JSON.parse(localStorage.getItem('doafacil_mock_reservations') || '[]');
+    return JSON.parse(sessionStorage.getItem('doafacil_mock_reservations') || '[]');
   }
 
   function _saveReservations(reservations) {
-    localStorage.setItem('doafacil_mock_reservations', JSON.stringify(reservations));
+    sessionStorage.setItem('doafacil_mock_reservations', JSON.stringify(reservations));
   }
 
   function _getCurrentUser() {
-    const userStr = localStorage.getItem('doafacil_user');
+    const userStr = sessionStorage.getItem('doafacil_user');
     return userStr ? JSON.parse(userStr) : null;
   }
 
@@ -122,10 +122,10 @@ const DoaFacilAPI = (() => {
       _saveUsers(users);
 
       const token = 'mock_token_' + newUser.id;
-      localStorage.setItem('doafacil_token', token);
-      localStorage.setItem('doafacil_user', JSON.stringify(newUser));
-      localStorage.setItem('doafacil_current_user', JSON.stringify(newUser));
-      localStorage.setItem('doafacil_fallback_session', 'true');
+      sessionStorage.setItem('doafacil_token', token);
+      sessionStorage.setItem('doafacil_user', JSON.stringify(newUser));
+      sessionStorage.setItem('doafacil_current_user', JSON.stringify(newUser));
+      sessionStorage.setItem('doafacil_fallback_session', 'true');
 
       return _mockResponse({ user: newUser, token });
     },
@@ -139,10 +139,10 @@ const DoaFacilAPI = (() => {
       }
 
       const token = 'mock_token_' + user.id;
-      localStorage.setItem('doafacil_token', token);
-      localStorage.setItem('doafacil_user', JSON.stringify(user));
-      localStorage.setItem('doafacil_current_user', JSON.stringify(user));
-      localStorage.setItem('doafacil_fallback_session', 'true');
+      sessionStorage.setItem('doafacil_token', token);
+      sessionStorage.setItem('doafacil_user', JSON.stringify(user));
+      sessionStorage.setItem('doafacil_current_user', JSON.stringify(user));
+      sessionStorage.setItem('doafacil_fallback_session', 'true');
 
       return _mockResponse({ user, token });
     },
@@ -156,19 +156,19 @@ const DoaFacilAPI = (() => {
     },
 
     logout() {
-      localStorage.removeItem('doafacil_token');
-      localStorage.removeItem('doafacil_user');
-      localStorage.removeItem('doafacil_current_user');
-      localStorage.removeItem('doafacil_fallback_session');
+      sessionStorage.removeItem('doafacil_token');
+      sessionStorage.removeItem('doafacil_user');
+      sessionStorage.removeItem('doafacil_current_user');
+      sessionStorage.removeItem('doafacil_fallback_session');
       return _mockResponse({ message: 'Logout realizado' });
     },
 
     isLoggedIn() {
-      return !!localStorage.getItem('doafacil_token');
+      return !!sessionStorage.getItem('doafacil_token');
     },
 
     isFallbackSession() {
-      return localStorage.getItem('doafacil_fallback_session') === 'true';
+      return sessionStorage.getItem('doafacil_fallback_session') === 'true';
     },
 
     hasRealSession() {
@@ -176,7 +176,7 @@ const DoaFacilAPI = (() => {
     },
 
     getCurrentUser() {
-      const raw = localStorage.getItem('doafacil_user');
+      const raw = sessionStorage.getItem('doafacil_user');
       return raw ? JSON.parse(raw) : null;
     },
 
@@ -190,10 +190,10 @@ const DoaFacilAPI = (() => {
       const filtered = users.filter(u => u.id !== currentUser.id);
       _saveUsers(filtered);
 
-      localStorage.removeItem('doafacil_token');
-      localStorage.removeItem('doafacil_user');
-      localStorage.removeItem('doafacil_current_user');
-      localStorage.removeItem('doafacil_fallback_session');
+      sessionStorage.removeItem('doafacil_token');
+      sessionStorage.removeItem('doafacil_user');
+      sessionStorage.removeItem('doafacil_current_user');
+      sessionStorage.removeItem('doafacil_fallback_session');
 
       return _mockResponse({ message: 'Conta excluída' });
     },
@@ -235,8 +235,8 @@ const DoaFacilAPI = (() => {
       users[index] = updatedUser;
       _saveUsers(users);
 
-      localStorage.setItem('doafacil_user', JSON.stringify(updatedUser));
-      localStorage.setItem('doafacil_current_user', JSON.stringify(updatedUser));
+      sessionStorage.setItem('doafacil_user', JSON.stringify(updatedUser));
+      sessionStorage.setItem('doafacil_current_user', JSON.stringify(updatedUser));
 
       return _mockResponse({ user: updatedUser });
     },
@@ -576,4 +576,5 @@ const DoaFacilAPI = (() => {
 })();
 
 window.DoaFacilAPI = DoaFacilAPI;
+
 
