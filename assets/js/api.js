@@ -89,39 +89,21 @@ const DoaFacilAPI = (() => {
   // ── Auth ────────────────────────────────────────────────────
   const Auth = {
     register(data) {
-      const users = _getUsers();
-      
-      if (users.find(u => u.email.toLowerCase() === data.email.toLowerCase())) {
-        return _mockError('Email já cadastrado', 409);
-      }
-
-      if (!data.name || data.name.length < 3) {
-        return _mockError('Nome deve ter pelo menos 3 caracteres');
-      }
-      if (!data.email || !data.email.includes('@')) {
-        return _mockError('Email inválido');
-      }
-      if (!data.password || data.password.length < 6) {
-        return _mockError('Senha deve ter pelo menos 6 caracteres');
-      }
-
+      // Aceita qualquer dado - apenas salva o nome fornecido
       const newUser = {
         id: Date.now(),
-        name: data.name,
-        email: data.email,
+        name: data.name || 'Usuário',
+        email: data.email || 'usuario@demo.com',
         phone: data.phone || '',
         cpf: data.cpf || '',
-        bairro: data.bairro || '',
-        address: data.address || data.bairro || '',
+        bairro: data.bairro || 'Rio de Janeiro',
+        address: data.address || data.bairro || 'Rio de Janeiro',
         profileType: data.profileType || 'pessoa',
         verified: false,
         created_at: new Date().toISOString()
       };
 
-      users.push(newUser);
-      _saveUsers(users);
-
-      const token = 'mock_token_' + newUser.id;
+      const token = 'demo_token_' + newUser.id;
       sessionStorage.setItem('doafacil_token', token);
       sessionStorage.setItem('doafacil_user', JSON.stringify(newUser));
       sessionStorage.setItem('doafacil_current_user', JSON.stringify(newUser));
@@ -131,14 +113,26 @@ const DoaFacilAPI = (() => {
     },
 
     login(credentials) {
-      const users = _getUsers();
-      const user = users.find(u => u.email.toLowerCase() === credentials.email.toLowerCase());
+      // Aceita qualquer email/senha - apenas para demonstração
+      const email = credentials.email || 'usuario@demo.com';
+      
+      // Cria usuário temporário com apenas o nome do email
+      const userName = email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1);
+      
+      const user = {
+        id: Date.now(),
+        name: userName,
+        email: email,
+        phone: '',
+        cpf: '',
+        bairro: 'Rio de Janeiro',
+        address: 'Rio de Janeiro',
+        profileType: 'pessoa',
+        verified: false,
+        created_at: new Date().toISOString()
+      };
 
-      if (!user) {
-        return _mockError('Email ou senha incorretos', 401);
-      }
-
-      const token = 'mock_token_' + user.id;
+      const token = 'demo_token_' + user.id;
       sessionStorage.setItem('doafacil_token', token);
       sessionStorage.setItem('doafacil_user', JSON.stringify(user));
       sessionStorage.setItem('doafacil_current_user', JSON.stringify(user));
